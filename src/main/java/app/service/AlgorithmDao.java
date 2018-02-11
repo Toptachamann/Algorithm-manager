@@ -1,6 +1,7 @@
 package app.service;
 
 import app.auxiliary.Connector;
+import app.auxiliary.Util;
 import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
@@ -88,7 +89,7 @@ public class AlgorithmDao implements AlgorithmService {
     if (id instanceof Integer) {
       query += id;
     } else {
-      query += fixForString(id.toString());
+      query += Util.fixForString(id.toString());
     }
     System.out.println(query);
     Statement statement = connection.createStatement();
@@ -105,14 +106,14 @@ public class AlgorithmDao implements AlgorithmService {
             + " Set "
             + column
             + " = "
-            + fixForString(value)
+            + Util.fixForString(value)
             + " WHERE "
             + primaryKeyColumn
             + " = ";
     if (id instanceof Integer) {
       query += id;
     } else {
-      query += fixForString(id.toString());
+      query += Util.fixForString(id.toString());
     }
     Statement statement = connection.createStatement();
     statement.executeUpdate(query);
@@ -132,20 +133,20 @@ public class AlgorithmDao implements AlgorithmService {
             + "WHERE 1 = 1";
     String whereClause = "";
     if (!StringUtils.isBlank(algorithm)) {
-      algorithm = fixForLike(algorithm);
-      whereClause += " AND algorithm LIKE '%" + algorithm.trim() + "%'";
+      algorithm = Util.fixForLike(algorithm);
+      whereClause += " AND algorithm LIKE " + algorithm.trim();
     }
     if (!StringUtils.isBlank(complexity)) {
-      complexity = fixForLike(complexity);
-      whereClause += " AND complexity LIKE '%" + complexity.trim() + "%'";
+      complexity = Util.fixForLike(complexity);
+      whereClause += " AND complexity LIKE " + complexity.trim();
     }
     if (!StringUtils.isBlank(designParadigm)) {
-      designParadigm = fixForLike(designParadigm);
-      whereClause += " AND paradigm LIKE '%" + designParadigm.trim() + "%'";
+      designParadigm = Util.fixForLike(designParadigm);
+      whereClause += " AND paradigm LIKE " + designParadigm.trim();
     }
     if (!StringUtils.isBlank(fieldOfStudy)) {
-      fieldOfStudy = fixForLike(fieldOfStudy);
-      whereClause += " AND field LIKE '%" + fieldOfStudy.trim() + "%'";
+      fieldOfStudy = Util.fixForLike(fieldOfStudy);
+      whereClause += " AND field LIKE " + fieldOfStudy.trim();
     }
     if (whereClause.length() == 0) {
       return getAlgorithms();
@@ -157,19 +158,6 @@ public class AlgorithmDao implements AlgorithmService {
     }
   }
 
-  private String fixForString(String str) {
-    str = str.replace("\\", "\\\\");
-    str = str.replace("'", "\\'");
-    return "'" + str + "'";
-  }
-
-  private String fixForLike(String str) {
-    str = str.replace("\\", "\\\\");
-    str = str.replace("'", "\\'");
-    str = str.replace("%", "\\%");
-    str = str.replace("_", "\\_");
-    return "'" + str + "'";
-  }
 
   private List<Algorithm> algorithmFromResultSet(ResultSet set) throws SQLException {
     List<Algorithm> algorithms = new ArrayList<>();
@@ -221,7 +209,7 @@ public class AlgorithmDao implements AlgorithmService {
     insertAlgorithm.setInt(3, paradigm.getId());
     insertAlgorithm.setInt(4, field.getId());
     insertAlgorithm.executeUpdate();
-    int id = getLastId();
+    int id = Util.getLastId(connection);
     return new Algorithm(id, algoName, algoComplexity, designParadigm, fieldOfStudy);
   }
 
@@ -275,10 +263,5 @@ public class AlgorithmDao implements AlgorithmService {
     }
   }
 
-  private int getLastId() throws SQLException {
-    Statement query = connection.createStatement();
-    ResultSet set = query.executeQuery("SELECT LAST_INSERT_ID()");
-    set.next();
-    return set.getInt(1);
-  }
+
 }

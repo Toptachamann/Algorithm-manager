@@ -49,8 +49,8 @@ CREATE TABLE book (
 );
 CREATE TABLE author (
     author_id INT(10) NOT NULL AUTO_INCREMENT,
-    firstName VARCHAR(50) NOT NULL,
-    lastName VARCHAR(50) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     PRIMARY KEY (author_id)
 );
 CREATE TABLE algorithm_reference (
@@ -78,20 +78,20 @@ CREATE TABLE textbook (
 INSERT INTO book (title, edition)  VALUES ('Introduction to algorithms', 3);
 INSERT INTO book (title, volume, edition) VALUES('The art of computer programming', 1, 3), 
 ('The art of computer programming', 2, 3),  ('The art of computer programming', 3, 2);
-INSERT INTO author (firstName, lastName) VALUES ('Donald', 'Knuth'), ('Thomas', 'Cormen'),
+INSERT INTO author (first_name, last_name) VALUES ('Donald', 'Knuth'), ('Thomas', 'Cormen'), 
 ('Charles', 'Leiserson'), ('Ronald', 'Rivest'), ('Clifford', 'Stein');     
 INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUES (2, 1), (3, 1), (4, 1), (1, 2), (1, 3), (1, 4), (1, 5);  
 INSERT INTO design_paradigm (paradigm) VALUES ('Divide and conquer'), ('Dynamic programming'), ('Greedy strategy');  
 INSERT INTO field_of_study (name) VALUES ('graph theory'), ('searching'), ('sorting'), 
 ('number theory'), ('linear programming'), ('matrix operations'), ('multithreaded algorithms'), 
 ('computational geametry'), ('string algorithms'), ('approximation algorithms'), ('data structures');
-insert into field_of_study (name) values ('combinatorial optimization');
-insert into area_of_use (name, description) values ('Electrical circuit design', 'Optiman interconnection of electrical pins with minimum amount of wire');
-insert into algorithm (name, complexity, algo_field_id, algo_paradigm_id) values ('Kruscal algorithm', 'O(Eα(V))', 12, 3); 
-insert into algorithm (name, complexity, algo_field_id, algo_paradigm_id) values ('Prim algorithm', 'O(Elg(V))', 12, 3); 
-insert into algorithm (name, complexity, algo_field_id, algo_paradigm_id) values ('Dijkstra algorithm', 'O(Elg(V))', 12, 3); 
-insert into algorithm_application (app_algorithm_id, app_area_id) values (1, 1), (2, 1);  
-  
+INSERT INTO field_of_study (name) VALUES ('combinatorial optimization');
+INSERT INTO area_of_use (name, description) VALUES ('Electrical circuit design', 'Optiman interconnection of electrical pins with minimum amount of wire');
+INSERT INTO algorithm (name, complexity, algo_field_id, algo_paradigm_id) VALUES ('Kruscal algorithm', 'O(Eα(V))', 12, 3); 
+INSERT INTO algorithm (name, complexity, algo_field_id, algo_paradigm_id) VALUES ('Prim algorithm', 'O(Elg(V))', 12, 3); 
+INSERT INTO algorithm (name, complexity, algo_field_id, algo_paradigm_id) VALUES ('Dijkstra algorithm', 'O(Elg(V))', 12, 3); 
+INSERT INTO algorithm_application (app_algorithm_id, app_area_id) VALUES (1, 1), (2, 1);  
+INSERT INTO algorithm (algorithm, complexity, algo_paradigm_id, algo_field_id) VALUE ('Dijkstra\'s algorithm', 'E*lgV', 3, 1);
   
 SHOW TABLES;
 SHOW CREATE TABLE algorithm;
@@ -108,8 +108,16 @@ ALTER TABLE algorithm ADD COLUMN algo_field_id INT(10) NOT NULL AFTER complexity
 ALTER TABLE algorithm ADD CONSTRAINT algo_field_id FOREIGN KEY(algo_field_id) REFERENCES field_of_study(field_id);
 ALTER TABLE design_paradigm ADD COLUMN description VARCHAR(255) DEFAULT NULL;
 ALTER TABLE implementation_type ADD COLUMN description VARCHAR(255) DEFAULT NULL;
-alter table algorithm drop column algo_implementation_id;
-drop table implementation_type;
+ALTER TABLE algorithm DROP COLUMN algo_implementation_id;
+DROP TABLE implementation_type;
+ALTER TABLE algorithm CHANGE algorithm_name algorithm VARCHAR(100) NOT NULL;
+ALTER TABLE field_of_study CHANGE field_name field VARCHAR(100) NOT NULL; 
+ALTER TABLE area_of_use CHANGE name area VARCHAR(50) NOT NULL;
+ALTER TABLE design_paradigm ADD UNIQUE (paradigm);
+ALTER TABLE field_of_study ADD UNIQUE (field);
+ALTER TABLE algorithm ADD UNIQUE (algorithm);
+ALTER TABLE algorithm_reference CHANGE ref_textbook_id ref_book_id INT NOT NULL;
+ALTER TABLE algorithm_reference ADD CONSTRAINT `fk_book_reference` FOREIGN KEY (ref_book_id) REFERENCES book(book_id); 
 
 DESCRIBE design_paradigm;
 DESCRIBE algorithm;
@@ -117,12 +125,13 @@ DESCRIBE algorithm_reference;
 DESCRIBE book;
 SELECT * FROM book;
 SELECT * FROM author;
-SELECT * FROM design_paradigm;
-select * from field_of_study;
-select * from algorithm;
-select * from area_of_use;
+SELECT * FROM design_paradigm;	
+SELECT * FROM field_of_study;
+SELECT * FROM algorithm;
+SELECT * FROM area_of_use;
+SELECT * FROM textbook;
 SELECT 
-    title, volume, edition, firstName, lastName
+    title, volume, edition, first_name, last_name
 FROM
     ((book
     INNER JOIN textbook ON book_id = txtbk_book_id)
@@ -135,6 +144,59 @@ FROM
     ((algorithm
     INNER JOIN algorithm_application ON algorithm_id = app_algorithm_id)
     INNER JOIN area_of_use ON app_area_id = area_id);
+SELECT LAST_INSERT_ID();
+
+SELECT 
+    algorithm_id, algorithm, complexity, paradigm, algo_paradigm_id, field, algo_field_id
+FROM
+    ((algorithm
+    INNER JOIN design_paradigm ON algo_paradigm_id = paradigm_id)
+    INNER JOIN field_of_study ON algo_field_id = field_id)
+WHERE 1 = 1 && paradigm = 'Dynamic programming';
+
+SELECT 
+    book_id, title, volume, edition, author_id, first_name, last_name
+FROM
+    ((book
+    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN author ON txtbk_author_id = author_id)
+    WHERE CONCAT(first_name, last_name) LIKE '%homas%' OR CONCAT(first_name, last_name) LIKE '%les%'
+ORDER BY book_id, author_id; 
+
+SELECT DISTINCT
+    book_id
+FROM
+    ((book
+    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN author ON txtbk_author_id = author_id)
+WHERE
+     CONCAT(first_name, last_name) LIKE '%Thomas%';
+
+SELECT DISTINCT
+    book_id
+FROM
+    ((book
+    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN author ON txtbk_author_id = author_id)
+WHERE
+    1 = 1
+        AND (1 != 1
+        OR CONCAT(first_name, last_name) LIKE '%Thomas%');
+
+SELECT 
+    book_id, title, volume, edition, author_id, first_name, last_name
+FROM
+    ((book
+    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN author ON txtbk_author_id = author_id)
+ORDER BY book_id, author_id
+
+
+
+
+
+
+
 
 
 

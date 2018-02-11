@@ -45,7 +45,6 @@ public class Controller {
   @FXML private Button addFieldButton;
   @FXML private Button addAlgorithmButton;
   @FXML private Button searchAlgorithmButton;
-  @FXML private Tab textbookTab;
 
   private List<String> designParadigms;
   private List<String> fieldsOfStudy;
@@ -54,12 +53,7 @@ public class Controller {
   private NewItemBoxController newField;
 
   public void initialize() {
-    try {
-      controller = new TextbookController();
-      textbookTab.setContent(controller);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+
     initTableView();
 
     try {
@@ -386,8 +380,7 @@ public class Controller {
 
   private void loadAllAlgorithms(AlgorithmService service) throws SQLException {
     List<Algorithm> algorithms = service.getAlgorithms();
-    ObservableList<Algorithm> observableList = FXCollections.observableArrayList(algorithms);
-    algorithmTableView.setItems(observableList);
+    algorithmTableView.setItems(FXCollections.observableArrayList(algorithms));
   }
 
   private void loadDesignParadigms(AlgorithmService service) throws SQLException {

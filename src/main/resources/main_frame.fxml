@@ -98,7 +98,7 @@
           </Tab>
           <Tab fx:id="textbookTab" text="Textbooks">
               <content>
-                  <!--<fx:include fx:id="textbookAnchorPane" source="textbook_tab.fxml"/>-->
+                  <fx:include fx:id="textbookAnchorPane" source="textbook_tab.fxml"/>
               </content>
           </Tab>
         </tabs>

@@ -18,13 +18,6 @@ public class TextbookDao implements TextbookService {
 
   private PreparedStatement allTextbooks;
 
-  public static TextbookDao getDao() throws SQLException {
-    if(textbookDao == null){
-      textbookDao = new TextbookDao();
-    }
-    return textbookDao;
-  }
-
   private TextbookDao() throws SQLException {
     connection = Connector.getConnection();
 
@@ -36,15 +29,22 @@ public class TextbookDao implements TextbookService {
                 + "    ((book\n"
                 + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
                 + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
-                + "ORDER BY book_id; ");
+                + "ORDER BY book_id, author_id; ");
+  }
+
+  public static TextbookDao getDao() throws SQLException {
+    if (textbookDao == null) {
+      textbookDao = new TextbookDao();
+    }
+    return textbookDao;
   }
 
   @Override
   public List<Textbook> getTextbooks() throws SQLException {
     ResultSet set = allTextbooks.executeQuery();
     List<Textbook> textbooks = new ArrayList<>();
-    set.next();
-    for (; set.isAfterLast(); ) {
+    System.out.println(set.next());
+    for (; !set.isAfterLast(); ) {
       Textbook textbook =
           new Textbook(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4));
       int id = set.getInt(1);
@@ -54,6 +54,7 @@ public class TextbookDao implements TextbookService {
           break;
         }
       }
+      System.out.println(textbook.getAuthors());
       textbooks.add(textbook);
     }
     return textbooks;

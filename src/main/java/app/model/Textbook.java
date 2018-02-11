@@ -1,5 +1,6 @@
 package app.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Textbook {
@@ -25,6 +26,7 @@ public class Textbook {
     this.title = title;
     this.volume = volume;
     this.edition = edition;
+    authors = new ArrayList<>();
   }
 
   public void addAuthor(Author author) {

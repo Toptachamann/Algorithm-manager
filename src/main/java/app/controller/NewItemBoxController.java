@@ -60,7 +60,6 @@ public class NewItemBoxController extends AnchorPane {
   }
 
   public void initialize() {
-    System.out.println("Initialize is called on new item box");
     addButton.setOnAction(
         e -> {
           retrievedName = nameTextField.getText();

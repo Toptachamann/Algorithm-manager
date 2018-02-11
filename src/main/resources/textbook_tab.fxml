@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.*?>
+<fx:root type="javafx.scene.layout.AnchorPane" fx:id="textbookRootPane" prefHeight="850.0" prefWidth="1300.0"
+         xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <SplitPane fx:id="textbookSplitPane" dividerPositions="0.5" layoutX="270.0" layoutY="100.0"
+                   orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <items>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <TableView fx:id="textbookTableView" prefHeight="377.0" prefWidth="1133.0"
+                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <columns>
+                                <TableColumn fx:id="bookIdColumn" prefWidth="134.99996948242188" text="book_id"/>
+                                <TableColumn fx:id="titleColumn" minWidth="0.0" prefWidth="244.00003051757812"
+                                             text="title"/>
+                                <TableColumn fx:id="volumeColumn" prefWidth="274.0" text="volume"/>
+                                <TableColumn fx:id="editionColumn" prefWidth="281.0" text="edition"/>
+                                <TableColumn fx:id="authorColumn" prefWidth="362.0" text="authors"/>
+                            </columns>
+                        </TableView>
+                    </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0"/>
+            </items>
+        </SplitPane>
+    </children>
+</fx:root>

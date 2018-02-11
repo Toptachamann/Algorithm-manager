@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab.iml" filepath="$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab_main.iml" group="Pure_JDBC_Lab" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Pure_JDBC_Lab_test.iml" group="Pure_JDBC_Lab" />
+    </modules>
+  </component>
+</project>

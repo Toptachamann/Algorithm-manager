@@ -5,6 +5,7 @@ import app.auxiliary.Util;
 import app.model.Author;
 import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,6 +25,8 @@ public class TextbookDao implements TextbookService {
   private PreparedStatement insertBook;
   private PreparedStatement insertAuthor;
   private PreparedStatement insertBookAuthor;
+
+  private final BasicFormatterImpl formatter = new BasicFormatterImpl();
 
   private TextbookDao() throws SQLException {
     connection = Connector.getConnection();
@@ -57,9 +60,9 @@ public class TextbookDao implements TextbookService {
       throws SQLException {
     title = title.trim();
     insertBook.setString(1, title);
-    if(volume == null){
+    if (volume == null) {
       insertBook.setNull(2, Types.INTEGER);
-    }else{
+    } else {
       insertBook.setInt(2, volume);
     }
     insertBook.setInt(3, edition);
@@ -69,7 +72,7 @@ public class TextbookDao implements TextbookService {
 
     String[] authorsArr = authors.split(",\\s*");
     List<Integer> authorIds = new ArrayList<>();
-    for(String authorFullName : authorsArr){
+    for (String authorFullName : authorsArr) {
       String[] fullName = authorFullName.split("\\s+");
       insertAuthor.setString(1, fullName[0]);
       insertAuthor.setString(2, fullName[1]);
@@ -78,7 +81,7 @@ public class TextbookDao implements TextbookService {
       textbook.addAuthor(new Author(authorId, fullName[0], fullName[1]));
       authorIds.add(authorId);
     }
-    for(int authorId : authorIds){
+    for (int authorId : authorIds) {
       insertBookAuthor.setInt(1, id);
       insertBookAuthor.setInt(2, authorId);
       insertBookAuthor.executeUpdate();
@@ -96,22 +99,24 @@ public class TextbookDao implements TextbookService {
       String title, Integer edition, Integer volume, String authors) throws SQLException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtils.isBlank(title)) {
-      builder.append(" AND title LIKE ").append(Util.fixForLike(title.trim()));
+      builder.append(" AND b1.title LIKE ").append(Util.fixForLike(title.trim()));
     }
     if (edition != null && edition > 0) {
-      builder.append(" AND edition = ").append(edition);
+      builder.append(" AND b1.edition = ").append(edition);
     }
     if (volume != null && volume > 0) {
-      builder.append(" AND volume = ").append(volume);
+      builder.append(" AND b1.volume = ").append(volume);
     }
     if (!StringUtils.isBlank(authors)) {
       String[] authorsArr = authors.split(", ");
       if (authorsArr.length > 0) {
         builder.append(" AND ( 1 != 1");
         for (String author : authorsArr) {
-          builder.append(" OR CONCAT(first_name, last_name) LIKE ").append(Util.fixForLike(author));
+          builder
+              .append(" OR CONCAT(a1.first_name, a1.last_name) LIKE ")
+              .append(Util.fixForLike(author));
         }
-        builder.append(")");
+        builder.append("))");
       }
     }
     if (builder.length() == 0) {
@@ -119,19 +124,33 @@ public class TextbookDao implements TextbookService {
     } else {
       builder.insert(
           0,
-          "SELECT DISTINCT book_id from ((book"
-              + " INNER JOIN textbook ON book_id = txtbk_book_id)"
-              + " INNER JOIN author ON txtbk_author_id = author_id) "
-              + " WHERE 1 = 1 ");
-      builder.append(" ORDER by book_id");
+          new StringBuilder()
+              .append("SELECT \n")
+              .append("    b2.book_id,\n")
+              .append("    b2.title,\n")
+              .append("    b2.volume,\n")
+              .append("    b2.edition,\n")
+              .append("    a2.author_id,\n")
+              .append("    a2.first_name,\n")
+              .append("    a2.last_name\n")
+              .append("FROM\n")
+              .append("    ((SELECT \n")
+              .append("        b1.book_id, b1.title, b1.edition, b1.volume\n")
+              .append("    FROM\n")
+              .append("        ((author AS a1\n")
+              .append("    INNER JOIN textbook AS t1 ON a1.author_id = t1.txtbk_author_id)\n")
+              .append("    INNER JOIN book AS b1 ON t1.txtbk_book_id = b1.book_id)")
+              .append(" WHERE 1 = 1 ")
+              .toString());
+      builder
+          .append(" AS b2\n")
+          .append("    INNER JOIN textbook AS t2 ON b2.book_id = t2.txtbk_book_id)\n")
+          .append("    INNER JOIN author AS a2 ON a2.author_id = t2.txtbk_author_id\n")
+          .append("    order by b2.book_id, a2.author_id");
       Statement statement = connection.createStatement();
-      System.out.println(builder.toString());
+      System.out.println(formatter.format(builder.toString()));
       ResultSet set = statement.executeQuery(builder.toString());
-      List<Integer> ids = new ArrayList<>();
-      for (; set.next(); ) {
-        ids.add(set.getInt(1));
-      }
-      return getByIds(ids);
+      return textbooksFromSet(set);
     }
   }
 
@@ -151,27 +170,5 @@ public class TextbookDao implements TextbookService {
       textbooks.add(textbook);
     }
     return textbooks;
-  }
-
-  private List<Textbook> getByIds(List<Integer> ids) throws SQLException {
-    if (ids.size() == 0) {
-      return new ArrayList<>();
-    } else {
-      StringBuilder builder =
-          new StringBuilder(
-              "SELECT \n"
-                  + "    book_id, title, volume, edition, author_id, first_name, last_name\n"
-                  + "FROM\n"
-                  + "    ((book\n"
-                  + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
-                  + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
-                  + "where book_id in (");
-      for (Integer id : ids) {
-        builder.append(id).append(", ");
-      }
-      builder.setCharAt(builder.length() - 2, ')');
-      builder.append("ORDER BY book_id, author_id");
-      return textbooksFromSet(connection.createStatement().executeQuery(builder.toString()));
-    }
   }
 }

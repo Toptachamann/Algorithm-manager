@@ -35,9 +35,26 @@
                                     </TableView>
                                  </children>
                               </AnchorPane>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                              <AnchorPane>
                                  <children>
+                                    <TextField fx:id="algoNameTextField" layoutX="450.0" layoutY="40.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter algorithm name">
+                                       <font>
+                                          <Font name="Arial" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <TextField fx:id="algoComplexityTextField" layoutX="450.0" layoutY="110.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter complexity">
+                                       <font>
+                                          <Font name="Arial" size="16.0" />
+                                       </font>
+                                    </TextField>
+                                    <ComboBox id="filter-combo-box" fx:id="designParadigmCB" layoutX="450.0" layoutY="180.0" maxHeight="35.0" maxWidth="350.0" minHeight="35.0" minWidth="350.0" prefHeight="35.0" prefWidth="350.0" promptText="Select design paradigm" stylesheets="@javafx.css" />
+                                    <ComboBox fx:id="fieldOfStudyCB" layoutX="450.0" layoutY="250.0" prefHeight="35.0" prefWidth="350.0" promptText="Select field of study" />
                                     <Label layoutX="260.0" layoutY="40.0" prefHeight="35.0" prefWidth="140.0" text="Algorithm name">
+                                       <font>
+                                          <Font name="Arial Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="260.0" layoutY="110.0" prefHeight="35.0" prefWidth="140.0" text="Complexity">
                                        <font>
                                           <Font name="Arial Bold" size="16.0" />
                                        </font>
@@ -47,28 +64,21 @@
                                           <Font name="Arial Bold" size="16.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="260.0" layoutY="250.0" prefHeight="35.0" prefWidth="140.0" text="Field of study">
+                                    <Label layoutX="250.0" layoutY="250.0" prefHeight="35.0" prefWidth="140.0" text="Field of study">
                                        <font>
                                           <Font name="Arial Bold" size="16.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="algoNameTextField" layoutX="450.0" layoutY="40.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter algorithm name">
-                                       <font>
-                                          <Font name="Arial" size="16.0" />
-                                       </font>
-                                    </TextField>
-                                    <ComboBox id="filter-combo-box" fx:id="designParadigmCB" layoutX="450.0" layoutY="180.0" maxHeight="35.0" maxWidth="350.0" minHeight="35.0" minWidth="350.0" prefHeight="35.0" prefWidth="350.0" promptText="Select design paradigm" stylesheets="@javafx.css" />
-                                    <ComboBox fx:id="fieldOfStudyCB" layoutX="450.0" layoutY="250.0" prefHeight="35.0" prefWidth="350.0" promptText="Select field of study" />
-                                    <Label layoutX="260.0" layoutY="110.0" prefHeight="35.0" prefWidth="140.0" text="Complexity">
+                                    <Button fx:id="searchAlgorithmButton" layoutX="350.0" layoutY="330.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Search algorithm">
                                        <font>
                                           <Font name="Arial Bold" size="16.0" />
                                        </font>
-                                    </Label>
-                                    <TextField fx:id="algoComplexityTextField" layoutX="450.0" layoutY="110.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter complexity">
+                                    </Button>
+                                    <Button fx:id="addAlgorithmButton" layoutX="700.0" layoutY="330.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Add algorithm">
                                        <font>
-                                          <Font name="Arial" size="16.0" />
+                                          <Font name="Arial Bold" size="16.0" />
                                        </font>
-                                    </TextField>
+                                    </Button>
                                     <Button fx:id="addParadigmButton" layoutX="850.0" layoutY="180.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Add design paradigm">
                                        <font>
                                           <Font name="Arial Bold" size="16.0" />
@@ -79,17 +89,8 @@
                                           <Font name="Arial Bold" size="16.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="searchAlgorithmButton" layoutX="350.0" layoutY="340.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Search algorithm">
-                                       <font>
-                                          <Font name="Arial Bold" size="16.0" />
-                                       </font>
-                                    </Button>
-                                    <Button fx:id="addAlgorithmButton" layoutX="700.0" layoutY="340.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Add algorithm">
-                                       <font>
-                                          <Font name="Arial Bold" size="16.0" />
-                                       </font>
-                                    </Button>
-                                 </children></AnchorPane>
+                                 </children>
+                              </AnchorPane>
                           </items>
                         </SplitPane>
                      </children>

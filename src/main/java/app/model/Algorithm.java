@@ -1,12 +1,12 @@
 package app.model;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "algorithm")
@@ -22,12 +22,14 @@ public class Algorithm {
   @Column(name = "complexity")
   private String complexity;
 
-  private String designParadigm;
+  @Transient
+  private DesignParadigm designParadigm;
 
-  private String fieldOfStudy;
+  @Transient
+  private FieldOfStudy fieldOfStudy;
 
   public Algorithm(
-      int id, String name, String complexity, String designParadigm, String fieldOfStudy) {
+      int id, String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy) {
     this.id = id;
     this.name = name;
     this.complexity = complexity;
@@ -61,19 +63,19 @@ public class Algorithm {
     this.complexity = complexity;
   }
 
-  public String getFieldOfStudy() {
-    return fieldOfStudy;
-  }
-
-  public void setFieldOfStudy(String fieldOfStudy) {
-    this.fieldOfStudy = fieldOfStudy;
-  }
-
-  public String getDesignParadigm() {
+  public DesignParadigm getDesignParadigm() {
     return designParadigm;
   }
 
-  public void setDesignParadigm(String designParadigm) {
+  public void setDesignParadigm(DesignParadigm designParadigm) {
     this.designParadigm = designParadigm;
+  }
+
+  public FieldOfStudy getFieldOfStudy() {
+    return fieldOfStudy;
+  }
+
+  public void setFieldOfStudy(FieldOfStudy fieldOfStudy) {
+    this.fieldOfStudy = fieldOfStudy;
   }
 }

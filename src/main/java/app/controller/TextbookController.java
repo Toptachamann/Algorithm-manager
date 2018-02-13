@@ -1,8 +1,9 @@
 package app.controller;
 
+import app.dao.TextbookDao;
+import app.dao.TextbookDaoImpl;
 import app.model.Author;
 import app.model.Textbook;
-import app.service.TextbookDao;
 import app.service.TextbookService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -13,17 +14,17 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TextbookController extends AnchorPane {
-  private final String numberPattern = "^\\s*[0-9]+\\s*$";
-  private final String authorsPattern = "^(\\s*[a-zA-Z]+\\s*[a-zA-Z]+(,\\s+(?!$)|\\s*$))+";
+
+  private TextbookService service;
 
   @FXML private TableView<Textbook> textbookTableView;
   @FXML private TableColumn<Textbook, Integer> bookIdColumn;
@@ -39,6 +40,8 @@ public class TextbookController extends AnchorPane {
   @FXML private Button addBookButton;
 
   public void initialize() {
+    service = new TextbookService();
+
     initTable();
     editionCB.setVisibleRowCount(5);
     editionCB.getItems().addAll("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
@@ -47,58 +50,29 @@ public class TextbookController extends AnchorPane {
     searchBookButton.setOnAction(
         e -> {
           try {
-            String title = titleTextField.getText();
-            Integer edition = null;
-            Integer volume = null;
-            String authors = authorsTextField.getText();
-
-            String editionStr = editionCB.getSelectionModel().getSelectedItem();
-            if (editionStr != null) {
-              if (editionStr.matches(numberPattern)) {
-                edition = Integer.valueOf(editionStr);
-              } else {
-                // TODO: alert
-              }
-            }
-            String volumeStr = volumeCB.getSelectionModel().getSelectedItem();
-            if (volumeStr != null) {
-              if (volumeStr.matches(numberPattern)) {
-                volume = Integer.valueOf(volumeStr);
-              } else {
-                // TODO alert
-              }
-            }
-
-            List<Textbook> textbooks = getService().searchTextbook(title, edition, volume, authors);
+            List<Textbook> textbooks =
+                service.searchTextbooks(
+                    titleTextField.getText(),
+                    editionCB.getSelectionModel().getSelectedItem(),
+                    volumeCB.getSelectionModel().getSelectedItem(),
+                    authorsTextField.getText());
             textbookTableView.setItems(FXCollections.observableArrayList(textbooks));
           } catch (SQLException e1) {
+            // TODO alert
             e1.printStackTrace();
           }
         });
     addBookButton.setOnAction(
         e -> {
           try {
-            String title = titleTextField.getText();
-            String editionStr = editionCB.getSelectionModel().getSelectedItem();
-            String volumeStr = volumeCB.getSelectionModel().getSelectedItem();
-            String authors = authorsTextField.getText();
-            if (StringUtils.isBlank(title)) {
-              // TODO alert
-            }
-            if (StringUtils.isBlank(editionStr) || editionStr.matches(numberPattern)) {
-              // TODO alert
-            }
-            if (!StringUtils.isBlank(volumeStr) && !volumeStr.matches(numberPattern)) {
-              // TODO alert
-            }
-            if (StringUtils.isBlank(authors) || !authors.matches(authorsPattern)) {
-              // TODO alert
-            }
-            Integer edition = StringUtils.isBlank(volumeStr) ? null : Integer.valueOf(editionStr);
-            Integer volume = Integer.valueOf(volumeStr);
             textbookTableView
                 .getItems()
-                .add(getService().insertTextbook(title, edition, volume, authors));
+                .add(
+                    service.createTextbook(
+                        titleTextField.getText(),
+                        editionCB.getSelectionModel().getSelectedItem(),
+                        volumeCB.getSelectionModel().getSelectedItem(),
+                        authorsTextField.getText()));
           } catch (SQLException e1) {
             e1.printStackTrace();
           }
@@ -146,15 +120,27 @@ public class TextbookController extends AnchorPane {
             };
           }
         });
-
+    textbookTableView.setOnKeyReleased(
+        e -> {
+          if (e.getCode().equals(KeyCode.DELETE)) {
+            Textbook textbook = textbookTableView.getSelectionModel().getSelectedItem();
+            if (textbook != null) {
+              // TODO: ask to confirm
+              try {
+                service.deleteTextbook(textbook);
+                textbookTableView.getItems().remove(textbook);
+              } catch (SQLException e1) {
+                // TODO alert
+                e1.printStackTrace();
+              }
+            }
+          }
+        });
     try {
-      textbookTableView.setItems(FXCollections.observableArrayList(getService().getTextbooks()));
+      textbookTableView.setItems(FXCollections.observableArrayList(service.getAllTextbooks()));
     } catch (SQLException e) {
+      //TODO alert
       e.printStackTrace();
     }
-  }
-
-  private TextbookService getService() throws SQLException {
-    return TextbookDao.getDao();
   }
 }

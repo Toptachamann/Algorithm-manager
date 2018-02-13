@@ -1,16 +1,15 @@
 package app.controller;
 
+import app.dao.AlgorithmDao;
+import app.dao.AlgorithmDaoImpl;
 import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
-import app.service.AlgorithmDao;
-import app.service.AlgorithmService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -20,7 +19,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -219,11 +217,8 @@ public class Controller {
     algoDesignParadigm.setCellFactory(TextFieldTableCell.forTableColumn());
     algoFieldOfStudy.setCellFactory(TextFieldTableCell.forTableColumn());
 
-    algorithmTableView.setOnKeyPressed(
+    algorithmTableView.setOnKeyReleased(
         e -> {
-          /*System.out.println(e.getText());
-          System.out.println(e.getText().length());
-          e.getCode().is*/
           Algorithm selectedRow = algorithmTableView.getSelectionModel().getSelectedItem();
           if (selectedRow != null) {
             if (e.getCode().equals(KeyCode.DELETE)) {
@@ -374,16 +369,16 @@ public class Controller {
     }
   }
 
-  private AlgorithmService getAlgorithmService() throws SQLException {
-    return AlgorithmDao.getDao();
+  private AlgorithmDao getAlgorithmService() throws SQLException {
+    return AlgorithmDaoImpl.getDao();
   }
 
-  private void loadAllAlgorithms(AlgorithmService service) throws SQLException {
-    List<Algorithm> algorithms = service.getAlgorithms();
+  private void loadAllAlgorithms(AlgorithmDao service) throws SQLException {
+    List<Algorithm> algorithms = service.getAllAlgorithms();
     algorithmTableView.setItems(FXCollections.observableArrayList(algorithms));
   }
 
-  private void loadDesignParadigms(AlgorithmService service) throws SQLException {
+  private void loadDesignParadigms(AlgorithmDao service) throws SQLException {
     List<DesignParadigm> paradigms = service.getDesignParadigms();
     ObservableList<String> designParadigms = FXCollections.observableArrayList();
     paradigms.forEach(paradigm -> designParadigms.add(paradigm.getParadigm()));
@@ -391,7 +386,7 @@ public class Controller {
     designParadigmCB.setItems(FXCollections.observableArrayList(designParadigms));
   }
 
-  private void loadFieldsOfStudy(AlgorithmService service) throws SQLException {
+  private void loadFieldsOfStudy(AlgorithmDao service) throws SQLException {
     List<FieldOfStudy> fields = service.getFieldsOfStudy();
     fieldsOfStudy = new ArrayList<>();
     fields.forEach(field -> fieldsOfStudy.add(field.getField()));

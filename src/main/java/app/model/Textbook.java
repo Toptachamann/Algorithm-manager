@@ -1,18 +1,21 @@
 package app.model;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Textbook {
-  private int id;
+  private Integer id;
   private String title;
-  private int volume;
-  private int edition;
+  private Integer volume;
+  private Integer edition;
   private List<Author> authors;
 
   public Textbook() {}
 
-  public Textbook(int id, String title, int volume, int edition, List<Author> authors) {
+  public Textbook(
+      Integer id, String title, @Nullable Integer volume, Integer edition, List<Author> authors) {
 
     this.id = id;
     this.title = title;
@@ -21,7 +24,7 @@ public class Textbook {
     this.authors = authors;
   }
 
-  public Textbook(int id, String title, int volume, int edition) {
+  public Textbook(Integer id, String title, @Nullable Integer volume, Integer edition) {
     this.id = id;
     this.title = title;
     this.volume = volume;
@@ -33,11 +36,11 @@ public class Textbook {
     this.authors.add(author);
   }
 
-  public int getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 
@@ -49,19 +52,19 @@ public class Textbook {
     this.title = title;
   }
 
-  public int getVolume() {
+  public Integer getVolume() {
     return volume;
   }
 
-  public void setVolume(int volume) {
+  public void setVolume(Integer volume) {
     this.volume = volume;
   }
 
-  public int getEdition() {
+  public Integer getEdition() {
     return edition;
   }
 
-  public void setEdition(int edition) {
+  public void setEdition(Integer edition) {
     this.edition = edition;
   }
 

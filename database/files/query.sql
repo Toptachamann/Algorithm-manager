@@ -1,4 +1,6 @@
 USE algorithms;
+show tables;
+
 CREATE TABLE design_paradigm (
     paradigm_id INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     paradigm VARCHAR(50) NOT NULL
@@ -189,12 +191,37 @@ FROM
     ((book
     INNER JOIN textbook ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id)
-ORDER BY book_id, author_id
+ORDER BY book_id, author_id;
+
+SELECT 
+    b2.book_id,
+    b2.title,
+    b2.volume,
+    b2.edition,
+    a2.author_id,
+    a2.first_name,
+    a2.last_name
+FROM
+    ((SELECT 
+        b1.book_id, b1.title, b1.edition, b1.volume
+    FROM
+        ((author AS a1
+    INNER JOIN textbook AS t1 ON a1.author_id = t1.txtbk_author_id)
+    INNER JOIN book AS b1 ON t1.txtbk_book_id = b1.book_id)
+    WHERE
+        CONCAT(a1.first_name, a1.first_name) LIKE '%Charles%') AS b2
+    INNER JOIN textbook AS t2 ON b2.book_id = t2.txtbk_book_id)
+    INNER JOIN author AS a2 ON a2.author_id = t2.txtbk_author_id
+    order by b2.book_id, a2.author_id;
 
 
+select * from book as b inner join textbook as t on b.book_id = t.txtbk_book_id;
 
-
-
+SELECT algorithm_id, algorithm, complexity, paradigm_id, paradigm, dp.description, field_id, field, fos.description
+FROM
+    ((algorithm
+    INNER JOIN design_paradigm as dp ON algo_paradigm_id = paradigm_id)
+    INNER JOIN field_of_study as fos ON algo_field_id = field_id)
 
 
 

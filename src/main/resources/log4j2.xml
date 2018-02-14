@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="warn" name="AlgorithmManager" schema="">
+    <Properties>
+        <Property name="baseDir">logs</Property>
+        <Property name="trace_file_name">pure_jdbc_lab.log</Property>
+        <Property name="error_file_name">pure_jdbc_lab.err</Property>
+        <Property name="project_name">pure_jdbc_lab</Property>
+    </Properties>
+    <Appenders>
+        <Console name="STDOUT">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+        </Console>
+        <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="500 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+        <RollingFile name="ERROR" fileName="${baseDir}/${error_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="All">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+        <Logger name="app.dao.AlgorithmDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.ParadigmDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.FieldDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.TextbookDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.AuthorDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.service.AlgorithmServiceImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.service.TextbookServiceImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.controller.AlgorithmController" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.controller.TextbookController" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+    </Loggers>
+</Configuration>

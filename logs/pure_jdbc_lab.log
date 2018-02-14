@@ -1,0 +1,13 @@
+19:49:16,334  {JavaFX Application Thread} [TRACE] app.controller.AlgorithmController - Committing changes, new value app.model.DesignParadigm@278
+19:49:16,336  {JavaFX Application Thread} [TRACE] app.service.AlgorithmServiceImpl - Updating design paradigm app.model.DesignParadigm@278, new name is Greedy strategy
+19:49:16,342  {JavaFX Application Thread} [INFO] app.dao.ParadigmDaoImpl - com.mysql.jdbc.JDBC4PreparedStatement@69516056: UPDATE design_paradigm SET paradigm = 'Greedy strategy' WHERE paradigm_id = 3
+19:51:31,073  {JavaFX Application Thread} [TRACE] app.controller.AlgorithmController - Committing changes, new value app.model.DesignParadigm@278
+19:51:31,075  {JavaFX Application Thread} [TRACE] app.service.AlgorithmServiceImpl - Updating design paradigm app.model.DesignParadigm@278, new name is Greedy strategyy
+19:51:31,082  {JavaFX Application Thread} [INFO] app.dao.ParadigmDaoImpl - com.mysql.jdbc.JDBC4PreparedStatement@63c058c5: UPDATE design_paradigm SET paradigm = 'Greedy strategyy' WHERE paradigm_id = 3
+19:51:41,257  {JavaFX Application Thread} [TRACE] app.controller.AlgorithmController - Committing changes, new value app.model.DesignParadigm@278
+19:51:41,258  {JavaFX Application Thread} [TRACE] app.service.AlgorithmServiceImpl - Updating design paradigm app.model.DesignParadigm@278, new name is Greedy strategy
+19:51:41,258  {JavaFX Application Thread} [INFO] app.dao.ParadigmDaoImpl - com.mysql.jdbc.JDBC4PreparedStatement@63c058c5: UPDATE design_paradigm SET paradigm = 'Greedy strategy' WHERE paradigm_id = 3
+20:12:14,805  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET algorithm = 'Kruskal\'s algorithmmmm' WHERE algorithm_id = 1
+20:14:17,870  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET algorithm = 'Kruskal\'s algorithm' WHERE algorithm_id = 1
+20:14:21,950  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET complexity = 'O(E*α(V))))))' WHERE algorithm_id = 1
+20:14:30,958  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET complexity = 'O(E*α(V))' WHERE algorithm_id = 1

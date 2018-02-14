@@ -1,7 +1,5 @@
 package app.controller;
 
-import app.dao.TextbookDao;
-import app.dao.TextbookDaoImpl;
 import app.model.Author;
 import app.model.Textbook;
 import app.service.TextbookService;
@@ -17,14 +15,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TextbookController extends AnchorPane {
+  private static final Logger logger = LogManager.getLogger(TextbookController.class);
 
-  private TextbookService service;
+
+  private TextbookService textbookService;
 
   @FXML private TableView<Textbook> textbookTableView;
   @FXML private TableColumn<Textbook, Integer> bookIdColumn;
@@ -39,9 +41,11 @@ public class TextbookController extends AnchorPane {
   @FXML private Button searchBookButton;
   @FXML private Button addBookButton;
 
-  public void initialize() {
-    service = new TextbookService();
+  public TextbookController(TextbookService textbookService) {
+    this.textbookService = textbookService;
+  }
 
+  public void initialize() {
     initTable();
     editionCB.setVisibleRowCount(5);
     editionCB.getItems().addAll("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
@@ -51,7 +55,7 @@ public class TextbookController extends AnchorPane {
         e -> {
           try {
             List<Textbook> textbooks =
-                service.searchTextbooks(
+                textbookService.searchTextbooks(
                     titleTextField.getText(),
                     editionCB.getSelectionModel().getSelectedItem(),
                     volumeCB.getSelectionModel().getSelectedItem(),
@@ -68,7 +72,7 @@ public class TextbookController extends AnchorPane {
             textbookTableView
                 .getItems()
                 .add(
-                    service.createTextbook(
+                    textbookService.createTextbook(
                         titleTextField.getText(),
                         editionCB.getSelectionModel().getSelectedItem(),
                         volumeCB.getSelectionModel().getSelectedItem(),
@@ -127,7 +131,7 @@ public class TextbookController extends AnchorPane {
             if (textbook != null) {
               // TODO: ask to confirm
               try {
-                service.deleteTextbook(textbook);
+                textbookService.deleteTextbook(textbook);
                 textbookTableView.getItems().remove(textbook);
               } catch (SQLException e1) {
                 // TODO alert
@@ -137,9 +141,10 @@ public class TextbookController extends AnchorPane {
           }
         });
     try {
-      textbookTableView.setItems(FXCollections.observableArrayList(service.getAllTextbooks()));
+      textbookTableView.setItems(
+          FXCollections.observableArrayList(textbookService.getAllTextbooks()));
     } catch (SQLException e) {
-      //TODO alert
+      // TODO alert
       e.printStackTrace();
     }
   }

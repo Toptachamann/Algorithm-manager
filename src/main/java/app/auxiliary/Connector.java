@@ -1,9 +1,10 @@
 package app.auxiliary;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import org.jetbrains.annotations.NotNull;
 
 public class Connector {
   private static Connection connection;

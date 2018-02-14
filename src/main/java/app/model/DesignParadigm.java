@@ -1,5 +1,8 @@
 package app.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +24,11 @@ public class DesignParadigm {
   @Column(name = "description")
   private String description;
 
+  public DesignParadigm(int id, String paradigm) {
+    this.id = id;
+    this.paradigm = paradigm;
+  }
+
   public DesignParadigm(int id, String paradigm, String description) {
     this.id = id;
     this.paradigm = paradigm;
@@ -28,6 +36,22 @@ public class DesignParadigm {
   }
 
   public DesignParadigm() {}
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    DesignParadigm that = (DesignParadigm) o;
+
+    return new EqualsBuilder().append(id, that.id).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+  }
 
   public int getId() {
     return id;

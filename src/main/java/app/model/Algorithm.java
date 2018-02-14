@@ -1,5 +1,8 @@
 package app.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,14 +25,16 @@ public class Algorithm {
   @Column(name = "complexity")
   private String complexity;
 
-  @Transient
-  private DesignParadigm designParadigm;
+  @Transient private DesignParadigm designParadigm;
 
-  @Transient
-  private FieldOfStudy fieldOfStudy;
+  @Transient private FieldOfStudy fieldOfStudy;
 
   public Algorithm(
-      int id, String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy) {
+      int id,
+      String name,
+      String complexity,
+      DesignParadigm designParadigm,
+      FieldOfStudy fieldOfStudy) {
     this.id = id;
     this.name = name;
     this.complexity = complexity;
@@ -77,5 +82,21 @@ public class Algorithm {
 
   public void setFieldOfStudy(FieldOfStudy fieldOfStudy) {
     this.fieldOfStudy = fieldOfStudy;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    Algorithm algorithm = (Algorithm) o;
+
+    return new EqualsBuilder().append(id, algorithm.id).isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37).append(id).toHashCode();
   }
 }

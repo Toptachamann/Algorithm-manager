@@ -6,6 +6,8 @@ import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,8 +16,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AlgorithmDaoImpl implements AlgorithmDao {
+  private static final Logger logger = LogManager.getLogger(AlgorithmDaoImpl.class);
 
   private Connection connection;
   private PreparedStatement insertAlgorithm;
@@ -59,27 +63,27 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   }
 
   @Override
-  public Algorithm getAlgorithmByName(String name) throws SQLException {
+  public Optional<Algorithm> getAlgorithmByName(String name) throws SQLException {
     getAlgoByName.setString(1, name);
-    List<Algorithm> algorithms = algorithmFromResultSet(getAlgoByName.executeQuery());
-    if (algorithms.size() > 0) {
-      return algorithms.get(0);
+    List<Algorithm> list = algorithmFromResultSet(getAlgoByName.executeQuery());
+    if (list.size() == 1) {
+      return Optional.of(list.get(0));
     } else {
-      return null;
+      return Optional.empty();
     }
   }
 
   @Override
   public List<Algorithm> searchAlgorithm(
-      String algorithm, String complexity, String designParadigm, String fieldOfStudy)
+      String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException {
     String query =
         "SELECT \n"
-            + "    algorithm_id, algorithm, complexity, paradigm, field\n"
+            + "    algorithm_id, algorithm, complexity, paradigm_id, paradigm, dp.description, field_id, field, fos.description\n"
             + "FROM\n"
             + "    ((algorithm\n"
-            + "    INNER JOIN design_paradigm ON algo_paradigm_id = paradigm_id)\n"
-            + "    INNER JOIN field_of_study ON algo_field_id = field_id)\n"
+            + "    INNER JOIN design_paradigm as dp ON algo_paradigm_id = paradigm_id)\n"
+            + "    INNER JOIN field_of_study as fos ON algo_field_id = field_id)\n"
             + "WHERE 1 = 1";
     String whereClause = "";
     if (!StringUtils.isBlank(algorithm)) {
@@ -90,13 +94,11 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
       complexity = Util.fixForLike(complexity);
       whereClause += " AND complexity LIKE " + complexity.trim();
     }
-    if (!StringUtils.isBlank(designParadigm)) {
-      designParadigm = Util.fixForLike(designParadigm);
-      whereClause += " AND paradigm LIKE " + designParadigm.trim();
+    if (designParadigm != null) {
+      whereClause += " AND paradigm_id = " + designParadigm.getId();
     }
-    if (!StringUtils.isBlank(fieldOfStudy)) {
-      fieldOfStudy = Util.fixForLike(fieldOfStudy);
-      whereClause += " AND field LIKE " + fieldOfStudy.trim();
+    if (fieldOfStudy != null) {
+      whereClause += " AND field_id = " + fieldOfStudy.getId();
     }
     if (whereClause.length() == 0) {
       return getAllAlgorithms();
@@ -115,14 +117,15 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   }
 
   @Override
-  public void updateEntry(String column, String value, int id)
-      throws SQLException {
+  public void updateEntry(String column, String value, int id) throws SQLException {
     String query =
         "UPDATE algorithm SET "
             + column
             + " = "
             + Util.fixForString(value)
-            + " WHERE algorithm_id = " + id;
+            + " WHERE algorithm_id = "
+            + id;
+    logger.trace(query);
     Statement statement = connection.createStatement();
     statement.executeUpdate(query);
   }
@@ -136,11 +139,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
           new FieldOfStudy(set.getInt(7), set.getString(8), set.getString(9));
       algorithms.add(
           new Algorithm(
-              set.getInt(1),
-              set.getString(2),
-              set.getString(3),
-              designParadigm,
-              fieldOfStudy));
+              set.getInt(1), set.getString(2), set.getString(3), designParadigm, fieldOfStudy));
     }
     return algorithms;
   }

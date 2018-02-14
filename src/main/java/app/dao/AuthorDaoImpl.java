@@ -3,12 +3,17 @@ package app.dao;
 import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.Author;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class AuthorDaoImpl implements AuthorDao {
+  private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
+
+
   private Connection connection;
 
   private PreparedStatement insertAuthor;

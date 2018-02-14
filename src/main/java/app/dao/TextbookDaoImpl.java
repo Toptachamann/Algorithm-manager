@@ -5,6 +5,8 @@ import app.auxiliary.Util;
 import app.model.Author;
 import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TextbookDaoImpl implements TextbookDao {
-  private final BasicFormatterImpl formatter = new BasicFormatterImpl();
+  private static final Logger logger = LogManager.getLogger(TextbookDaoImpl.class);
+
   private Connection connection;
   private PreparedStatement allTextbooks;
   private PreparedStatement insertBook;
@@ -92,9 +95,10 @@ public class TextbookDaoImpl implements TextbookDao {
               .append(" OR CONCAT(a1.first_name, a1.last_name) LIKE ")
               .append(Util.fixForLike(author));
         }
-        builder.append("))");
+        builder.append(")");
       }
     }
+    builder.append(")");
     if (builder.length() == 0) {
       return getTextbooks();
     } else {
@@ -124,7 +128,7 @@ public class TextbookDaoImpl implements TextbookDao {
           .append("    INNER JOIN author AS a2 ON a2.author_id = t2.txtbk_author_id\n")
           .append("    order by b2.book_id, a2.author_id");
       Statement statement = connection.createStatement();
-      System.out.println(formatter.format(builder.toString()));
+      logger.info(Util.format(builder.toString()));
       return textbooksFromSet(statement.executeQuery(builder.toString()));
     }
   }
@@ -150,7 +154,9 @@ public class TextbookDaoImpl implements TextbookDao {
 
   private List<Textbook> textbooksFromSet(ResultSet set) throws SQLException {
     List<Textbook> textbooks = new ArrayList<>();
-    set.next();
+    if (!set.next()) {
+      return new ArrayList<>();
+    }
     for (; !set.isAfterLast(); ) {
       Textbook textbook =
           new Textbook(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4));

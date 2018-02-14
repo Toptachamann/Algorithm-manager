@@ -6,6 +6,7 @@ import app.model.FieldOfStudy;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface AlgorithmDao {
   Algorithm insertAlgorithm(
@@ -14,11 +15,11 @@ public interface AlgorithmDao {
 
   List<Algorithm> getAllAlgorithms() throws SQLException;
 
-  Algorithm getAlgorithmByName(String name) throws SQLException;
+  Optional<Algorithm> getAlgorithmByName(String name) throws SQLException;
 
   List<Algorithm> searchAlgorithm(
-      String algorithm, String complexity, String designParadigm, String fieldOfStudy)
-  throws SQLException;
+      String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
+      throws SQLException;
 
   void updateEntry(String column, String value, int id) throws SQLException;
 

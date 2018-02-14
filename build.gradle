@@ -11,6 +11,10 @@ repositories {
 }
 
 dependencies {
+  compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+  // https://mvnrepository.com/artifact/org.springframework/spring-context
+  compile group: 'org.springframework', name: 'spring-context', version: '5.0.3.RELEASE'
   // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
   compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.12.Final'
   // https://mvnrepository.com/artifact/mysql/mysql-connector-java

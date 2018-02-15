@@ -33,6 +33,10 @@
         <Root level="All">
             <AppenderRef ref="STDOUT"/>
         </Root>
+        <Logger name="org.springframework" aditivity="false">
+            <AppenderRef ref="ALL" level="OFF"/>
+            <AppenderRef ref="ERROR" level="OFF"/>
+        </Logger>
         <Logger name="app.dao.AlgorithmDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>

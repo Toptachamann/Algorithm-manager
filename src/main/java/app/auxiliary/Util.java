@@ -36,6 +36,6 @@ public class Util {
 
   public static String format(PreparedStatement statement){
     String str = statement.toString();
-    return formatter.format(str.substring(str.indexOf(":"), str.length() - 1));
+    return formatter.format(str.substring(str.indexOf(":") + 1, str.length()));
   }
 }

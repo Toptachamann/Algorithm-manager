@@ -11,3 +11,285 @@
 20:14:17,870  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET algorithm = 'Kruskal\'s algorithm' WHERE algorithm_id = 1
 20:14:21,950  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET complexity = 'O(E*α(V))))))' WHERE algorithm_id = 1
 20:14:30,958  {JavaFX Application Thread} [TRACE] app.dao.AlgorithmDaoImpl - UPDATE algorithm SET complexity = 'O(E*α(V))' WHERE algorithm_id = 1
+12:15:04,930 [INFO] {JavaFX Application Thread} ClassPathXmlApplicationContext --- Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@4c702fee: startup date [Thu Feb 15 12:15:04 EET 2018]; root of context hierarchy
+12:15:05,000 [INFO] {JavaFX Application Thread} XmlBeanDefinitionReader --- Loading XML bean definitions from class path resource [META-INF/beans.xml]
+13:27:39,679 [DEBUG] {JavaFX Application Thread} TextbookDaoImpl --- 
+    : SELECT
+        book_id,
+        title,
+        volume,
+        edition,
+        author_id,
+        first_name,
+        last_name 
+    FROM
+        ((book     
+    INNER JOIN
+        textbook 
+            ON book_id = txtbk_book_id
+        )     
+INNER JOIN
+    author 
+        ON txtbk_author_id = author_id
+    ) 
+ORDER BY
+book_id,
+author_i
+13:27:39,685 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    : SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+13:27:39,687 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    : SELECT
+        * 
+    FROM
+        design_paradig
+13:27:39,687 [DEBUG] {JavaFX Application Thread} FieldDaoImpl --- 
+    : SELECT
+        * 
+    FROM
+        field_of_stud
+13:55:16,679 [DEBUG] {JavaFX Application Thread} TextbookDaoImpl --- 
+    SELECT
+        book_id,
+        title,
+        volume,
+        edition,
+        author_id,
+        first_name,
+        last_name 
+    FROM
+        ((book     
+    INNER JOIN
+        textbook 
+            ON book_id = txtbk_book_id
+        )     
+INNER JOIN
+    author 
+        ON txtbk_author_id = author_id
+    ) 
+ORDER BY
+book_id,
+author_id
+13:55:16,686 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    )
+13:55:16,688 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    SELECT
+        * 
+    FROM
+        design_paradigm
+13:55:16,689 [DEBUG] {JavaFX Application Thread} FieldDaoImpl --- 
+    SELECT
+        * 
+    FROM
+        field_of_study
+13:55:50,967 [TRACE] {JavaFX Application Thread} AlgorithmController --- Committing changes, new value app.model.DesignParadigm@278
+13:55:50,969 [TRACE] {JavaFX Application Thread} AlgorithmServiceImpl --- Updating design paradigm app.model.DesignParadigm@278, new name is Greedy strategyy
+13:55:50,977 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    UPDATE
+        design_paradigm 
+    SET
+        paradigm = 'Greedy strategyy' 
+    WHERE
+        paradigm_id = 3
+13:55:56,689 [TRACE] {JavaFX Application Thread} AlgorithmController --- Committing changes, new value app.model.DesignParadigm@278
+13:55:56,689 [TRACE] {JavaFX Application Thread} AlgorithmServiceImpl --- Updating design paradigm app.model.DesignParadigm@278, new name is Greedy strategy
+13:55:56,690 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    UPDATE
+        design_paradigm 
+    SET
+        paradigm = 'Greedy strategy' 
+    WHERE
+        paradigm_id = 3
+13:56:02,564 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    ) 
+WHERE
+1 = 1 
+AND paradigm_id = 1
+13:56:04,330 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    SELECT
+        * 
+    FROM
+        design_paradigm 
+    WHERE
+        paradigm_id = 1
+13:56:54,101 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    ) 
+WHERE
+1 = 1 
+AND paradigm_id = 1
+13:57:08,765 [DEBUG] {JavaFX Application Thread} TextbookDaoImpl --- 
+    SELECT
+        book_id,
+        title,
+        volume,
+        edition,
+        author_id,
+        first_name,
+        last_name 
+    FROM
+        ((book     
+    INNER JOIN
+        textbook 
+            ON book_id = txtbk_book_id
+        )     
+INNER JOIN
+    author 
+        ON txtbk_author_id = author_id
+    ) 
+ORDER BY
+book_id,
+author_id
+13:57:08,773 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    )
+13:57:08,774 [DEBUG] {JavaFX Application Thread} ParadigmDaoImpl --- 
+    SELECT
+        * 
+    FROM
+        design_paradigm
+13:57:08,775 [DEBUG] {JavaFX Application Thread} FieldDaoImpl --- 
+    SELECT
+        * 
+    FROM
+        field_of_study
+13:57:11,464 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    ) 
+WHERE
+1 = 1 
+AND paradigm_id = 1
+13:57:19,149 [DEBUG] {JavaFX Application Thread} AlgorithmDaoImpl --- 
+    SELECT
+        algorithm_id,
+        algorithm,
+        complexity,
+        paradigm_id,
+        paradigm,
+        dp.description,
+        field_id,
+        field,
+        fos.description 
+    FROM
+        ((algorithm     
+    INNER JOIN
+        design_paradigm as dp 
+            ON algo_paradigm_id = paradigm_id
+        )     
+INNER JOIN
+    field_of_study as fos 
+        ON algo_field_id = field_id
+    ) 
+WHERE
+1 = 1 
+AND paradigm_id = 1 
+AND field_id = 5

@@ -7,7 +7,6 @@ import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -27,6 +26,7 @@ public class TextbookDaoImpl implements TextbookDao {
   private PreparedStatement insertBook;
   private PreparedStatement insertTextbook;
   private PreparedStatement deleteBook;
+  private PreparedStatement resetTextbooks;
 
   public TextbookDaoImpl() throws SQLException {
     connection = Connector.getConnection();
@@ -45,6 +45,9 @@ public class TextbookDaoImpl implements TextbookDao {
         connection.prepareStatement(
             "INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUE (?, ?)");
     deleteBook = connection.prepareStatement("DELETE FROM book WHERE book_id = ?");
+    resetTextbooks =
+        connection.prepareStatement(
+            "DELETE * FROM algorithms.textbook WHERE algorithms.textbook.txtbk_author_id = ?");
   }
 
   @Override
@@ -64,18 +67,21 @@ public class TextbookDaoImpl implements TextbookDao {
     for (Author author : authors) {
       insertTextbook.setInt(1, bookId);
       insertTextbook.setInt(2, author.getId());
+      logger.debug(Util.format(insertTextbook));
+      insertTextbook.executeUpdate();
     }
     return new Textbook(bookId, title, volume, edition, authors);
   }
 
   @Override
   public List<Textbook> getTextbooks() throws SQLException {
+    logger.debug(Util.format(allTextbooks));
     return textbooksFromSet(allTextbooks.executeQuery());
   }
 
   @Override
   public List<Textbook> searchTextbook(
-      String title, Integer volume, Integer edition, String authors) throws SQLException {
+      String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtils.isBlank(title)) {
       builder.append(" AND b1.title LIKE ").append(Util.fixForLike(title.trim()));
@@ -86,17 +92,14 @@ public class TextbookDaoImpl implements TextbookDao {
     if (edition != null && edition > 0) {
       builder.append(" AND b1.edition = ").append(edition);
     }
-    if (!StringUtils.isBlank(authors)) {
-      String[] authorsArr = authors.split(", ");
-      if (authorsArr.length > 0) {
-        builder.append(" AND ( 1 != 1");
-        for (String author : authorsArr) {
-          builder
-              .append(" OR CONCAT(a1.first_name, a1.last_name) LIKE ")
-              .append(Util.fixForLike(author));
-        }
-        builder.append(")");
+    if (authors.size() > 0) {
+      builder.append(" AND ( 1 != 1");
+      for (Author author : authors) {
+        builder
+            .append(" OR CONCAT(a1.first_name, a1.last_name) LIKE ")
+            .append(Util.fixForLike(author.getFirstName() + " " + author.getLastName()));
       }
+      builder.append(")");
     }
     builder.append(")");
     if (builder.length() == 0) {
@@ -128,27 +131,29 @@ public class TextbookDaoImpl implements TextbookDao {
           .append("    INNER JOIN author AS a2 ON a2.author_id = t2.txtbk_author_id\n")
           .append("    order by b2.book_id, a2.author_id");
       Statement statement = connection.createStatement();
-      logger.info(Util.format(builder.toString()));
-      return textbooksFromSet(statement.executeQuery(builder.toString()));
+      String query = builder.toString();
+      logger.debug(Util.format(query));
+      return textbooksFromSet(statement.executeQuery(query));
     }
   }
 
   @Override
-  public void updateTitle(String column, String value, int id) throws SQLException {
-    connection
-        .createStatement()
-        .executeUpdate(
-            "UPDATE book SET "
-                + column
-                + " = "
-                + Util.fixForString(value)
-                + " WHERE book_id = "
-                + id);
+  public <T> void updateBook(String column, T newValue, int id) throws SQLException {
+    String query = "UPDATE book SET " + column + " = ";
+    if (newValue instanceof Integer) {
+      query += newValue;
+    } else {
+      query += Util.fixForString(newValue.toString());
+    }
+    query += " WHERE book_id = " + id;
+    logger.debug(query);
+    connection.createStatement().executeUpdate(query);
   }
 
   @Override
   public void deleteTextbookById(int id) throws SQLException {
     deleteBook.setInt(1, id);
+    logger.debug(Util.format(deleteBook));
     deleteBook.executeUpdate();
   }
 
@@ -170,5 +175,17 @@ public class TextbookDaoImpl implements TextbookDao {
       textbooks.add(textbook);
     }
     return textbooks;
+  }
+
+  @Override
+  public void setAuthors(Textbook textbook, List<Author> authors) throws SQLException {
+    resetTextbooks.setInt(1, textbook.getId());
+    resetTextbooks.executeUpdate();
+    int bookId = textbook.getId();
+    for (Author author : authors) {
+      insertTextbook.setInt(1, bookId);
+      insertTextbook.setInt(2, author.getId());
+      insertTextbook.executeUpdate();
+    }
   }
 }

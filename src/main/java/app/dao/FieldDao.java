@@ -16,4 +16,6 @@ public interface FieldDao {
   Optional<FieldOfStudy> getFieldByName(String name) throws SQLException;
 
   Optional<FieldOfStudy> getFieldById(int id) throws SQLException;
+
+  void updateFieldOfStudy(String newName, int id) throws SQLException;
 }

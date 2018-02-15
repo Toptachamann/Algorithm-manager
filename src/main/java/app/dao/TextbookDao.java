@@ -14,10 +14,12 @@ public interface TextbookDao {
 
   List<Textbook> getTextbooks() throws SQLException;
 
-  List<Textbook> searchTextbook(String title, Integer edition, Integer volume, String authors)
+  List<Textbook> searchTextbook(String title, Integer volume,  Integer edition, List<Author> authors)
       throws SQLException;
 
-  void updateTitle(String column, String value, int id) throws SQLException;
+  <T> void updateBook(String column, T value, int id) throws SQLException;
 
   void deleteTextbookById(int id) throws SQLException;
+
+  void setAuthors(Textbook textbook, List<Author> authors) throws SQLException;
 }

@@ -7,6 +7,7 @@ import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,6 @@ import java.util.Optional;
 
 public class AlgorithmServiceImpl implements AlgorithmService {
   private static final Logger logger = LogManager.getLogger(AlgorithmServiceImpl.class);
-
 
   private AlgorithmDao algorithmDao;
   private ParadigmDao paradigmDao;
@@ -125,18 +125,14 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void updateAlgorithmName(Algorithm algorithm, String newName) throws SQLException {
-    if (StringUtils.isBlank(newName)) {
-      throw new SQLException("Algorithm's name can't be blank");
-    }
+    Validate.isTrue(!StringUtils.isBlank(newName));
     algorithmDao.updateEntry("algorithm", newName.trim(), algorithm.getId());
   }
 
   @Override
   public void updateAlgorithmComplexity(Algorithm algorithm, String newComplexity)
       throws SQLException {
-    if (StringUtils.isBlank(newComplexity)) {
-      throw new SQLException("Algorithm's complexity can't be blank");
-    }
+    Validate.isTrue(!StringUtils.isBlank(newComplexity));
     algorithmDao.updateEntry("complexity", newComplexity.trim(), algorithm.getId());
   }
 
@@ -144,17 +140,15 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String newParadigm)
       throws SQLException {
     logger.trace("Updating design paradigm {}, new name is {}", oldValue, newParadigm);
-    if (StringUtils.isBlank(newParadigm)) {
-      throw new SQLException("Paradigm can't be blank");
-    }
-    newParadigm = newParadigm.trim();
+    Validate.isTrue(!StringUtils.isBlank(newParadigm));
     paradigmDao.updateDesignParadigm(newParadigm, oldValue.getId());
     return new DesignParadigm(oldValue.getId(), newParadigm, oldValue.getDescription());
   }
 
   @Override
-  public DesignParadigm updateFieldOfStudy(FieldOfStudy newValue, String newField)
-      throws SQLException {
-    return null;
+  public FieldOfStudy updateFieldOfStudy(FieldOfStudy field, String newField) throws SQLException {
+    Validate.isTrue(!StringUtils.isBlank(newField));
+    fieldDao.updateFieldOfStudy(newField, field.getId());
+    return new FieldOfStudy(field.getId(), newField, field.getDescription());
   }
 }

@@ -37,5 +37,5 @@ public interface AlgorithmService {
 
   DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String paradigm) throws SQLException;
 
-  DesignParadigm updateFieldOfStudy(FieldOfStudy newValue, String field) throws SQLException;
+  FieldOfStudy updateFieldOfStudy(FieldOfStudy newValue, String field) throws SQLException;
 }

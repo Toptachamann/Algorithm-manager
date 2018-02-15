@@ -5,6 +5,7 @@ import app.dao.TextbookDao;
 import app.model.Author;
 import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,12 +16,8 @@ import java.util.List;
 public class TextbookServiceImpl implements TextbookService {
   private static final Logger logger = LogManager.getLogger(TextbookServiceImpl.class);
 
-
   private final TextbookDao textbookDao;
   private final AuthorDao authorDao;
-
-  private final String numberPattern = "^\\s*[0-9]+\\s*$";
-  private final String authorsPattern = "^(\\s*[a-zA-Z]+\\s+[a-zA-Z]+(,\\s+(?!$)|\\s*$))+";
 
   public TextbookServiceImpl(TextbookDao textbookDao, AuthorDao authorDao) {
     this.textbookDao = textbookDao;
@@ -28,29 +25,14 @@ public class TextbookServiceImpl implements TextbookService {
   }
 
   @Override
-  public List<Textbook> searchTextbooks(
-      String title, String editionStr, String volumeStr, String authors) throws SQLException {
-    Integer edition = null;
-    Integer volume = null;
+  public Textbook createTextbook(
+      String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
+    return textbookDao.insertTextbook(title, volume, edition, fixIds(authors));
+  }
 
-    if (editionStr != null) {
-      if (editionStr.matches(numberPattern)) {
-        edition = Integer.valueOf(editionStr);
-      } else {
-        // TODO: alert
-      }
-    }
-    if (volumeStr != null) {
-      if (volumeStr.matches(numberPattern)) {
-        volume = Integer.valueOf(volumeStr);
-      } else {
-        // TODO alert
-      }
-    }
-    if (!StringUtils.isBlank(authors) && !authors.matches(authorsPattern)) {
-      // TODO alert
-    }
-    return textbookDao.searchTextbook(title, edition, volume, authors);
+  @Override
+  public Author createAuthor(String firstName, String lastName) throws SQLException {
+    return authorDao.insertAuthor(firstName, lastName);
   }
 
   @Override
@@ -59,34 +41,50 @@ public class TextbookServiceImpl implements TextbookService {
   }
 
   @Override
-  public void deleteTextbook(Textbook textbook) throws SQLException {
-    textbookDao.deleteTextbookById(textbook.getId());
+  public List<Textbook> searchTextbooks(
+      String title, Integer edition, Integer volume, List<Author> authors) throws SQLException {
+    return textbookDao.searchTextbook(title, edition, volume, authors);
+  }
+
+  private List<Author> fixIds(List<Author> authors) throws SQLException {
+    List<Author> authorsList = new ArrayList<>();
+    for (Author author : authors) {
+      authorsList.add(authorDao.insertAuthor(author.getFirstName(), author.getLastName()));
+    }
+    return authorsList;
   }
 
   @Override
-  public Textbook createTextbook(String title, String volumeStr, String editionStr, String authors)
-      throws SQLException {
-    if (StringUtils.isBlank(title)) {
-      // TODO alert
-    }
-    if (!StringUtils.isBlank(volumeStr) && !volumeStr.matches(numberPattern)) {
-      // TODO alert
-    }
-    if (StringUtils.isBlank(editionStr) || editionStr.matches(numberPattern)) {
-      // TODO alert
-    }
-    if (StringUtils.isBlank(authors) || !authors.matches(authorsPattern)) {
-      // TODO alert
-    }
-    Integer volume = Integer.valueOf(volumeStr);
-    Integer edition = StringUtils.isBlank(volumeStr) ? null : Integer.valueOf(editionStr);
+  public void updateTitle(Textbook textbook, String newValue) throws SQLException {
+    Validate.isTrue(!StringUtils.isBlank(newValue));
+    textbookDao.updateBook("title", newValue, textbook.getId());
+  }
 
-    String[] authorsArr = authors.split(",\\s*");
-    List<Author> authorsList = new ArrayList<>();
-    for (String authorStr : authorsArr) {
-      String[] authorName = authorStr.split("\\s+");
-      authorsList.add(authorDao.insertAuthor(authorName[0], authorName[1]));
+  @Override
+  public void updateVolume(Textbook textbook, Integer volume) throws SQLException {
+    if (volume == null) {
+      textbookDao.updateBook("volume", null, textbook.getId());
+    } else {
+      Validate.isTrue(volume > 0);
+      textbookDao.updateBook("volume", volume, textbook.getId());
     }
-    return textbookDao.insertTextbook(title, volume, edition, authorsList);
+  }
+
+  @Override
+  public void updateEdition(Textbook textbook, Integer edition) throws SQLException {
+    Validate.isTrue(edition > 0);
+    textbookDao.updateBook("edition", edition, textbook.getId());
+  }
+
+  @Override
+  public List<Author> updateAuthors(Textbook textbook, List<Author> newValue) throws SQLException {
+    List<Author> authors = fixIds(newValue);
+    textbookDao.setAuthors(textbook, newValue);
+    return authors;
+  }
+
+  @Override
+  public void deleteTextbook(Textbook textbook) throws SQLException {
+    textbookDao.deleteTextbookById(textbook.getId());
   }
 }

@@ -45,9 +45,6 @@ public class AlgorithmController {
   @FXML private Button addAlgorithmButton;
   @FXML private Button searchAlgorithmButton;
 
-  private List<String> designParadigms;
-  private List<String> fieldsOfStudy;
-
   private NewItemBoxController newParadigm;
   private NewItemBoxController newField;
 
@@ -193,11 +190,7 @@ public class AlgorithmController {
               // TODO: alert
             }
             Algorithm algorithm =
-                algorithmService.createAlgorithm(
-                    algoNameTextField.getText(),
-                    algoComplexityTextField.getText(),
-                    designParadigmCB.getSelectionModel().getSelectedItem(),
-                    fieldOfStudyCB.getSelectionModel().getSelectedItem());
+                algorithmService.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
             algorithmTableView.getItems().add(algorithm);
           } catch (SQLException e1) {
             e1.printStackTrace();
@@ -286,25 +279,30 @@ public class AlgorithmController {
     algoName.setOnEditCommit(
         e -> {
           Algorithm algorithm = e.getRowValue();
-          String newValue = e.getNewValue().trim();
-          try {
-            algorithmService.updateAlgorithmName(algorithm, newValue);
-            algorithm.setName(newValue);
-          } catch (SQLException e1) {
-            // TODO: alert
-            e1.printStackTrace();
-            algorithmTableView
-                .getItems()
-                .get(e.getTablePosition().getRow())
-                .setName(e.getOldValue());
-            algorithmTableView.refresh();
+          String newValue = e.getNewValue();
+          if (StringUtils.isBlank(newValue)) {
+            // TODO alert
+          } else {
+            try {
+              newValue = newValue.trim();
+              algorithmService.updateAlgorithmName(algorithm, newValue);
+              algorithm.setName(newValue);
+            } catch (SQLException e1) {
+              // TODO: alert
+              e1.printStackTrace();
+              algorithmTableView.refresh();
+            }
           }
         });
     algoComplexity.setOnEditCommit(
         e -> {
           Algorithm algorithm = e.getRowValue();
-          String newValue = e.getNewValue().trim();
+          String newValue = e.getNewValue();
+          if(StringUtils.isBlank(newValue)){
+            //TODO alert
+          }
           try {
+            newValue = newValue.trim();
             algorithmService.updateAlgorithmComplexity(e.getRowValue(), newValue);
             algorithm.setComplexity(newValue);
           } catch (SQLException e1) {

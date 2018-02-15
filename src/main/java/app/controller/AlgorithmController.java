@@ -1,12 +1,15 @@
 package app.controller;
 
+import app.auxiliary.LogicException;
 import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import app.service.AlgorithmService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -14,9 +17,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public class AlgorithmController {
   private static final Logger logger = LogManager.getLogger(AlgorithmController.class);
@@ -47,12 +54,36 @@ public class AlgorithmController {
 
   private NewItemBoxController newParadigm;
   private NewItemBoxController newField;
+  private Alert confirm;
+  private Alert info;
+  private Alert error;
 
   public AlgorithmController(AlgorithmService algorithmService) {
     this.algorithmService = algorithmService;
   }
 
   public void initialize() {
+    info = new Alert(Alert.AlertType.INFORMATION);
+    info.setTitle("Information dialog");
+    info.setHeaderText(null);
+    info.setGraphic(null);
+    ((Stage) info.getDialogPane().getScene().getWindow())
+        .getIcons()
+        .add(new Image(getClass().getResource("/alert_icon.png").toString()));
+    error = new Alert(Alert.AlertType.ERROR);
+    error.setTitle("Error dialog");
+    error.setHeaderText(null);
+    error.setGraphic(null);
+    ((Stage) error.getDialogPane().getScene().getWindow())
+        .getIcons()
+        .add(new Image(getClass().getResource("/error_icon.png").toString()));
+    confirm = new Alert(Alert.AlertType.CONFIRMATION);
+    confirm.setTitle("Confirm dialog");
+    confirm.setHeaderText(null);
+    confirm.setGraphic(null);
+    ((Stage) confirm.getDialogPane().getScene().getWindow())
+        .getIcons()
+        .add(new Image(getClass().getResource("/confirm_icon.png").toString()));
 
     initTableView();
 
@@ -150,24 +181,64 @@ public class AlgorithmController {
         e -> {
           try {
             newParadigm.show();
-            DesignParadigm paradigm =
-                algorithmService.insertDesignParadigm(
-                    newParadigm.getRetrievedName(), newParadigm.getRetrievedDescription());
-            designParadigmCB.getItems().add(paradigm);
+            String retrievedName = newParadigm.getRetrievedName();
+            String retrievedDescription = newParadigm.getRetrievedDescription();
+            if (StringUtils.isBlank(retrievedName)) {
+              info.setContentText("Design paradigm must have a name");
+              info.showAndWait();
+            } else {
+              DesignParadigm designParadigm;
+              if (StringUtils.isBlank(retrievedDescription)) {
+                designParadigm = algorithmService.insertDesignParadigm(retrievedName.trim());
+              } else {
+                designParadigm =
+                    algorithmService.insertDesignParadigm(
+                        retrievedName.trim(), retrievedDescription.trim());
+              }
+              designParadigmCB.getItems().add(designParadigm);
+            }
           } catch (SQLException e1) {
-            e1.printStackTrace();
+            logger.catching(Level.ERROR, e1);
+            error.setContentText(
+                "Addition of the new design paradigm failed due to some internal error.\n"
+                    + "See logs for details.");
+            error.showAndWait();
+          } catch (LogicException e1) {
+            logger.catching(Level.ERROR, e1);
+            error.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
+            error.showAndWait();
           }
         });
     addFieldButton.setOnAction(
         e -> {
           try {
             newField.show();
-            FieldOfStudy field =
-                algorithmService.insertFieldOfStudy(
-                    newField.getRetrievedName(), newField.getRetrievedDescription());
-            fieldOfStudyCB.getItems().add(field);
+            String retrievedName = newField.getRetrievedName();
+            String retrievedDescription = newField.getRetrievedDescription();
+            if (StringUtils.isBlank(retrievedName)) {
+              info.setContentText("Field of study must have a new name");
+              info.showAndWait();
+            } else {
+              FieldOfStudy fieldOfStudy;
+              if (StringUtils.isBlank(retrievedDescription)) {
+                fieldOfStudy = algorithmService.insertFieldOfStudy(retrievedName.trim());
+              } else {
+                fieldOfStudy =
+                    algorithmService.insertFieldOfStudy(
+                        retrievedName.trim(), retrievedDescription.trim());
+              }
+              fieldOfStudyCB.getItems().add(fieldOfStudy);
+            }
           } catch (SQLException e1) {
-            e1.printStackTrace();
+            logger.catching(Level.ERROR, e1);
+            error.setContentText(
+                "Addition of the new field of study failed due to some internal error.\n"
+                    + "See logs for details.");
+            error.showAndWait();
+          } catch (LogicException e1) {
+            logger.catching(Level.ERROR, e1);
+            error.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
+            error.showAndWait();
           }
         });
     addAlgorithmButton.setOnAction(
@@ -178,22 +249,32 @@ public class AlgorithmController {
             DesignParadigm designParadigm = designParadigmCB.getSelectionModel().getSelectedItem();
             FieldOfStudy fieldOfStudy = fieldOfStudyCB.getSelectionModel().getSelectedItem();
             if (StringUtils.isBlank(name)) {
-              // TODO: alert
+              info.setContentText("Algorithm must have a name");
+              info.showAndWait();
+            } else if (StringUtils.isBlank(complexity)) {
+              info.setContentText("Algorithm must have a complexity");
+              info.showAndWait();
+            } else if (designParadigm == null) {
+              info.setContentText("Algorithm must have a design paradigm");
+              info.showAndWait();
+            } else if (fieldOfStudy == null) {
+              info.setContentText("Algorithm must have a field of study");
+              info.showAndWait();
+            } else {
+              Algorithm algorithm =
+                  algorithmService.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
+              algorithmTableView.getItems().add(algorithm);
+              algorithmTableView.scrollTo(algorithmTableView.getItems().size() - 1);
             }
-            if (StringUtils.isBlank(complexity)) {
-              // TODO: alert
-            }
-            if (designParadigm == null) {
-              // TODO: alert
-            }
-            if (fieldOfStudy == null) {
-              // TODO: alert
-            }
-            Algorithm algorithm =
-                algorithmService.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
-            algorithmTableView.getItems().add(algorithm);
           } catch (SQLException e1) {
-            e1.printStackTrace();
+            logger.catching(Level.ERROR, e1);
+            error.setContentText(
+                "Addition of a new algorithm failed failed due to some internal error.\n"
+                    + "See logs for details.");
+          } catch (LogicException e1) {
+            logger.catching(Level.ERROR, e1);
+            error.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
+            error.showAndWait();
           }
         });
     searchAlgorithmButton.setOnAction(
@@ -207,7 +288,9 @@ public class AlgorithmController {
                     fieldOfStudyCB.getSelectionModel().getSelectedItem());
             algorithmTableView.setItems(FXCollections.observableArrayList(algorithms));
           } catch (SQLException e1) {
-            e1.printStackTrace();
+            logger.catching(Level.ERROR, e1);
+            error.setContentText("Search failed due to some internal error.\nSee logs for details");
+            error.showAndWait();
           }
         });
   }
@@ -265,13 +348,20 @@ public class AlgorithmController {
           Algorithm algorithm = algorithmTableView.getSelectionModel().getSelectedItem();
           if (algorithm != null) {
             if (e.getCode().equals(KeyCode.DELETE)) {
-              // TODO: ask whether wants to delete
-              try {
-                algorithmService.deleteItem(algorithm);
-                algorithmTableView.getItems().remove(algorithm);
-              } catch (SQLException e1) {
-                // TODO: alert
-                e1.printStackTrace();
+              confirm.setContentText(
+                  "Do you really want to delete this algorithm?\n" + "This operation is undoable");
+              Optional<ButtonType> buttonType = confirm.showAndWait();
+              if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {
+                try {
+                  algorithmService.deleteItem(algorithm);
+                  algorithmTableView.getItems().remove(algorithm);
+                } catch (SQLException e1) {
+                  logger.catching(Level.ERROR, e1);
+                  error.setContentText(
+                      "Deletion of the algorithm failed due to some internal error.\n"
+                          + "See logs for details.");
+                  error.showAndWait();
+                }
               }
             }
           }
@@ -281,16 +371,25 @@ public class AlgorithmController {
           Algorithm algorithm = e.getRowValue();
           String newValue = e.getNewValue();
           if (StringUtils.isBlank(newValue)) {
-            // TODO alert
+            info.setContentText("Algorithm's name can't be blank");
+            info.showAndWait();
+            algorithmTableView.refresh();
           } else {
             try {
               newValue = newValue.trim();
               algorithmService.updateAlgorithmName(algorithm, newValue);
               algorithm.setName(newValue);
             } catch (SQLException e1) {
-              // TODO: alert
-              e1.printStackTrace();
+              logger.catching(Level.ERROR, e1);
+              error.setContentText(
+                  "Algorithm's name wasn't changed due to some internal error.\n"
+                      + "See logs for details.");
+              error.showAndWait();
               algorithmTableView.refresh();
+            } catch (LogicException e1) {
+              logger.catching(Level.ERROR, e1);
+              error.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
+              error.showAndWait();
             }
           }
         });
@@ -298,16 +397,21 @@ public class AlgorithmController {
         e -> {
           Algorithm algorithm = e.getRowValue();
           String newValue = e.getNewValue();
-          if(StringUtils.isBlank(newValue)){
-            //TODO alert
+          if (StringUtils.isBlank(newValue)) {
+            info.setContentText("Algorithm's complexity can't be blank");
+            info.showAndWait();
+            algorithmTableView.refresh();
           }
           try {
             newValue = newValue.trim();
             algorithmService.updateAlgorithmComplexity(e.getRowValue(), newValue);
             algorithm.setComplexity(newValue);
           } catch (SQLException e1) {
-            // TODO: alert
-            e1.printStackTrace();
+            logger.catching(Level.ERROR, e1);
+            error.setContentText(
+                "Algorithm's complexity wasn't changed due to some internal error.\n"
+                    + "See logs for details.");
+            error.showAndWait();
           }
         });
   }
@@ -395,7 +499,7 @@ public class AlgorithmController {
   private class FieldCell extends TableCell<Algorithm, FieldOfStudy> {
     private TextField textField;
 
-    public FieldCell() {
+    FieldCell() {
       textField = new TextField();
       textField
           .focusedProperty()
@@ -449,19 +553,40 @@ public class AlgorithmController {
     @Override
     public void commitEdit(FieldOfStudy newValue) {
       super.commitEdit(newValue);
-      FieldOfStudy oldValue = getItem();
-      try {
-        algorithmService.updateFieldOfStudy(oldValue, newValue.getField());
-        AlgorithmController.this.updateTableView(
-            Algorithm.class, algorithmTableView.getItems(), "fieldOfStudy", oldValue, newValue);
-        AlgorithmController.this.updateList(fieldOfStudyCB.getItems(), oldValue, newValue);
+      if (StringUtils.isBlank(newValue.getField())) {
+        info.setContentText("Algorithm's field of study can't be blank");
+        info.showAndWait();
         algorithmTableView.refresh();
-      } catch (SQLException e1) {
-        // TODO: alert
-        e1.printStackTrace();
-        setText(oldValue.getField());
-        setGraphic(null);
-        algorithmTableView.refresh();
+      } else {
+        String newFieldOfStudy = newValue.getField().trim();
+        FieldOfStudy oldValue = getItem();
+        try {
+          Optional<FieldOfStudy> field = algorithmService.getFieldByName(newFieldOfStudy);
+          if (field.isPresent()) {
+            Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
+            algorithmService.setFieldOfStudy(rowAlgorithm, field.get());
+            rowAlgorithm.setFieldOfStudy(field.get());
+          } else {
+            FieldOfStudy fieldOfStudy = algorithmService.updateFieldName(oldValue, newFieldOfStudy);
+            AlgorithmController.this.updateTableView(
+                Algorithm.class,
+                algorithmTableView.getItems(),
+                "fieldOfStudy",
+                oldValue,
+                fieldOfStudy);
+            AlgorithmController.this.updateList(fieldOfStudyCB.getItems(), oldValue, fieldOfStudy);
+            algorithmTableView.refresh();
+          }
+        } catch (SQLException e1) {
+          logger.catching(Level.ERROR, e1);
+          error.setContentText(
+              "Algorithm's design paradigm wasn't changed due to some internal error.\n"
+                  + "See logs for details.");
+          error.showAndWait();
+          setText(oldValue.getField());
+          setGraphic(null);
+          algorithmTableView.refresh();
+        }
       }
     }
 
@@ -481,7 +606,7 @@ public class AlgorithmController {
   private class ParadigmCell extends TableCell<Algorithm, DesignParadigm> {
     private TextField textField;
 
-    public ParadigmCell() {
+    ParadigmCell() {
       textField = new TextField();
       textField
           .focusedProperty()
@@ -537,19 +662,41 @@ public class AlgorithmController {
     public void commitEdit(DesignParadigm newValue) {
       logger.trace("Committing changes, new value {}", newValue);
       super.commitEdit(newValue);
-      DesignParadigm oldValue = getItem();
-      try {
-        algorithmService.updateDesignParadigm(oldValue, newValue.getParadigm());
-        AlgorithmController.this.updateTableView(
-            Algorithm.class, algorithmTableView.getItems(), "designParadigm", oldValue, newValue);
-        AlgorithmController.this.updateList(designParadigmCB.getItems(), oldValue, newValue);
+      if (StringUtils.isBlank(newValue.getParadigm())) {
+        info.setContentText("Algorithm's design paradigm can't be blank");
+        info.showAndWait();
         algorithmTableView.refresh();
-      } catch (SQLException e1) {
-        // TODO: alert
-        e1.printStackTrace();
-        setText(oldValue.getParadigm());
-        setGraphic(null);
-        algorithmTableView.refresh();
+      } else {
+        String newName = newValue.getParadigm().trim();
+        DesignParadigm oldValue = getItem();
+        try {
+          Optional<DesignParadigm> paradigm = algorithmService.getParadigmByName(newName);
+          if (paradigm.isPresent()) {
+            Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
+            algorithmService.setDesignParadigm(rowAlgorithm, paradigm.get());
+            rowAlgorithm.setDesignParadigm(paradigm.get());
+          } else {
+            DesignParadigm designParadigm =
+                algorithmService.updateDesignParadigm(oldValue, newValue.getParadigm());
+            AlgorithmController.this.updateTableView(
+                Algorithm.class,
+                algorithmTableView.getItems(),
+                "designParadigm",
+                oldValue,
+                designParadigm);
+            AlgorithmController.this.updateList(
+                designParadigmCB.getItems(), oldValue, designParadigm);
+            algorithmTableView.refresh();
+          }
+        } catch (SQLException e1) {
+          logger.catching(Level.ERROR, e1);
+          error.setContentText(
+              "Algorithm's design paradigm wasn't changed due to some internal error.\n"
+                  + "See logs for details.");
+          setText(oldValue.getParadigm());
+          setGraphic(null);
+          algorithmTableView.refresh();
+        }
       }
     }
 

@@ -21,6 +21,10 @@ public interface AlgorithmDao {
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException;
 
+  void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException;
+
+  void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException;
+
   void updateEntry(String column, String value, int id) throws SQLException;
 
   void deleteById(int id) throws SQLException;

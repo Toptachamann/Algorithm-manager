@@ -26,6 +26,8 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   private PreparedStatement allAlgorithms;
   private PreparedStatement getAlgoByName;
   private PreparedStatement deleteById;
+  private PreparedStatement setParadigm;
+  private PreparedStatement setField;
 
   public AlgorithmDaoImpl() throws SQLException {
     connection = Connector.getConnection();
@@ -41,6 +43,14 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgoByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
     deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
+    setParadigm =
+        connection.prepareStatement(
+            "UPDATE algorithms.algorithm "
+                + "SET algorithms.algorithm.algo_paradigm_id = ? WHERE algorithms.algorithm.algorithm_id = ?");
+    setField =
+        connection.prepareStatement(
+            "UPDATE algorithms.algorithm "
+                + "SET algorithms.algorithm.algo_field_id = ? WHERE algorithms.algorithm.algorithm_id = ?");
   }
 
   @Override
@@ -120,6 +130,22 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
     deleteById.setInt(1, id);
     logger.debug(Util.format(deleteById));
     deleteById.executeUpdate();
+  }
+
+  @Override
+  public void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException {
+    setParadigm.setInt(1, paradigmId);
+    setParadigm.setInt(2, algorithmId);
+    logger.debug(Util.format(setParadigm));
+    setParadigm.executeUpdate();
+  }
+
+  @Override
+  public void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException {
+    setField.setInt(1, fieldId);
+    setField.setInt(2, algorithmId);
+    logger.debug(Util.format(setField));
+    setField.executeUpdate();
   }
 
   @Override

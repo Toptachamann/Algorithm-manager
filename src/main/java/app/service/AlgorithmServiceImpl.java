@@ -1,5 +1,6 @@
 package app.service;
 
+import app.auxiliary.LogicException;
 import app.dao.AlgorithmDao;
 import app.dao.FieldDao;
 import app.dao.ParadigmDao;
@@ -32,16 +33,16 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   @Override
   public Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
-      throws SQLException {
+      throws SQLException, LogicException {
     Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
     Optional<FieldOfStudy> field = fieldDao.getFieldById(fieldOfStudy.getId());
     Optional<Algorithm> algorithm = algorithmDao.getAlgorithmByName(name.trim());
     if (!paradigm.isPresent()) {
-      throw new SQLException("Can't find paradigm by " + designParadigm);
+      throw new LogicException("Can't find paradigm by " + designParadigm);
     } else if (!field.isPresent()) {
-      throw new SQLException("Can't find field of study by " + fieldOfStudy);
-    } else if (!algorithm.isPresent()) {
-      throw new SQLException("Algorithm with this name is already present");
+      throw new LogicException("Can't find field of study by " + fieldOfStudy);
+    } else if (algorithm.isPresent()) {
+      throw new LogicException("Algorithm with this name is already present");
     }
     return algorithmDao.insertAlgorithm(name, complexity, designParadigm, fieldOfStudy);
   }
@@ -69,63 +70,72 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public DesignParadigm insertDesignParadigm(String paradigmName, String description)
-      throws SQLException {
-    if (StringUtils.isBlank(description)) {
-      return this.insertDesignParadigm(paradigmName);
-    } else if (StringUtils.isBlank(paradigmName)) {
-      throw new SQLException("Paradigm name is blank");
-    } else {
-      if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
-        throw new SQLException("There already exists design paradigm with such name");
-      } else {
-        return paradigmDao.insertParadigm(paradigmName, description);
-      }
-    }
+  public Optional<FieldOfStudy> getFieldByName(String name) throws SQLException {
+    return fieldDao.getFieldByName(name);
   }
 
-  public DesignParadigm insertDesignParadigm(String paradigmName) throws SQLException {
+  @Override
+  public Optional<DesignParadigm> getParadigmByName(String name) throws SQLException {
+    return paradigmDao.getParadigmByName(name);
+  }
+
+  @Override
+  public DesignParadigm insertDesignParadigm(String paradigmName)
+      throws SQLException, LogicException {
+    Validate.isTrue(!StringUtils.isBlank(paradigmName));
     if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
-      if (StringUtils.isBlank(paradigmName)) {
-        throw new SQLException("Paradigm name is blank");
-      }
-      throw new SQLException("This design paradigm already exists");
+      throw new LogicException("This design paradigm already exists");
     } else {
       return paradigmDao.insertParadigm(paradigmName);
     }
   }
 
   @Override
-  public FieldOfStudy insertFieldOfStudy(String fieldName, String fieldDescription)
-      throws SQLException {
-    if (StringUtils.isBlank(fieldName)) {
-      throw new SQLException("Paradigm name is blank");
-    } else if (StringUtils.isBlank(fieldName)) {
-      throw new SQLException("This field of study already exists");
+  public DesignParadigm insertDesignParadigm(String paradigmName, String description)
+      throws SQLException, LogicException {
+    if (StringUtils.isBlank(description)) {
+      return this.insertDesignParadigm(paradigmName);
     } else {
-      return fieldDao.insertFieldOfStudy(fieldDescription, fieldDescription);
+      Validate.isTrue(!StringUtils.isBlank(paradigmName));
+      if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
+        throw new SQLException("This design paradigm already exists");
+      } else {
+        return paradigmDao.insertParadigm(paradigmName, description);
+      }
     }
   }
 
   @Override
-  public FieldOfStudy insertFieldOfStudy(String fieldName) throws SQLException {
+  public FieldOfStudy insertFieldOfStudy(String fieldName) throws SQLException, LogicException {
+    Validate.isTrue(!StringUtils.isBlank(fieldName));
     if (fieldDao.getFieldByName(fieldName).isPresent()) {
-      throw new SQLException("This field of study already exists");
-    } else if (StringUtils.isBlank(fieldName)) {
-      throw new SQLException("Paradigm name is blank");
+      throw new LogicException("This field of study already exists");
     } else {
       return fieldDao.insertFieldOfStudy(fieldName);
     }
   }
 
   @Override
-  public void deleteItem(Algorithm algorithm) throws SQLException {
-    algorithmDao.deleteById(algorithm.getId());
+  public FieldOfStudy insertFieldOfStudy(String fieldName, String fieldDescription)
+      throws SQLException, LogicException {
+    if (StringUtils.isBlank(fieldDescription)) {
+      insertFieldOfStudy(fieldName);
+    }
+    Validate.isTrue(!StringUtils.isBlank(fieldName));
+    if (fieldDao.getFieldByName(fieldName).isPresent()) {
+      throw new LogicException("This field of study already exists");
+    } else {
+      return fieldDao.insertFieldOfStudy(fieldDescription, fieldDescription);
+    }
   }
 
   @Override
-  public void updateAlgorithmName(Algorithm algorithm, String newName) throws SQLException {
+  public void updateAlgorithmName(Algorithm algorithm, String newName)
+      throws SQLException, LogicException {
     Validate.isTrue(!StringUtils.isBlank(newName));
+    if (algorithmDao.getAlgorithmByName(newName).isPresent()) {
+      throw new LogicException("Algorithm with this name already exists");
+    }
     algorithmDao.updateEntry("algorithm", newName.trim(), algorithm.getId());
   }
 
@@ -146,9 +156,24 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public FieldOfStudy updateFieldOfStudy(FieldOfStudy field, String newField) throws SQLException {
+  public FieldOfStudy updateFieldName(FieldOfStudy field, String newField) throws SQLException {
     Validate.isTrue(!StringUtils.isBlank(newField));
     fieldDao.updateFieldOfStudy(newField, field.getId());
     return new FieldOfStudy(field.getId(), newField, field.getDescription());
+  }
+
+  @Override
+  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException {
+    algorithmDao.setDesignParadigm(paradigm.getId(), algorithm.getId());
+  }
+
+  @Override
+  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws SQLException {
+    algorithmDao.setFieldOfStudy(field.getId(), algorithm.getId());
+  }
+
+  @Override
+  public void deleteItem(Algorithm algorithm) throws SQLException {
+    algorithmDao.deleteById(algorithm.getId());
   }
 }

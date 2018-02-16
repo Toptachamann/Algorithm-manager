@@ -7,7 +7,6 @@ import app.model.FieldOfStudy;
 import app.service.AlgorithmService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -17,9 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -32,7 +29,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class AlgorithmController {
+public class AlgorithmController extends AbstractController {
   private static final Logger logger = LogManager.getLogger(AlgorithmController.class);
 
   private AlgorithmService algorithmService;
@@ -54,37 +51,12 @@ public class AlgorithmController {
 
   private NewItemBoxController newParadigm;
   private NewItemBoxController newField;
-  private Alert confirm;
-  private Alert info;
-  private Alert error;
 
   public AlgorithmController(AlgorithmService algorithmService) {
     this.algorithmService = algorithmService;
   }
 
   public void initialize() {
-    info = new Alert(Alert.AlertType.INFORMATION);
-    info.setTitle("Information dialog");
-    info.setHeaderText(null);
-    info.setGraphic(null);
-    ((Stage) info.getDialogPane().getScene().getWindow())
-        .getIcons()
-        .add(new Image(getClass().getResource("/alert_icon.png").toString()));
-    error = new Alert(Alert.AlertType.ERROR);
-    error.setTitle("Error dialog");
-    error.setHeaderText(null);
-    error.setGraphic(null);
-    ((Stage) error.getDialogPane().getScene().getWindow())
-        .getIcons()
-        .add(new Image(getClass().getResource("/error_icon.png").toString()));
-    confirm = new Alert(Alert.AlertType.CONFIRMATION);
-    confirm.setTitle("Confirm dialog");
-    confirm.setHeaderText(null);
-    confirm.setGraphic(null);
-    ((Stage) confirm.getDialogPane().getScene().getWindow())
-        .getIcons()
-        .add(new Image(getClass().getResource("/confirm_icon.png").toString()));
-
     initTableView();
 
     designParadigmCB.setConverter(
@@ -130,7 +102,9 @@ public class AlgorithmController {
       fieldOfStudyCB.setItems(
           FXCollections.observableArrayList(algorithmService.getAllFieldsOfStudy()));
     } catch (SQLException e) {
-      e.printStackTrace();
+      logger.catching(Level.ERROR, e);
+      info.setContentText("Can't load algorithms' data. Check server connection.");
+      info.showAndWait();
     }
     /*designParadigmCB
         .getEditor()
@@ -180,22 +154,24 @@ public class AlgorithmController {
     addParadigmButton.setOnAction(
         e -> {
           try {
-            newParadigm.show();
-            String retrievedName = newParadigm.getRetrievedName();
-            String retrievedDescription = newParadigm.getRetrievedDescription();
-            if (StringUtils.isBlank(retrievedName)) {
-              info.setContentText("Design paradigm must have a name");
-              info.showAndWait();
-            } else {
-              DesignParadigm designParadigm;
-              if (StringUtils.isBlank(retrievedDescription)) {
-                designParadigm = algorithmService.insertDesignParadigm(retrievedName.trim());
+            Optional<ButtonType> buttonType = newParadigm.show();
+            if (buttonType.isPresent() && buttonType.get().equals(ButtonType.APPLY)) {
+              String retrievedName = newParadigm.getRetrievedName();
+              String retrievedDescription = newParadigm.getRetrievedDescription();
+              if (StringUtils.isBlank(retrievedName)) {
+                info.setContentText("Design paradigm must have a name");
+                info.showAndWait();
               } else {
-                designParadigm =
-                    algorithmService.insertDesignParadigm(
-                        retrievedName.trim(), retrievedDescription.trim());
+                DesignParadigm designParadigm;
+                if (StringUtils.isBlank(retrievedDescription)) {
+                  designParadigm = algorithmService.insertDesignParadigm(retrievedName.trim());
+                } else {
+                  designParadigm =
+                      algorithmService.insertDesignParadigm(
+                          retrievedName.trim(), retrievedDescription.trim());
+                }
+                designParadigmCB.getItems().add(designParadigm);
               }
-              designParadigmCB.getItems().add(designParadigm);
             }
           } catch (SQLException e1) {
             logger.catching(Level.ERROR, e1);
@@ -204,30 +180,32 @@ public class AlgorithmController {
                     + "See logs for details.");
             error.showAndWait();
           } catch (LogicException e1) {
-            logger.catching(Level.ERROR, e1);
-            error.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
-            error.showAndWait();
+            logger.catching(Level.WARN, e1);
+            info.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
+            info.showAndWait();
           }
         });
     addFieldButton.setOnAction(
         e -> {
           try {
-            newField.show();
-            String retrievedName = newField.getRetrievedName();
-            String retrievedDescription = newField.getRetrievedDescription();
-            if (StringUtils.isBlank(retrievedName)) {
-              info.setContentText("Field of study must have a new name");
-              info.showAndWait();
-            } else {
-              FieldOfStudy fieldOfStudy;
-              if (StringUtils.isBlank(retrievedDescription)) {
-                fieldOfStudy = algorithmService.insertFieldOfStudy(retrievedName.trim());
+            Optional<ButtonType> buttonType = newField.show();
+            if (buttonType.isPresent() && buttonType.get().equals(ButtonType.APPLY)) {
+              String retrievedName = newField.getRetrievedName();
+              String retrievedDescription = newField.getRetrievedDescription();
+              if (StringUtils.isBlank(retrievedName)) {
+                info.setContentText("Field of study must have a new name");
+                info.showAndWait();
               } else {
-                fieldOfStudy =
-                    algorithmService.insertFieldOfStudy(
-                        retrievedName.trim(), retrievedDescription.trim());
-              }
-              fieldOfStudyCB.getItems().add(fieldOfStudy);
+                FieldOfStudy fieldOfStudy;
+                if (StringUtils.isBlank(retrievedDescription)) {
+                  fieldOfStudy = algorithmService.insertFieldOfStudy(retrievedName.trim());
+                } else {
+                  fieldOfStudy =
+                      algorithmService.insertFieldOfStudy(
+                          retrievedName.trim(), retrievedDescription.trim());
+                }
+                fieldOfStudyCB.getItems().add(fieldOfStudy);
+               }
             }
           } catch (SQLException e1) {
             logger.catching(Level.ERROR, e1);
@@ -236,9 +214,9 @@ public class AlgorithmController {
                     + "See logs for details.");
             error.showAndWait();
           } catch (LogicException e1) {
-            logger.catching(Level.ERROR, e1);
-            error.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
-            error.showAndWait();
+            logger.catching(Level.WARN, e1);
+            info.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
+            info.showAndWait();
           }
         });
     addAlgorithmButton.setOnAction(
@@ -272,9 +250,9 @@ public class AlgorithmController {
                 "Addition of a new algorithm failed failed due to some internal error.\n"
                     + "See logs for details.");
           } catch (LogicException e1) {
-            logger.catching(Level.ERROR, e1);
-            error.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
-            error.showAndWait();
+            logger.catching(Level.WARN, e1);
+            info.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
+            info.showAndWait();
           }
         });
     searchAlgorithmButton.setOnAction(
@@ -387,9 +365,9 @@ public class AlgorithmController {
               error.showAndWait();
               algorithmTableView.refresh();
             } catch (LogicException e1) {
-              logger.catching(Level.ERROR, e1);
-              error.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
-              error.showAndWait();
+              logger.catching(Level.WARN, e1);
+              info.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
+              info.showAndWait();
             }
           }
         });

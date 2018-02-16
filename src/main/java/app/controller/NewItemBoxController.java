@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -13,18 +14,20 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class NewItemBoxController extends AnchorPane {
 
   @FXML AnchorPane rootAnchorPane;
-  @FXML Label nameLabel;
-  @FXML Label messageLabel;
-  @FXML TextField nameTextField;
-  @FXML TextArea descriptionTextArea;
-  @FXML Button addButton;
+  @FXML private Label nameLabel;
+  @FXML private Label messageLabel;
+  @FXML private TextField nameTextField;
+  @FXML private TextArea descriptionTextArea;
+  @FXML private Button addButton;
   private Stage stage;
   private String retrievedName;
   private String retrievedDescription;
+  private ButtonType buttonType;
 
   public NewItemBoxController() {
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/new_item_frame.fxml"));
@@ -35,6 +38,8 @@ public class NewItemBoxController extends AnchorPane {
       Parent root = loader.load();
       stage.setScene(new Scene(root));
       stage.initModality(Modality.APPLICATION_MODAL);
+      stage.setOnCloseRequest(e -> buttonType = ButtonType.CANCEL);
+      stage.setOnShowing(e -> buttonType = null);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -49,12 +54,13 @@ public class NewItemBoxController extends AnchorPane {
     descriptionTextArea.setPromptText(descriptionPrompt);
   }
 
-  public void show() {
+  public Optional<ButtonType> show() {
     reload();
     stage.showAndWait();
+    return Optional.of(buttonType);
   }
 
-  public void reload() {
+  private void reload() {
     nameTextField.setText("");
     descriptionTextArea.setText("");
   }
@@ -64,6 +70,7 @@ public class NewItemBoxController extends AnchorPane {
         e -> {
           retrievedName = nameTextField.getText();
           retrievedDescription = descriptionTextArea.getText();
+          buttonType = ButtonType.APPLY;
           stage.hide();
         });
   }

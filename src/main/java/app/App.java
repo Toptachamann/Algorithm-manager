@@ -25,7 +25,7 @@ public class App extends Application {
     loader.setControllerFactory(context::getBean);
     Parent root = loader.load();
     primaryStage.setTitle("Algorithm manager");
-    primaryStage.getIcons().add(new Image("/icon.png"));
+    primaryStage.getIcons().add(new Image(getClass().getResource("/main_icon.png").toString()));
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     primaryStage.setScene(new Scene(root, screenSize.width * 5 / 7, screenSize.height * 11 / 14));
     primaryStage.show();

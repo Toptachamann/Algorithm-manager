@@ -288,7 +288,19 @@ SELECT
 FROM
   ((algorithm
     INNER JOIN design_paradigm AS dp ON algo_paradigm_id = paradigm_id)
-    INNER JOIN field_of_study AS fos ON algo_field_id = field_id)
+    INNER JOIN field_of_study AS fos ON algo_field_id = field_id);
+    
+    SELECT 
+    area_id, area, description
+FROM
+    (SELECT 
+        app_area_id
+    FROM
+        algorithm_application
+    WHERE
+        app_algorithm_id = 1) as areas
+        INNER JOIN
+    area_of_use ON areas.app_area_id = area_id;
 
 
 

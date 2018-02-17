@@ -2,6 +2,7 @@ package app.service;
 
 import app.auxiliary.LogicException;
 import app.model.Algorithm;
+import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 
@@ -16,17 +17,18 @@ public interface AlgorithmService {
 
   List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException;
 
-  DesignParadigm insertDesignParadigm(String paradigmName) throws SQLException, LogicException;
+  DesignParadigm createDesignParadigm(String paradigmName) throws SQLException, LogicException;
 
-  DesignParadigm insertDesignParadigm(String paradigmName, String description) throws SQLException, LogicException;
+  DesignParadigm createDesignParadigm(String paradigmName, String description)
+      throws SQLException, LogicException;
 
   Optional<FieldOfStudy> getFieldByName(String name) throws SQLException;
 
   Optional<DesignParadigm> getParadigmByName(String name) throws SQLException;
 
-  FieldOfStudy insertFieldOfStudy(String fieldName) throws SQLException, LogicException;
+  FieldOfStudy createFieldOfStudy(String fieldName) throws SQLException, LogicException;
 
-  FieldOfStudy insertFieldOfStudy(String fieldName, String fieldDescription)
+  FieldOfStudy createFieldOfStudy(String fieldName, String fieldDescription)
       throws SQLException, LogicException;
 
   Algorithm createAlgorithm(
@@ -49,5 +51,22 @@ public interface AlgorithmService {
 
   void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws SQLException;
 
-  void deleteItem(Algorithm algorithm) throws SQLException;
+  void deleteAlgorithm(Algorithm algorithm) throws SQLException;
+
+  List<AreaOfUse> getAllAreas() throws SQLException;
+
+  AreaOfUse createAreaOfUse(String area) throws SQLException, LogicException;
+
+  AreaOfUse createAreaOfUse(String area, String description) throws SQLException, LogicException;
+
+  void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException;
+
+  Optional<AreaOfUse> getAreaOfUse(String name) throws SQLException;
+
+  void createAlgorithmApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws SQLException, LogicException;
+
+  List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws SQLException;
+
+  List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws SQLException;
 }

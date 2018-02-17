@@ -26,5 +26,5 @@ public interface TextbookService {
 
   void updateEdition(Textbook textbook, Integer edition) throws SQLException;
 
-  List<Author> updateAuthors(Textbook textbook, List<Author> authors) throws SQLException;
+  List<Author> setAuthors(Textbook textbook, List<Author> authors) throws SQLException;
 }

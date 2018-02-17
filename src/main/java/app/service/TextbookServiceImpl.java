@@ -27,12 +27,12 @@ public class TextbookServiceImpl implements TextbookService {
   @Override
   public Textbook createTextbook(
       String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
-    return textbookDao.insertTextbook(title, volume, edition, fixIds(authors));
+    return textbookDao.insertTextbook(title, volume, edition, fixIds(authors), new ArrayList<>());
   }
 
   @Override
   public Author createAuthor(String firstName, String lastName) throws SQLException {
-    return authorDao.insertAuthor(firstName, lastName);
+    return authorDao.createAuthor(firstName, lastName);
   }
 
   @Override
@@ -49,7 +49,7 @@ public class TextbookServiceImpl implements TextbookService {
   private List<Author> fixIds(List<Author> authors) throws SQLException {
     List<Author> authorsList = new ArrayList<>();
     for (Author author : authors) {
-      authorsList.add(authorDao.insertAuthor(author.getFirstName(), author.getLastName()));
+      authorsList.add(authorDao.createAuthor(author.getFirstName(), author.getLastName()));
     }
     return authorsList;
   }
@@ -77,9 +77,9 @@ public class TextbookServiceImpl implements TextbookService {
   }
 
   @Override
-  public List<Author> updateAuthors(Textbook textbook, List<Author> newValue) throws SQLException {
+  public List<Author> setAuthors(Textbook textbook, List<Author> newValue) throws SQLException {
     List<Author> authors = fixIds(newValue);
-    textbookDao.setAuthors(textbook, newValue);
+    textbookDao.addAuthors(textbook.getId(), newValue);
     return authors;
   }
 

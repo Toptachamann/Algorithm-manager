@@ -40,13 +40,15 @@ public class NewItemBoxController extends AnchorPane {
       stage.initModality(Modality.APPLICATION_MODAL);
       stage.setOnCloseRequest(e -> buttonType = ButtonType.CANCEL);
       stage.setOnShowing(e -> buttonType = null);
+      descriptionTextArea.setWrapText(true);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  public void setParameters(
+  public NewItemBoxController(
       String title, String message, String name, String namePrompt, String descriptionPrompt) {
+    this();
     stage.setTitle(title);
     messageLabel.setText(message);
     nameLabel.setText(name);

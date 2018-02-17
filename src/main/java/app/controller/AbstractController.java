@@ -4,10 +4,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class AbstractController {
-  protected Alert confirm;
-  protected Alert info;
-  protected Alert error;
+public abstract class AbstractController {
+  Alert confirm;
+  Alert info;
+  Alert error;
 
   public AbstractController() {
     info = new Alert(Alert.AlertType.INFORMATION);
@@ -30,6 +30,12 @@ public class AbstractController {
     confirm.setGraphic(null);
     ((Stage) confirm.getDialogPane().getScene().getWindow())
         .getIcons()
-        .add(new Image(getClass().getResource("/confirm_icon.png").toString()));
+        .add(new Image(getClass().getResource("/confirm_icon_1.png").toString()));
+  }
+
+  protected void error() {
+    error.setContentText(
+        "Operation wasn't completed due to some internal error.\nSee logs for details.");
+    error.showAndWait();
   }
 }

@@ -88,12 +88,12 @@ public class TextbookController extends AbstractController {
                 FXCollections.observableArrayList(
                     textbookService.searchTextbooks(title, volume, edition, authors)));
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Can't perform search due to some internal error.\n" + "See logs for details.");
             error.showAndWait();
           } catch (InputException e1) {
-            logger.catching(Level.WARN, e1);
+            logger.warn(e1);
             info.setContentText(
                 "Authors' first and last names should be specified in sequence, comma separated.\n"
                     + "For example, Vasya Pupkin, Fedya Nozkin");
@@ -128,12 +128,12 @@ public class TextbookController extends AbstractController {
               textbookTableView.scrollTo(textbookTableView.getItems().size() - 1);
             }
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Can't add new algorithm due to some internal error.\n" + "See logs for details.");
             error.showAndWait();
           } catch (InputException e1) {
-            logger.catching(Level.WARN, e1);
+            logger.warn(e1);
             error.setContentText(
                 "Authors' first and last names should be specified in sequence, comma separated.\n"
                     + "For example, Vasya Pupkin, Fedya Nozhkin");
@@ -181,7 +181,7 @@ public class TextbookController extends AbstractController {
                   textbookService.deleteTextbook(textbook);
                   textbookTableView.getItems().remove(textbook);
                 } catch (SQLException e1) {
-                  logger.catching(Level.ERROR, e1);
+                  logger.error(e1);
                   error.setContentText(
                       "Can't delete selected book due to some internal error.\n"
                           + "See logs for details.");
@@ -205,7 +205,7 @@ public class TextbookController extends AbstractController {
               textbookService.updateTitle(textbook, newTitle);
               textbook.setTitle(newTitle);
             } catch (SQLException e1) {
-              logger.catching(Level.ERROR, e1);
+              logger.error(e1);
               error.setContentText(
                   "Book's title wasn't updated due to some internal error.\n"
                       + "See logs for details.");
@@ -227,7 +227,7 @@ public class TextbookController extends AbstractController {
               textbookService.updateEdition(textbook, newEdition);
               textbook.setEdition(newEdition);
             } catch (SQLException e1) {
-              logger.catching(Level.ERROR, e1);
+              logger.error(e1);
               error.setContentText(
                   "Edition wasn't changed due to some internal error.\n" + "See logs for details.");
               error.showAndWait();
@@ -239,7 +239,7 @@ public class TextbookController extends AbstractController {
       textbookTableView.setItems(
           FXCollections.observableArrayList(textbookService.getAllTextbooks()));
     } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
+      logger.error(e);
       info.setContentText(
           "Can't load books' information due to some internal error.\n" + "See logs for details.");
       info.showAndWait();
@@ -289,7 +289,7 @@ public class TextbookController extends AbstractController {
                 List<Author> authorsFromInput = authorsFromStr(textField.getText());
                 commitEdit(authorsFromInput);
               } catch (InputException e1) {
-                logger.catching(Level.WARN, e1);
+                logger.error(e1);
                 info.setContentText(
                     "Authors' first and last names should be specified in sequence, comma separated.\n"
                         + "For example, Vasya Pupkin, Fedya Nozkin");
@@ -328,11 +328,11 @@ public class TextbookController extends AbstractController {
       super.commitEdit(newValue);
       try {
         Textbook textbook = getTableView().getItems().get(getTableRow().getIndex());
-        List<Author> newAuthors = textbookService.updateAuthors(textbook, newValue);
+        List<Author> newAuthors = textbookService.setAuthors(textbook, newValue);
         setItem(newAuthors);
         updateItem(newAuthors, false);
       } catch (SQLException e) {
-        logger.catching(Level.ERROR, e);
+        logger.error(e);
         error.setContentText(
             "Authors weren't updated due to some internal error.\n" + "See logs for details.");
         error.showAndWait();
@@ -388,7 +388,7 @@ public class TextbookController extends AbstractController {
                   textbookService.updateVolume(rowValue, null);
                   rowValue.setVolume(null);
                 } catch (SQLException e1) {
-                  logger.catching(Level.ERROR, e1);
+                  logger.error(e1);
                   error.setContentText(
                       "Can't set book's volume to none due to some internal error.\n"
                           + "See logs for details.");
@@ -447,7 +447,7 @@ public class TextbookController extends AbstractController {
           textbookService.updateVolume(rowValue, newValue);
           rowValue.setVolume(newValue);
         } catch (SQLException e) {
-          logger.catching(Level.ERROR, e);
+          logger.error(e);
           error.setContentText(
               "Can't set book's volume to none due to some internal error.\n"
                   + "See logs for details.");

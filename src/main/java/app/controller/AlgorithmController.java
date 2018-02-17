@@ -19,7 +19,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,7 +101,7 @@ public class AlgorithmController extends AbstractController {
       fieldOfStudyCB.setItems(
           FXCollections.observableArrayList(algorithmService.getAllFieldsOfStudy()));
     } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
+      logger.error(e);
       info.setContentText("Can't load algorithms' data. Check server connection.");
       info.showAndWait();
     }
@@ -136,16 +135,12 @@ public class AlgorithmController extends AbstractController {
           }
         });*/
 
-    newParadigm = new NewItemBoxController();
-    newParadigm.setParameters(
-        "New design paradigm",
+    newParadigm = new NewItemBoxController("New design paradigm",
         "Enter new design paradigm parameters",
         "Design paradigm",
         "Enter design paradigm",
         "Enter paradigm description");
-    newField = new NewItemBoxController();
-    newField.setParameters(
-        "New field of study",
+    newField = new NewItemBoxController("New field of study",
         "Enter field of study parameters",
         "Field of Study",
         "Enter field of study",
@@ -164,23 +159,23 @@ public class AlgorithmController extends AbstractController {
               } else {
                 DesignParadigm designParadigm;
                 if (StringUtils.isBlank(retrievedDescription)) {
-                  designParadigm = algorithmService.insertDesignParadigm(retrievedName.trim());
+                  designParadigm = algorithmService.createDesignParadigm(retrievedName.trim());
                 } else {
                   designParadigm =
-                      algorithmService.insertDesignParadigm(
+                      algorithmService.createDesignParadigm(
                           retrievedName.trim(), retrievedDescription.trim());
                 }
                 designParadigmCB.getItems().add(designParadigm);
               }
             }
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Addition of the new design paradigm failed due to some internal error.\n"
                     + "See logs for details.");
             error.showAndWait();
           } catch (LogicException e1) {
-            logger.catching(Level.WARN, e1);
+            logger.warn(e1);
             info.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
             info.showAndWait();
           }
@@ -198,23 +193,23 @@ public class AlgorithmController extends AbstractController {
               } else {
                 FieldOfStudy fieldOfStudy;
                 if (StringUtils.isBlank(retrievedDescription)) {
-                  fieldOfStudy = algorithmService.insertFieldOfStudy(retrievedName.trim());
+                  fieldOfStudy = algorithmService.createFieldOfStudy(retrievedName.trim());
                 } else {
                   fieldOfStudy =
-                      algorithmService.insertFieldOfStudy(
+                      algorithmService.createFieldOfStudy(
                           retrievedName.trim(), retrievedDescription.trim());
                 }
                 fieldOfStudyCB.getItems().add(fieldOfStudy);
                }
             }
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Addition of the new field of study failed due to some internal error.\n"
                     + "See logs for details.");
             error.showAndWait();
           } catch (LogicException e1) {
-            logger.catching(Level.WARN, e1);
+            logger.warn(e1);
             info.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
             info.showAndWait();
           }
@@ -245,12 +240,12 @@ public class AlgorithmController extends AbstractController {
               algorithmTableView.scrollTo(algorithmTableView.getItems().size() - 1);
             }
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Addition of a new algorithm failed failed due to some internal error.\n"
                     + "See logs for details.");
           } catch (LogicException e1) {
-            logger.catching(Level.WARN, e1);
+            logger.warn(e1);
             info.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
             info.showAndWait();
           }
@@ -266,7 +261,7 @@ public class AlgorithmController extends AbstractController {
                     fieldOfStudyCB.getSelectionModel().getSelectedItem());
             algorithmTableView.setItems(FXCollections.observableArrayList(algorithms));
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText("Search failed due to some internal error.\nSee logs for details");
             error.showAndWait();
           }
@@ -331,10 +326,10 @@ public class AlgorithmController extends AbstractController {
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {
                 try {
-                  algorithmService.deleteItem(algorithm);
+                  algorithmService.deleteAlgorithm(algorithm);
                   algorithmTableView.getItems().remove(algorithm);
                 } catch (SQLException e1) {
-                  logger.catching(Level.ERROR, e1);
+                  logger.error(e1);
                   error.setContentText(
                       "Deletion of the algorithm failed due to some internal error.\n"
                           + "See logs for details.");
@@ -358,14 +353,14 @@ public class AlgorithmController extends AbstractController {
               algorithmService.updateAlgorithmName(algorithm, newValue);
               algorithm.setName(newValue);
             } catch (SQLException e1) {
-              logger.catching(Level.ERROR, e1);
+              logger.error(e1);
               error.setContentText(
                   "Algorithm's name wasn't changed due to some internal error.\n"
                       + "See logs for details.");
               error.showAndWait();
               algorithmTableView.refresh();
             } catch (LogicException e1) {
-              logger.catching(Level.WARN, e1);
+              logger.warn(e1);
               info.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
               info.showAndWait();
             }
@@ -385,7 +380,7 @@ public class AlgorithmController extends AbstractController {
             algorithmService.updateAlgorithmComplexity(e.getRowValue(), newValue);
             algorithm.setComplexity(newValue);
           } catch (SQLException e1) {
-            logger.catching(Level.ERROR, e1);
+            logger.error(e1);
             error.setContentText(
                 "Algorithm's complexity wasn't changed due to some internal error.\n"
                     + "See logs for details.");
@@ -556,7 +551,7 @@ public class AlgorithmController extends AbstractController {
             algorithmTableView.refresh();
           }
         } catch (SQLException e1) {
-          logger.catching(Level.ERROR, e1);
+          logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");
@@ -667,7 +662,7 @@ public class AlgorithmController extends AbstractController {
             algorithmTableView.refresh();
           }
         } catch (SQLException e1) {
-          logger.catching(Level.ERROR, e1);
+          logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");

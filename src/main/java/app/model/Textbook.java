@@ -13,17 +13,24 @@ public class Textbook {
   private Integer volume;
   private Integer edition;
   private List<Author> authors;
+  private List<Algorithm> algorithms;
 
-  public Textbook() {}
+  public Textbook() {
+  }
 
   public Textbook(
-      Integer id, String title, @Nullable Integer volume, Integer edition, List<Author> authors) {
-
+      Integer id,
+      String title,
+      @Nullable Integer volume,
+      Integer edition,
+      List<Author> authors,
+      List<Algorithm> algorithms) {
     this.id = id;
     this.title = title;
     this.volume = volume;
     this.edition = edition;
     this.authors = authors;
+    this.algorithms = algorithms;
   }
 
   public Textbook(Integer id, String title, @Nullable Integer volume, Integer edition) {
@@ -32,6 +39,31 @@ public class Textbook {
     this.volume = volume;
     this.edition = edition;
     authors = new ArrayList<>();
+    algorithms = new ArrayList<>();
+  }
+
+  public void addAuthor(Author author) {
+    this.authors.add(author);
+  }
+
+  public void addAuthors(List<Author> authors) {
+    this.authors.addAll(authors);
+  }
+
+  public void addAlgorithm(Algorithm algorithm) {
+    this.algorithms.add(algorithm);
+  }
+
+  public void addAlgorithms(List<Algorithm> algorithms) {
+    this.algorithms.addAll(algorithms);
+  }
+
+  public List<Algorithm> getAlgorithms() {
+    return algorithms;
+  }
+
+  public void setAlgorithms(List<Algorithm> algorithms) {
+    this.algorithms = algorithms;
   }
 
   @Override
@@ -48,10 +80,6 @@ public class Textbook {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 37).append(id).toHashCode();
-  }
-
-  public void addAuthor(Author author) {
-    this.authors.add(author);
   }
 
   public Integer getId() {

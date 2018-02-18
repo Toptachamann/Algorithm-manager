@@ -1,7 +1,9 @@
 package app.service;
 
+import app.auxiliary.LogicException;
 import app.dao.AuthorDao;
 import app.dao.TextbookDao;
+import app.model.Algorithm;
 import app.model.Author;
 import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +29,7 @@ public class TextbookServiceImpl implements TextbookService {
   @Override
   public Textbook createTextbook(
       String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
-    return textbookDao.insertTextbook(title, volume, edition, fixIds(authors), new ArrayList<>());
+    return textbookDao.insertTextbook(title, volume, edition, fixIds(authors));
   }
 
   @Override
@@ -79,12 +81,37 @@ public class TextbookServiceImpl implements TextbookService {
   @Override
   public List<Author> setAuthors(Textbook textbook, List<Author> newValue) throws SQLException {
     List<Author> authors = fixIds(newValue);
-    textbookDao.addAuthors(textbook.getId(), newValue);
+    textbookDao.setAuthors(textbook.getId(), authors);
     return authors;
   }
 
   @Override
   public void deleteTextbook(Textbook textbook) throws SQLException {
     textbookDao.deleteTextbookById(textbook.getId());
+  }
+
+  @Override
+  public void createReference(Algorithm algorithm, Textbook textbook)
+      throws SQLException, LogicException {
+    if (textbookDao.containsReference(algorithm.getId(), textbook.getId())) {
+      throw new LogicException("This reference already exists");
+    } else {
+      textbookDao.createReference(algorithm.getId(), textbook.getId());
+    }
+  }
+
+  @Override
+  public List<Textbook> getReferences(Algorithm algorithm) throws SQLException {
+    return textbookDao.getTextbooksByAlgorithm(algorithm.getId());
+  }
+
+  @Override
+  public void deleteReference(Algorithm algorithm, Textbook textbook)
+      throws SQLException, LogicException {
+    if (!textbookDao.containsReference(algorithm.getId(), textbook.getId())) {
+      throw new LogicException("This reference doesn't exist");
+    } else {
+      textbookDao.deleteReference(algorithm.getId(), textbook.getId());
+    }
   }
 }

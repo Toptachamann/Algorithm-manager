@@ -52,6 +52,11 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
+  public List<Algorithm> getAllAlgorithms() throws SQLException {
+    return algorithmDao.getAllAlgorithms();
+  }
+
+  @Override
   public List<Algorithm> searchAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException {
@@ -59,28 +64,40 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public List<Algorithm> getAllAlgorithms() throws SQLException {
-    return algorithmDao.getAllAlgorithms();
+  public List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws SQLException {
+    return algorithmDao.getAlgorithmsByArea(areaOfUse.getId());
   }
 
   @Override
-  public List<DesignParadigm> getDesignParadigms() throws SQLException {
-    return paradigmDao.getAllDesignParadigms();
+  public void updateAlgorithmName(Algorithm algorithm, String newName)
+      throws SQLException, LogicException {
+    Validate.isTrue(!StringUtils.isBlank(newName));
+    if (algorithmDao.getAlgorithmByName(newName).isPresent()) {
+      throw new LogicException("Algorithm with this name already exists");
+    }
+    algorithmDao.updateEntry("algorithm", newName.trim(), algorithm.getId());
   }
 
   @Override
-  public List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException {
-    return fieldDao.getAllFieldsOfStudy();
+  public void updateAlgorithmComplexity(Algorithm algorithm, String newComplexity)
+      throws SQLException {
+    Validate.isTrue(!StringUtils.isBlank(newComplexity));
+    algorithmDao.updateEntry("complexity", newComplexity.trim(), algorithm.getId());
   }
 
   @Override
-  public Optional<FieldOfStudy> getFieldByName(String name) throws SQLException {
-    return fieldDao.getFieldByName(name);
+  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException {
+    algorithmDao.setDesignParadigm(paradigm.getId(), algorithm.getId());
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmByName(String name) throws SQLException {
-    return paradigmDao.getParadigmByName(name);
+  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws SQLException {
+    algorithmDao.setFieldOfStudy(field.getId(), algorithm.getId());
+  }
+
+  @Override
+  public void deleteAlgorithm(Algorithm algorithm) throws SQLException {
+    algorithmDao.deleteById(algorithm.getId());
   }
 
   @Override
@@ -110,13 +127,13 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public FieldOfStudy createFieldOfStudy(String fieldName) throws SQLException, LogicException {
-    Validate.isTrue(!StringUtils.isBlank(fieldName));
-    if (fieldDao.getFieldByName(fieldName).isPresent()) {
-      throw new LogicException("This field of study already exists");
-    } else {
-      return fieldDao.insertFieldOfStudy(fieldName);
-    }
+  public List<DesignParadigm> getDesignParadigms() throws SQLException {
+    return paradigmDao.getAllDesignParadigms();
+  }
+
+  @Override
+  public Optional<DesignParadigm> getParadigmByName(String name) throws SQLException {
+    return paradigmDao.getParadigmByName(name);
   }
 
   @Override
@@ -134,20 +151,23 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void updateAlgorithmName(Algorithm algorithm, String newName)
-      throws SQLException, LogicException {
-    Validate.isTrue(!StringUtils.isBlank(newName));
-    if (algorithmDao.getAlgorithmByName(newName).isPresent()) {
-      throw new LogicException("Algorithm with this name already exists");
+  public FieldOfStudy createFieldOfStudy(String fieldName) throws SQLException, LogicException {
+    Validate.isTrue(!StringUtils.isBlank(fieldName));
+    if (fieldDao.getFieldByName(fieldName).isPresent()) {
+      throw new LogicException("This field of study already exists");
+    } else {
+      return fieldDao.insertFieldOfStudy(fieldName);
     }
-    algorithmDao.updateEntry("algorithm", newName.trim(), algorithm.getId());
   }
 
   @Override
-  public void updateAlgorithmComplexity(Algorithm algorithm, String newComplexity)
-      throws SQLException {
-    Validate.isTrue(!StringUtils.isBlank(newComplexity));
-    algorithmDao.updateEntry("complexity", newComplexity.trim(), algorithm.getId());
+  public List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException {
+    return fieldDao.getAllFieldsOfStudy();
+  }
+
+  @Override
+  public Optional<FieldOfStudy> getFieldByName(String name) throws SQLException {
+    return fieldDao.getFieldByName(name);
   }
 
   @Override
@@ -164,26 +184,6 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     Validate.isTrue(!StringUtils.isBlank(newField));
     fieldDao.updateFieldOfStudy(newField, field.getId());
     return new FieldOfStudy(field.getId(), newField, field.getDescription());
-  }
-
-  @Override
-  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException {
-    algorithmDao.setDesignParadigm(paradigm.getId(), algorithm.getId());
-  }
-
-  @Override
-  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws SQLException {
-    algorithmDao.setFieldOfStudy(field.getId(), algorithm.getId());
-  }
-
-  @Override
-  public void deleteAlgorithm(Algorithm algorithm) throws SQLException {
-    algorithmDao.deleteById(algorithm.getId());
-  }
-
-  @Override
-  public List<AreaOfUse> getAllAreas() throws SQLException {
-    return areaDao.getAllAreas();
   }
 
   @Override
@@ -212,8 +212,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException {
-    areaDao.deleteAreaOfUse(areaOfUse.getId());
+  public List<AreaOfUse> getAllAreas() throws SQLException {
+    return areaDao.getAllAreas();
   }
 
   @Override
@@ -222,7 +222,17 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void createAlgorithmApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+  public List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws SQLException {
+    return areaDao.getAreasOfUse(algorithm.getId());
+  }
+
+  @Override
+  public void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException {
+    areaDao.deleteAreaOfUse(areaOfUse.getId());
+  }
+
+  @Override
+  public void createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException {
     if (areaDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
       throw new LogicException("This algorithm application does already exist");
@@ -232,14 +242,12 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws SQLException {
-    return areaDao.getAreasOfUse(algorithm.getId());
+  public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws SQLException, LogicException {
+    if (!areaDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
+      throw new LogicException("This application didn't exist");
+    } else {
+      areaDao.deleteApplication(algorithm.getId(), areaOfUse.getId());
+    }
   }
-
-  @Override
-  public List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws SQLException {
-    return algorithmDao.getAlgorithmsByArea(areaOfUse.getId());
-  }
-
-
 }

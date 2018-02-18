@@ -63,10 +63,13 @@ public interface AlgorithmService {
 
   Optional<AreaOfUse> getAreaOfUse(String name) throws SQLException;
 
-  void createAlgorithmApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+  void createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException;
 
   List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws SQLException;
 
   List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws SQLException;
+
+  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws SQLException, LogicException;
 }

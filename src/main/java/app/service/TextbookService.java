@@ -1,5 +1,7 @@
 package app.service;
 
+import app.auxiliary.LogicException;
+import app.model.Algorithm;
 import app.model.Author;
 import app.model.Textbook;
 
@@ -27,4 +29,10 @@ public interface TextbookService {
   void updateEdition(Textbook textbook, Integer edition) throws SQLException;
 
   List<Author> setAuthors(Textbook textbook, List<Author> authors) throws SQLException;
+
+  void createReference(Algorithm algorithm, Textbook textbook) throws SQLException, LogicException;
+
+  List<Textbook> getReferences(Algorithm algorithm) throws SQLException;
+
+  void deleteReference(Algorithm algorithm, Textbook textbook) throws SQLException, LogicException;
 }

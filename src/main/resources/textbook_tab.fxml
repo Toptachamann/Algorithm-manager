@@ -29,48 +29,48 @@
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
-                        <Label layoutX="260.0" layoutY="40.0" prefHeight="35.0" prefWidth="100.0" text="Book title">
+                        <Label layoutX="285.0" layoutY="40.0" prefHeight="35.0" prefWidth="100.0" text="Book title">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="260.0" layoutY="110.0" prefHeight="35.0" prefWidth="100.0" text="Edition">
+                        <Label layoutX="285.0" layoutY="180.0" prefHeight="35.0" prefWidth="100.0" text="Edition">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="260.0" layoutY="250.0" prefHeight="35.0" prefWidth="100.0" text="Authors">
+                        <Label layoutX="285.0" layoutY="250.0" prefHeight="35.0" prefWidth="100.0" text="Authors">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Label>
-                        <Label layoutX="260.0" layoutY="180.0" prefHeight="35.0" prefWidth="100.0" text="Volume">
+                        <Label layoutX="285.0" layoutY="110.0" prefHeight="35.0" prefWidth="100.0" text="Volume">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Label>
-                        <TextField fx:id="titleTextField" layoutX="450.0" layoutY="40.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter book title">
+                        <TextField fx:id="titleTextField" layoutX="475.0" layoutY="40.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter book title">
                             <font>
-                                <Font name="Arial Bold" size="16.0" />
+                                <Font name="Arial" size="16.0" />
                             </font>
                         </TextField>
-                        <ComboBox fx:id="editionCB" editable="true" layoutX="450.0" layoutY="110.0" prefHeight="35.0" prefWidth="100.0" />
-                        <ComboBox fx:id="volumeCB" editable="true" layoutX="450.0" layoutY="180.0" prefHeight="35.0" prefWidth="100.0" />
-                        <Button fx:id="searchBookButton" layoutX="350.0" layoutY="340.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Search book">
+                        <ComboBox fx:id="volumeCB" editable="true" layoutX="475.0" layoutY="110.0" prefHeight="35.0" prefWidth="100.0" />
+                        <ComboBox fx:id="editionCB" editable="true" layoutX="475.0" layoutY="180.0" prefHeight="35.0" prefWidth="100.0" />
+                        <TextField fx:id="authorsTextField" layoutX="475.0" layoutY="250.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter book authors, comma-separated">
+                     <font>
+                        <Font name="Arial" size="16.0" />
+                     </font>
+                        </TextField>
+                        <Button fx:id="searchBookButton" layoutX="375.0" layoutY="330.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Search book">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Button>
-                        <Button fx:id="addBookButton" layoutX="700.0" layoutY="340.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Create book">
+                        <Button fx:id="addBookButton" layoutX="725.0" layoutY="330.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="200.0" text="Create book">
                             <font>
                                 <Font name="Arial Bold" size="16.0" />
                             </font>
                         </Button>
-                        <TextField fx:id="authorsTextField" layoutX="450.0" layoutY="250.0" prefHeight="35.0" prefWidth="350.0" promptText="Enter book authors, comma-separated">
-                            <font>
-                                <Font name="Arial Bold" size="16.0" />
-                            </font>
-                        </TextField>
                     </children>
                 </AnchorPane>
             </items>

@@ -6,10 +6,12 @@
     <bean id="algorithmDao" class="app.dao.AlgorithmDaoImpl"/>
     <bean id="paradigmDao" class="app.dao.ParadigmDaoImpl"/>
     <bean id="fieldDao" class="app.dao.FieldDaoImpl"/>
+    <bean id="areaDao" class="app.dao.AreaDaoImpl"/>
     <bean id="algorithmService" class="app.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="algorithmDao"/>
         <constructor-arg name="paradigmDao" ref="paradigmDao"/>
         <constructor-arg name="fieldDao" ref="fieldDao"/>
+        <constructor-arg name="areaDao" ref="areaDao"/>
     </bean>
 
     <bean id="algorithmController" class="app.controller.AlgorithmController">
@@ -24,6 +26,11 @@
         <constructor-arg name="authorDao" ref="authorDao"/>
     </bean>
     <bean id="textbookController" class="app.controller.TextbookController">
+        <constructor-arg name="textbookService" ref="textbookService"/>
+    </bean>
+
+    <bean id="referenceController" class="app.controller.ReferenceController">
+        <constructor-arg name="algorithmService" ref="algorithmService"/>
         <constructor-arg name="textbookService" ref="textbookService"/>
     </bean>
 </beans>

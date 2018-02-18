@@ -301,6 +301,47 @@ FROM
         app_algorithm_id = 1) as areas
         INNER JOIN
     area_of_use ON areas.app_area_id = area_id;
+    
+    SELECT
+        COUNT(*) 
+    FROM
+        algorithm_application 
+    WHERE
+        app_algorithm_id = 27 
+        AND app_area_id = 2;
+        
+SELECT 
+    algorithm_id,
+    algorithm,
+    complexity,
+    paradigm_id,
+    paradigm,
+    dp.description,
+    field_id,
+    field,
+    f.description
+FROM
+    (SELECT 
+        app_algorithm_id
+    FROM
+        algorithm_application
+    WHERE
+        app_area_id = 1) AS algos
+        INNER JOIN
+    algorithm ON algos.app_algorithm_id = algorithm_id
+        INNER JOIN
+    design_paradigm as dp ON algo_paradigm_id = paradigm_id
+        INNER JOIN
+    field_of_study as f ON algo_field_id = field_id
+ORDER BY algorithm_id;
+
+select book_id, title, volume, edition, author_id, first_name, last_name
+from (select ref_book_id from algorithm_reference where ref_algorithm_id = 1) as algos
+inner join book on algos.ref_book_id = book_id inner join textbook on book_id = txtbk_book_id 
+inner join author on txtbk_author_id = author_id
+order by book_id, author_id;
+
+SELECT author_id from author WHERE author_id = 1 LIMIT 1;
 
 
 

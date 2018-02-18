@@ -8,7 +8,7 @@
     </Properties>
     <Appenders>
         <Console name="STDOUT">
-            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
         </Console>
         <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
@@ -33,9 +33,9 @@
         <Root level="All">
             <AppenderRef ref="STDOUT"/>
         </Root>
-        <Logger name="org.springframework" aditivity="false">
-            <AppenderRef ref="ALL" level="OFF"/>
-            <AppenderRef ref="ERROR" level="OFF"/>
+        <Logger name="org.springframework.core.env.StandardEnvironment">
+            <AppenderRef ref="ALL" level="FATAL"/>
+            <AppenderRef ref="ERROR" level="FATAL"/>
         </Logger>
         <Logger name="app.dao.AlgorithmDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>

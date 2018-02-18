@@ -3,6 +3,7 @@ package app.dao;
 import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.DesignParadigm;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ParadigmDaoImpl implements ParadigmDao {
+public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private static final Logger logger = LogManager.getLogger(ParadigmDaoImpl.class);
 
   private Connection connection;
 
-  private PreparedStatement insertParadigmByName;
-  private PreparedStatement insertParadigm;
+  private PreparedStatement createParadigmByName;
+  private PreparedStatement createParadigm;
   private PreparedStatement allParadigms;
   private PreparedStatement getParadigmById;
   private PreparedStatement getParadigmByName;
@@ -28,10 +29,10 @@ public class ParadigmDaoImpl implements ParadigmDao {
 
   public ParadigmDaoImpl() throws SQLException {
     connection = Connector.getConnection();
-    insertParadigm =
+    createParadigm =
         connection.prepareStatement(
             "INSERT INTO design_paradigm (paradigm, description) VALUE (?, ?)");
-    insertParadigmByName =
+    createParadigmByName =
         connection.prepareStatement("INSERT INTO design_paradigm (paradigm) VALUE (?)");
     allParadigms = connection.prepareStatement("SELECT * FROM design_paradigm");
     getParadigmById =
@@ -44,20 +45,39 @@ public class ParadigmDaoImpl implements ParadigmDao {
   }
 
   @Override
-  public DesignParadigm insertParadigm(String paradigm) throws SQLException {
-    insertParadigmByName.setString(1, paradigm);
-    logger.debug(() -> Util.format(insertParadigmByName));
-    insertParadigmByName.executeUpdate();
-    return new DesignParadigm(Util.getLastId(connection), paradigm);
+  public DesignParadigm createParadigm(String paradigm) throws SQLException {
+    try {
+      createParadigmByName.setString(1, paradigm);
+      logger.debug(() -> Util.format(createParadigmByName));
+      createParadigmByName.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new DesignParadigm(id, paradigm);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to create design paradigm {}", paradigm);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
-  public DesignParadigm insertParadigm(String paradigm, String description) throws SQLException {
-    insertParadigm.setString(1, paradigm);
-    insertParadigm.setString(2, description);
-    logger.debug(() -> Util.format(insertParadigm));
-    insertParadigm.executeUpdate();
-    return new DesignParadigm(Util.getLastId(connection), paradigm, description);
+  public DesignParadigm createParadigm(String paradigm, String description) throws SQLException {
+    try {
+      createParadigm.setString(1, paradigm);
+      createParadigm.setString(2, description);
+      logger.debug(() -> Util.format(createParadigm));
+      createParadigm.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new DesignParadigm(id, paradigm, description);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create design paradigm {} with description {}", paradigm, description);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
@@ -97,9 +117,17 @@ public class ParadigmDaoImpl implements ParadigmDao {
 
   @Override
   public void updateDesignParadigm(String newName, int id) throws SQLException {
-    updateParadigm.setString(1, newName);
-    updateParadigm.setInt(2, id);
-    logger.debug(() -> Util.format(updateParadigm));
-    updateParadigm.executeUpdate();
+    try {
+      updateParadigm.setString(1, newName);
+      updateParadigm.setInt(2, id);
+      logger.debug(() -> Util.format(updateParadigm));
+      updateParadigm.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to set paradigm name to {} where paradigm id = {}", newName, id);
+      rollBack(connection);
+      throw e;
+    }
   }
 }

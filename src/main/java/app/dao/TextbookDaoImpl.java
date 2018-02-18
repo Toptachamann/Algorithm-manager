@@ -6,6 +6,7 @@ import app.model.Algorithm;
 import app.model.Author;
 import app.model.Textbook;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +20,12 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextbookDaoImpl implements TextbookDao {
+public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
   private static final Logger logger = LogManager.getLogger(TextbookDaoImpl.class);
 
   private Connection connection;
   private PreparedStatement allTextbooks;
-  private PreparedStatement insertBook;
+  private PreparedStatement createBook;
   private PreparedStatement countReferences;
   private PreparedStatement createReference;
   private PreparedStatement connectAlgorithm;
@@ -44,7 +45,7 @@ public class TextbookDaoImpl implements TextbookDao {
                 + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
                 + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
                 + "ORDER BY book_id, author_id");
-    insertBook =
+    createBook =
         connection.prepareStatement("INSERT INTO book (title, volume, edition) VALUE (?, ?, ?)");
     countReferences =
         connection.prepareStatement(
@@ -76,23 +77,34 @@ public class TextbookDaoImpl implements TextbookDao {
   public Textbook insertTextbook(
       String title, @Nullable Integer volume, Integer edition, List<Author> authors)
       throws SQLException {
-    // TODO add transaction
-    insertBook.setString(1, title.trim());
-    if (volume == null) {
-      insertBook.setNull(2, Types.INTEGER);
-    } else {
-      insertBook.setInt(2, volume);
+    try {
+      createBook.setString(1, title.trim());
+      if (volume == null) {
+        createBook.setNull(2, Types.INTEGER);
+      } else {
+        createBook.setInt(2, volume);
+      }
+      createBook.setInt(3, edition);
+      createBook.executeUpdate();
+      int bookId = getLastId(connection);
+      addAuthorsToBook(bookId, authors);
+      connection.commit();
+      return new Textbook(bookId, title, volume, edition, authors);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create a textbook: title = {}, volume = {}, edition = {}, authors = {}",
+          title,
+          String.valueOf(volume),
+          edition,
+          authors.toString());
+      rollBack(connection);
+      throw e;
     }
-    insertBook.setInt(3, edition);
-    insertBook.executeUpdate();
-    int bookId = Util.getLastId(connection);
-    addAuthors(bookId, authors);
-    return new Textbook(bookId, title, volume, edition, authors);
   }
 
   @Override
   public List<Textbook> getTextbooks() throws SQLException {
-    // TODO add transaction
     logger.debug(() -> Util.format(allTextbooks));
     return textbooksFromSet(allTextbooks.executeQuery());
   }
@@ -211,33 +223,57 @@ public class TextbookDaoImpl implements TextbookDao {
 
   @Override
   public <T> void updateBook(String column, T newValue, int id) throws SQLException {
-    String query = "UPDATE book SET " + column + " = ";
-    if (newValue instanceof Integer) {
-      query += newValue;
-    } else {
-      query += Util.fixForString(newValue.toString());
+    try {
+      String query = "UPDATE book SET " + column + " = ";
+      if (newValue instanceof Integer) {
+        query += newValue;
+      } else {
+        query += Util.fixForString(newValue.toString());
+      }
+      query += " WHERE book_id = " + id;
+      String query1 = query;
+      logger.debug(() -> Util.format(query1));
+      connection.createStatement().executeUpdate(query);
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to set value {} in column {} in table book where id = {}", newValue, column, id);
+      rollBack(connection);
+      throw e;
     }
-    query += " WHERE book_id = " + id;
-    String query1 = query;
-    logger.debug(() -> Util.format(query1));
-    connection.createStatement().executeUpdate(query);
   }
 
   @Override
-  public void deleteTextbookById(int id) throws SQLException {
-    deleteBook.setInt(1, id);
-    logger.debug(() -> Util.format(deleteBook));
-    deleteBook.executeUpdate();
+  public void deleteTextbookById(int bookId) throws SQLException {
+    try {
+      deleteBook.setInt(1, bookId);
+      logger.debug(() -> Util.format(deleteBook));
+      deleteBook.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete textbook with id = {}", bookId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   private void resetAuthors(int bookId) throws SQLException {
-    resetAuthors.setInt(1, bookId);
-    logger.debug(() -> Util.format(resetAuthors));
-    resetAuthors.executeUpdate();
+    try {
+      resetAuthors.setInt(1, bookId);
+      logger.debug(() -> Util.format(resetAuthors));
+      resetAuthors.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to reset textbook's authors:  book_id = {}", bookId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
-  @Override
-  public void addAuthors(int bookId, List<Author> authors) throws SQLException {
+  private void addAuthorsToBook(int bookId, List<Author> authors) throws SQLException {
     if (authors.size() > 0) {
       StringBuilder builder =
           new StringBuilder("INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUES ");
@@ -247,6 +283,19 @@ public class TextbookDaoImpl implements TextbookDao {
       String query = builder.toString();
       logger.debug(() -> Util.format(query));
       connection.createStatement().executeUpdate(query);
+    }
+  }
+
+  @Override
+  public void addAuthors(int bookId, List<Author> authors) throws SQLException {
+    try {
+      addAuthorsToBook(bookId, authors);
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to add authors {} to book with id {}", authors.toString(), bookId);
+      rollBack(connection);
+      throw e;
     }
   }
 
@@ -310,18 +359,40 @@ public class TextbookDaoImpl implements TextbookDao {
 
   @Override
   public void createReference(int algorithmId, int bookId) throws SQLException {
-    createReference.setInt(1, algorithmId);
-    createReference.setInt(2, bookId);
-    logger.debug(() -> Util.format(createReference));
-    createReference.executeUpdate();
+    try {
+      createReference.setInt(1, algorithmId);
+      createReference.setInt(2, bookId);
+      logger.debug(() -> Util.format(createReference));
+      createReference.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create reference with algorithm_id = {} and book_id = {}",
+          algorithmId,
+          bookId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public void deleteReference(int algorithmId, int bookId) throws SQLException {
-    deleteReference.setInt(1, algorithmId);
-    deleteReference.setInt(2, bookId);
-    logger.debug(() -> Util.format(deleteBook));
-    deleteReference.executeUpdate();
+    try {
+      deleteReference.setInt(1, algorithmId);
+      deleteReference.setInt(2, bookId);
+      logger.debug(() -> Util.format(deleteBook));
+      deleteReference.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to delete reference with algorithm_id = {} and book_id = {}",
+          algorithmId,
+          bookId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override

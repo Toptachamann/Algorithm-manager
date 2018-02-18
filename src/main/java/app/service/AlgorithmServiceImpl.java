@@ -107,7 +107,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
       throw new LogicException("This design paradigm already exists");
     } else {
-      return paradigmDao.insertParadigm(paradigmName);
+      return paradigmDao.createParadigm(paradigmName);
     }
   }
 
@@ -121,7 +121,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
       if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
         throw new SQLException("This design paradigm already exists");
       } else {
-        return paradigmDao.insertParadigm(paradigmName, description);
+        return paradigmDao.createParadigm(paradigmName, description);
       }
     }
   }

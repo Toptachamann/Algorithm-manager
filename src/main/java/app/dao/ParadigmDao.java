@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParadigmDao {
-  DesignParadigm insertParadigm(String paradigm) throws SQLException;
+  DesignParadigm createParadigm(String paradigm) throws SQLException;
 
-  DesignParadigm insertParadigm(String paradigm, String description) throws SQLException;
+  DesignParadigm createParadigm(String paradigm, String description) throws SQLException;
 
   List<DesignParadigm> getAllDesignParadigms() throws SQLException;
 

@@ -19,6 +19,7 @@ public class AuthorDaoImpl implements AuthorDao {
   private Connection connection;
 
   private PreparedStatement getAuthorByName;
+  private PreparedStatement getAuthorId;
   private PreparedStatement insertAuthor;
 
   public AuthorDaoImpl() throws SQLException {
@@ -27,6 +28,9 @@ public class AuthorDaoImpl implements AuthorDao {
         connection.prepareStatement("INSERT INTO author (first_name, last_name) VALUE (?, ?)");
     getAuthorByName =
         connection.prepareStatement("SELECT * FROM author WHERE first_name = ? && last_name = ?");
+    getAuthorId =
+        connection.prepareStatement(
+            "SELECT author_id from author WHERE first_name = ? AND last_name = ? LIMIT 1");
   }
 
   @Override
@@ -34,7 +38,7 @@ public class AuthorDaoImpl implements AuthorDao {
     List<Author> authors = new ArrayList<>();
     getAuthorByName.setString(1, firstName);
     getAuthorByName.setString(2, lastName);
-    logger.debug(Util.format(getAuthorByName));
+    logger.debug(() -> Util.format(getAuthorByName));
     ResultSet set = getAuthorByName.executeQuery();
     while (set.next()) {
       authors.add(new Author(set.getInt(1), set.getString(2), set.getString(3)));
@@ -43,15 +47,28 @@ public class AuthorDaoImpl implements AuthorDao {
   }
 
   @Override
-  public Author insertAuthor(String firstName, String lastName) throws SQLException {
+  public int getAuthorId(String firstName, String lastName) throws SQLException {
+    getAuthorId.setString(1, firstName);
+    getAuthorId.setString(2, lastName);
+    logger.debug(() -> Util.format(getAuthorId));
+    ResultSet set = getAuthorId.executeQuery();
+    if (set.next()) {
+      return set.getInt(1);
+    } else {
+      return -1;
+    }
+  }
+
+  @Override
+  public Author createAuthor(String firstName, String lastName) throws SQLException {
     // TODO add transaction
-    List<Author> matchedAuthors = getAuthorByName(firstName, lastName);
-    if(matchedAuthors.size() > 0){
-      return matchedAuthors.get(0);
-    }else{
+    int id = getAuthorId(firstName, lastName);
+    if (id != -1) {
+      return new Author(id, firstName, lastName);
+    } else {
       insertAuthor.setString(1, firstName);
       insertAuthor.setString(2, lastName);
-      logger.debug(Util.format(insertAuthor));
+      logger.debug(() -> Util.format(insertAuthor));
       insertAuthor.executeUpdate();
       return new Author(Util.getLastId(connection), firstName, lastName);
     }

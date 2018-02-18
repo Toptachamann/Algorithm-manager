@@ -6,7 +6,6 @@ import app.model.AreaOfUse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.awt.geom.Area;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,6 +28,7 @@ public class AreaDaoImpl implements AreaDao {
   private PreparedStatement getAreasByAlgo;
   private PreparedStatement containsApp;
   private PreparedStatement deleteAreaById;
+  private PreparedStatement deleteApplication;
 
   public AreaDaoImpl() throws SQLException {
     connection = Connector.getConnection();
@@ -45,27 +45,19 @@ public class AreaDaoImpl implements AreaDao {
     getAreasByAlgo =
         connection.prepareStatement(
             "SELECT area_id, area, description "
-                + "FROM (SELECT app_area_id FROM algorithm_application WHERE app_algorithm_id = ?) AS areas " +
-                "INNER JOIN area_of_use ON areas.app_area_id = area_id");
-    deleteAreaById =
-        connection.prepareStatement("DELETE FROM algorithms.area_of_use WHERE area_id = ?");
+                + "FROM (SELECT app_area_id FROM algorithm_application WHERE app_algorithm_id = ?) AS areas "
+                + "INNER JOIN area_of_use ON areas.app_area_id = area_id");
     createApp =
         connection.prepareStatement(
             "INSERT INTO algorithm_application (app_algorithm_id, app_area_id) VALUE (?, ?)");
     containsApp =
         connection.prepareStatement(
             "SELECT COUNT(*) FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
-  }
-
-  @Override
-  public List<AreaOfUse> getAllAreas() throws SQLException {
-    logger.debug(() -> Util.format(getAllAreas));
-    ResultSet set = getAllAreas.executeQuery();
-    List<AreaOfUse> result = new ArrayList<>();
-    while (set.next()) {
-      result.add(new AreaOfUse(set.getInt(1), set.getString(2), set.getString(3)));
-    }
-    return result;
+    deleteAreaById =
+        connection.prepareStatement("DELETE FROM algorithms.area_of_use WHERE area_id = ?");
+    deleteApplication =
+        connection.prepareStatement(
+            "DELETE FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
   }
 
   @Override
@@ -83,6 +75,25 @@ public class AreaDaoImpl implements AreaDao {
     logger.debug(() -> Util.format(createAreaByName));
     createAreaByName.executeUpdate();
     return new AreaOfUse(Util.getLastId(connection), area);
+  }
+
+  @Override
+  public void createApplication(int algorithmId, int areaId) throws SQLException {
+    createApp.setInt(1, algorithmId);
+    createApp.setInt(2, areaId);
+    logger.debug(() -> Util.format(createApp));
+    createApp.executeUpdate();
+  }
+
+  @Override
+  public List<AreaOfUse> getAllAreas() throws SQLException {
+    logger.debug(() -> Util.format(getAllAreas));
+    ResultSet set = getAllAreas.executeQuery();
+    List<AreaOfUse> result = new ArrayList<>();
+    while (set.next()) {
+      result.add(new AreaOfUse(set.getInt(1), set.getString(2), set.getString(3)));
+    }
+    return result;
   }
 
   @Override
@@ -110,18 +121,15 @@ public class AreaDaoImpl implements AreaDao {
   }
 
   @Override
-  public void deleteAreaOfUse(int id) throws SQLException {
-    deleteAreaById.setInt(1, id);
-    logger.debug(() -> Util.format(deleteAreaById));
-    deleteAreaById.executeUpdate();
-  }
-
-  @Override
-  public void createApplication(int algorithmId, int areaId) throws SQLException {
-    createApp.setInt(1, algorithmId);
-    createApp.setInt(2, areaId);
-    logger.debug(() -> Util.format(createApp));
-    createApp.executeUpdate();
+  public List<AreaOfUse> getAreasOfUse(int algorithmId) throws SQLException {
+    getAreasByAlgo.setInt(1, algorithmId);
+    logger.debug(() -> Util.format(getAreasByAlgo));
+    List<AreaOfUse> areas = new ArrayList<>();
+    ResultSet set = getAreasByAlgo.executeQuery();
+    while (set.next()) {
+      areas.add(new AreaOfUse(set.getInt(1), set.getString(2), set.getString(3)));
+    }
+    return areas;
   }
 
   @Override
@@ -135,14 +143,17 @@ public class AreaDaoImpl implements AreaDao {
   }
 
   @Override
-  public List<AreaOfUse> getAreasOfUse(int algorithmId) throws SQLException {
-    getAreasByAlgo.setInt(1, algorithmId);
-    logger.debug(()->Util.format(getAreasByAlgo));
-    List<AreaOfUse> areas = new ArrayList<>();
-    ResultSet set = getAreasByAlgo.executeQuery();
-    while(set.next()){
-      areas.add(new AreaOfUse(set.getInt(1), set.getString(2), set.getString(3)));
-    }
-    return areas;
+  public void deleteAreaOfUse(int id) throws SQLException {
+    deleteAreaById.setInt(1, id);
+    logger.debug(() -> Util.format(deleteAreaById));
+    deleteAreaById.executeUpdate();
+  }
+
+  @Override
+  public void deleteApplication(int algorithmId, int areaId) throws SQLException {
+    deleteApplication.setInt(1, algorithmId);
+    deleteApplication.setInt(2, areaId);
+    logger.debug(() -> Util.format(deleteApplication));
+    deleteApplication.executeUpdate();
   }
 }

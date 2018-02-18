@@ -43,7 +43,7 @@ public class FieldDaoImpl implements FieldDao {
   @Override
   public FieldOfStudy insertFieldOfStudy(String fieldOfStudy) throws SQLException {
     insertFieldByName.setString(1, fieldOfStudy);
-    logger.debug(Util.format(insertFieldByName));
+    logger.debug(() -> Util.format(insertFieldByName));
     insertFieldByName.executeUpdate();
     return new FieldOfStudy(Util.getLastId(connection), fieldOfStudy);
   }
@@ -53,14 +53,14 @@ public class FieldDaoImpl implements FieldDao {
       throws SQLException {
     insertField.setString(1, fieldOfStudy);
     insertField.setString(2, description);
-    logger.debug(Util.format(insertField));
+    logger.debug(() -> Util.format(insertField));
     insertField.executeUpdate();
     return new FieldOfStudy(Util.getLastId(connection), fieldOfStudy, description);
   }
 
   @Override
   public List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException {
-    logger.debug(Util.format(allFieldsOfStudy));
+    logger.debug(() -> Util.format(allFieldsOfStudy));
     ResultSet result = allFieldsOfStudy.executeQuery();
     List<FieldOfStudy> fields = new ArrayList<>();
     while (result.next()) {
@@ -72,7 +72,7 @@ public class FieldDaoImpl implements FieldDao {
   @Override
   public Optional<FieldOfStudy> getFieldByName(String name) throws SQLException {
     getFieldByName.setString(1, name);
-    logger.debug(Util.format(getFieldByName));
+    logger.debug(() -> Util.format(getFieldByName));
     ResultSet set = getFieldByName.executeQuery();
     if (set.next()) {
       return Optional.of(new FieldOfStudy(set.getInt(1), set.getString(2), set.getString(3)));
@@ -84,7 +84,7 @@ public class FieldDaoImpl implements FieldDao {
   @Override
   public Optional<FieldOfStudy> getFieldById(int id) throws SQLException {
     getFieldById.setInt(1, id);
-    logger.debug(Util.format(getFieldById));
+    logger.debug(() -> Util.format(getFieldById));
     ResultSet set = getFieldById.executeQuery();
     if (set.next()) {
       return Optional.of(new FieldOfStudy(set.getInt(1), set.getString(2), set.getString(3)));
@@ -97,7 +97,7 @@ public class FieldDaoImpl implements FieldDao {
   public void updateFieldOfStudy(String newValue, int id) throws SQLException {
     updateFieldOfStudy.setString(1, newValue);
     updateFieldOfStudy.setInt(2, id);
-    logger.debug(Util.format(updateFieldOfStudy));
+    logger.debug(() -> Util.format(updateFieldOfStudy));
     updateFieldOfStudy.executeUpdate();
   }
 }

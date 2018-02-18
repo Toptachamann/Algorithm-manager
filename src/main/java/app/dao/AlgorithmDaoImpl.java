@@ -25,9 +25,10 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   private PreparedStatement insertAlgorithm;
   private PreparedStatement allAlgorithms;
   private PreparedStatement getAlgoByName;
-  private PreparedStatement deleteById;
+  private PreparedStatement getAlgorithmsByArea;
   private PreparedStatement setParadigm;
   private PreparedStatement setField;
+  private PreparedStatement deleteById;
 
   public AlgorithmDaoImpl() throws SQLException {
     connection = Connector.getConnection();
@@ -42,6 +43,32 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
             + "    INNER JOIN field_of_study as fos ON algo_field_id = field_id)";
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgoByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
+    getAlgorithmsByArea =
+        connection.prepareStatement(
+            "SELECT \n"
+                + "    algorithm_id,\n"
+                + "    algorithm,\n"
+                + "    complexity,\n"
+                + "    paradigm_id,\n"
+                + "    paradigm,\n"
+                + "    dp.description,\n"
+                + "    field_id,\n"
+                + "    field,\n"
+                + "    f.description\n"
+                + "FROM\n"
+                + "    (SELECT \n"
+                + "        app_algorithm_id\n"
+                + "    FROM\n"
+                + "        algorithm_application\n"
+                + "    WHERE\n"
+                + "        app_area_id = ?) AS algos\n"
+                + "        INNER JOIN\n"
+                + "    algorithm ON algos.app_algorithm_id = algorithm_id\n"
+                + "        INNER JOIN\n"
+                + "    design_paradigm AS dp ON algo_paradigm_id = paradigm_id\n"
+                + "        INNER JOIN\n"
+                + "    field_of_study AS f ON algo_field_id = field_id\n"
+                + "ORDER BY algorithm_id");
     deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
     setParadigm =
         connection.prepareStatement(
@@ -61,7 +88,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
     insertAlgorithm.setString(2, complexity);
     insertAlgorithm.setInt(3, designParadigm.getId());
     insertAlgorithm.setInt(4, fieldOfStudy.getId());
-    logger.debug(Util.format(insertAlgorithm));
+    logger.debug(() -> Util.format(insertAlgorithm));
     insertAlgorithm.executeUpdate();
     int id = Util.getLastId(connection);
     return new Algorithm(id, name, complexity, designParadigm, fieldOfStudy);
@@ -69,7 +96,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
 
   @Override
   public List<Algorithm> getAllAlgorithms() throws SQLException {
-    logger.debug(Util.format(allAlgorithms));
+    logger.debug(() -> Util.format(allAlgorithms));
     ResultSet result = allAlgorithms.executeQuery();
     return algorithmFromResultSet(result);
   }
@@ -77,7 +104,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   @Override
   public Optional<Algorithm> getAlgorithmByName(String name) throws SQLException {
     getAlgoByName.setString(1, name);
-    logger.debug(Util.format(getAlgoByName));
+    logger.debug(() -> Util.format(getAlgoByName));
     List<Algorithm> list = algorithmFromResultSet(getAlgoByName.executeQuery());
     if (list.size() == 1) {
       return Optional.of(list.get(0));
@@ -109,17 +136,17 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
       whereClause += " AND complexity LIKE " + complexity.trim();
     }
     if (designParadigm != null) {
-      whereClause += " AND paradigm_id = " + designParadigm.getId();
+      whereClause += " AND paradigm_id LIKE " + designParadigm.getParadigm();
     }
     if (fieldOfStudy != null) {
-      whereClause += " AND field_id = " + fieldOfStudy.getId();
+      whereClause += " AND field_id LIKE " + fieldOfStudy.getField();
     }
     if (whereClause.length() == 0) {
       return getAllAlgorithms();
     } else {
       Statement statement = connection.createStatement();
       String allQuery = query + whereClause;
-      logger.debug(Util.format(allQuery));
+      logger.debug(() -> Util.format(allQuery));
       ResultSet set = statement.executeQuery(allQuery);
       return algorithmFromResultSet(set);
     }
@@ -128,7 +155,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   @Override
   public void deleteById(int id) throws SQLException {
     deleteById.setInt(1, id);
-    logger.debug(Util.format(deleteById));
+    logger.debug(() -> Util.format(deleteById));
     deleteById.executeUpdate();
   }
 
@@ -136,7 +163,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   public void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException {
     setParadigm.setInt(1, paradigmId);
     setParadigm.setInt(2, algorithmId);
-    logger.debug(Util.format(setParadigm));
+    logger.debug(() -> Util.format(setParadigm));
     setParadigm.executeUpdate();
   }
 
@@ -144,7 +171,7 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   public void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException {
     setField.setInt(1, fieldId);
     setField.setInt(2, algorithmId);
-    logger.debug(Util.format(setField));
+    logger.debug(() -> Util.format(setField));
     setField.executeUpdate();
   }
 
@@ -157,9 +184,16 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
             + Util.fixForString(value)
             + " WHERE algorithm_id = "
             + id;
-    logger.debug(query);
+    logger.debug(() -> Util.format(query));
     Statement statement = connection.createStatement();
     statement.executeUpdate(query);
+  }
+
+  @Override
+  public List<Algorithm> getAlgorithmsByArea(int areaId) throws SQLException {
+    getAlgorithmsByArea.setInt(1, areaId);
+    logger.debug(() -> Util.format(getAlgorithmsByArea));
+    return algorithmFromResultSet(getAlgorithmsByArea.executeQuery());
   }
 
   private List<Algorithm> algorithmFromResultSet(ResultSet set) throws SQLException {

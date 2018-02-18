@@ -46,7 +46,7 @@ public class ParadigmDaoImpl implements ParadigmDao {
   @Override
   public DesignParadigm insertParadigm(String paradigm) throws SQLException {
     insertParadigmByName.setString(1, paradigm);
-    logger.debug(Util.format(insertParadigmByName));
+    logger.debug(() -> Util.format(insertParadigmByName));
     insertParadigmByName.executeUpdate();
     return new DesignParadigm(Util.getLastId(connection), paradigm);
   }
@@ -55,14 +55,14 @@ public class ParadigmDaoImpl implements ParadigmDao {
   public DesignParadigm insertParadigm(String paradigm, String description) throws SQLException {
     insertParadigm.setString(1, paradigm);
     insertParadigm.setString(2, description);
-    logger.debug(Util.format(insertParadigm));
+    logger.debug(() -> Util.format(insertParadigm));
     insertParadigm.executeUpdate();
     return new DesignParadigm(Util.getLastId(connection), paradigm, description);
   }
 
   @Override
   public List<DesignParadigm> getAllDesignParadigms() throws SQLException {
-    logger.debug(Util.format(allParadigms));
+    logger.debug(() -> Util.format(allParadigms));
     ResultSet result = allParadigms.executeQuery();
     List<DesignParadigm> paradigms = new ArrayList<>();
     while (result.next()) {
@@ -74,7 +74,7 @@ public class ParadigmDaoImpl implements ParadigmDao {
   @Override
   public Optional<DesignParadigm> getParadigmByName(String name) throws SQLException {
     getParadigmByName.setString(1, name);
-    logger.debug(Util.format(getParadigmByName));
+    logger.debug(() -> Util.format(getParadigmByName));
     ResultSet set = getParadigmByName.executeQuery();
     if (set.next()) {
       return Optional.of(new DesignParadigm(set.getInt(1), set.getString(2), set.getString(3)));
@@ -86,7 +86,7 @@ public class ParadigmDaoImpl implements ParadigmDao {
   @Override
   public Optional<DesignParadigm> getParadigmById(int id) throws SQLException {
     getParadigmById.setInt(1, id);
-    logger.debug(Util.format(getParadigmById));
+    logger.debug(() -> Util.format(getParadigmById));
     ResultSet set = getParadigmById.executeQuery();
     if (set.next()) {
       return Optional.of(new DesignParadigm(set.getInt(1), set.getString(2), set.getString(3)));
@@ -99,7 +99,7 @@ public class ParadigmDaoImpl implements ParadigmDao {
   public void updateDesignParadigm(String newName, int id) throws SQLException {
     updateParadigm.setString(1, newName);
     updateParadigm.setInt(2, id);
-    logger.debug(Util.format(updateParadigm));
+    logger.debug(() -> Util.format(updateParadigm));
     updateParadigm.executeUpdate();
   }
 }

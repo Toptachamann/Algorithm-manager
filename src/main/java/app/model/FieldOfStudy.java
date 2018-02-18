@@ -2,6 +2,7 @@ package app.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class FieldOfStudy {
   private int id;
@@ -61,5 +62,14 @@ public class FieldOfStudy {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("field", field)
+        .append("description", description)
+        .toString();
   }
 }

@@ -1,6 +1,7 @@
 package app.model;
 
-import java.util.ArrayList;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.List;
 
 public class AreaOfUse {
@@ -28,6 +29,15 @@ public class AreaOfUse {
   }
 
   public AreaOfUse() {}
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("areaOfUse", areaOfUse)
+        .append("description", description)
+        .toString();
+  }
 
   public int getId() {
     return id;

@@ -2,6 +2,7 @@ package app.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class Author {
   private int id;
@@ -15,20 +16,6 @@ public class Author {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
-  }
-
-  @Override
-  public String toString() {
-    return "Author{"
-        + "id="
-        + id
-        + ", firstName='"
-        + firstName
-        + '\''
-        + ", lastName='"
-        + lastName
-        + '\''
-        + '}';
   }
 
   @Override
@@ -69,5 +56,14 @@ public class Author {
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("firstName", firstName)
+        .append("lastName", lastName)
+        .toString();
   }
 }

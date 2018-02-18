@@ -2,6 +2,7 @@ package app.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -13,24 +14,16 @@ public class Textbook {
   private Integer volume;
   private Integer edition;
   private List<Author> authors;
-  private List<Algorithm> algorithms;
 
-  public Textbook() {
-  }
+  public Textbook() {}
 
   public Textbook(
-      Integer id,
-      String title,
-      @Nullable Integer volume,
-      Integer edition,
-      List<Author> authors,
-      List<Algorithm> algorithms) {
+      Integer id, String title, @Nullable Integer volume, Integer edition, List<Author> authors) {
     this.id = id;
     this.title = title;
     this.volume = volume;
     this.edition = edition;
     this.authors = authors;
-    this.algorithms = algorithms;
   }
 
   public Textbook(Integer id, String title, @Nullable Integer volume, Integer edition) {
@@ -39,7 +32,17 @@ public class Textbook {
     this.volume = volume;
     this.edition = edition;
     authors = new ArrayList<>();
-    algorithms = new ArrayList<>();
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("title", title)
+        .append("volume", volume)
+        .append("edition", edition)
+        .append("authors", authors)
+        .toString();
   }
 
   public void addAuthor(Author author) {
@@ -48,22 +51,6 @@ public class Textbook {
 
   public void addAuthors(List<Author> authors) {
     this.authors.addAll(authors);
-  }
-
-  public void addAlgorithm(Algorithm algorithm) {
-    this.algorithms.add(algorithm);
-  }
-
-  public void addAlgorithms(List<Algorithm> algorithms) {
-    this.algorithms.addAll(algorithms);
-  }
-
-  public List<Algorithm> getAlgorithms() {
-    return algorithms;
-  }
-
-  public void setAlgorithms(List<Algorithm> algorithms) {
-    this.algorithms = algorithms;
   }
 
   @Override

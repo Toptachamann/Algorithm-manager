@@ -2,6 +2,7 @@ package app.model;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,9 +25,7 @@ public class Algorithm {
 
   @Column(name = "complexity")
   private String complexity;
-
   @Transient private DesignParadigm designParadigm;
-
   @Transient private FieldOfStudy fieldOfStudy;
 
   public Algorithm(
@@ -43,6 +42,17 @@ public class Algorithm {
   }
 
   public Algorithm() {}
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("name", name)
+        .append("complexity", complexity)
+        .append("designParadigm", designParadigm)
+        .append("fieldOfStudy", fieldOfStudy)
+        .toString();
+  }
 
   public int getId() {
     return id;

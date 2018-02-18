@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FieldDao {
-  FieldOfStudy insertFieldOfStudy(String fieldOfStudy) throws SQLException;
+  FieldOfStudy createFieldOfStudy(String fieldOfStudy) throws SQLException;
 
-  FieldOfStudy insertFieldOfStudy(String fieldOfStudy, String description) throws SQLException;
+  FieldOfStudy createFieldOfStudy(String fieldOfStudy, String description) throws SQLException;
 
   List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException;
 

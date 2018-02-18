@@ -202,7 +202,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       connection.commit();
     } catch (SQLException e){
       logger.catching(Level.ERROR, e);
-      logger.info("Failed to set field of study id {} to algorithm with id {}", fieldId, algorithmId);
+      logger.error("Failed to set field of study id {} to algorithm with id {}", fieldId, algorithmId);
       rollBack(connection);
       throw e;
     }
@@ -223,7 +223,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       statement.executeUpdate(query);
     } catch (SQLException e){
       logger.catching(Level.ERROR, e);
-      logger.info("Failed to update value {} of column {} where id = {}", value, column, id);
+      logger.error("Failed to update value {} of column {} where id = {}", value, column, id);
       rollBack(connection);
       throw e;
     }

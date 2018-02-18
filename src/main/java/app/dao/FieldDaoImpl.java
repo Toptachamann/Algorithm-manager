@@ -3,6 +3,7 @@ package app.dao;
 import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.FieldOfStudy;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FieldDaoImpl implements FieldDao {
+public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private static final Logger logger = LogManager.getLogger(FieldDaoImpl.class);
 
   private Connection connection;
 
-  private PreparedStatement insertFieldByName;
-  private PreparedStatement insertField;
+  private PreparedStatement createFieldByName;
+  private PreparedStatement createField;
   private PreparedStatement allFieldsOfStudy;
   private PreparedStatement getFieldById;
   private PreparedStatement getFieldByName;
@@ -29,8 +30,8 @@ public class FieldDaoImpl implements FieldDao {
   public FieldDaoImpl() throws SQLException {
     connection = Connector.getConnection();
     allFieldsOfStudy = connection.prepareStatement("SELECT * FROM field_of_study");
-    insertFieldByName = connection.prepareStatement("INSERT INTO field_of_study (field) VALUE (?)");
-    insertField =
+    createFieldByName = connection.prepareStatement("INSERT INTO field_of_study (field) VALUE (?)");
+    createField =
         connection.prepareStatement("INSERT INTO field_of_study (field, description) VALUE (?, ?)");
     getFieldById = connection.prepareStatement("SELECT * FROM field_of_study WHERE field_id = ?");
     getFieldByName = connection.prepareStatement("SELECT * FROM field_of_study WHERE field = ?");
@@ -41,21 +42,40 @@ public class FieldDaoImpl implements FieldDao {
   }
 
   @Override
-  public FieldOfStudy insertFieldOfStudy(String fieldOfStudy) throws SQLException {
-    insertFieldByName.setString(1, fieldOfStudy);
-    logger.debug(() -> Util.format(insertFieldByName));
-    insertFieldByName.executeUpdate();
-    return new FieldOfStudy(Util.getLastId(connection), fieldOfStudy);
+  public FieldOfStudy createFieldOfStudy(String fieldOfStudy) throws SQLException {
+    try {
+      createFieldByName.setString(1, fieldOfStudy);
+      logger.debug(() -> Util.format(createFieldByName));
+      createFieldByName.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new FieldOfStudy(id, fieldOfStudy);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to create field of study {}", fieldOfStudy);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
-  public FieldOfStudy insertFieldOfStudy(String fieldOfStudy, String description)
+  public FieldOfStudy createFieldOfStudy(String fieldOfStudy, String description)
       throws SQLException {
-    insertField.setString(1, fieldOfStudy);
-    insertField.setString(2, description);
-    logger.debug(() -> Util.format(insertField));
-    insertField.executeUpdate();
-    return new FieldOfStudy(Util.getLastId(connection), fieldOfStudy, description);
+    try {
+      createField.setString(1, fieldOfStudy);
+      createField.setString(2, description);
+      logger.debug(() -> Util.format(createField));
+      createField.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new FieldOfStudy(id, fieldOfStudy, description);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create field of study {} with description {}", fieldOfStudy, description);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
@@ -95,9 +115,17 @@ public class FieldDaoImpl implements FieldDao {
 
   @Override
   public void updateFieldOfStudy(String newValue, int id) throws SQLException {
-    updateFieldOfStudy.setString(1, newValue);
-    updateFieldOfStudy.setInt(2, id);
-    logger.debug(() -> Util.format(updateFieldOfStudy));
-    updateFieldOfStudy.executeUpdate();
+    try {
+      updateFieldOfStudy.setString(1, newValue);
+      updateFieldOfStudy.setInt(2, id);
+      logger.debug(() -> Util.format(updateFieldOfStudy));
+      updateFieldOfStudy.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to update field of study name to {} where id = {}", newValue, id);
+      rollBack(connection);
+      throw e;
+    }
   }
 }

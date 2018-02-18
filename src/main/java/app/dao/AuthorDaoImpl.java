@@ -3,6 +3,7 @@ package app.dao;
 import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.Author;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuthorDaoImpl implements AuthorDao {
+public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
 
   private Connection connection;
@@ -61,16 +62,24 @@ public class AuthorDaoImpl implements AuthorDao {
 
   @Override
   public Author createAuthor(String firstName, String lastName) throws SQLException {
-    // TODO add transaction
     int id = getAuthorId(firstName, lastName);
     if (id != -1) {
       return new Author(id, firstName, lastName);
     } else {
-      insertAuthor.setString(1, firstName);
-      insertAuthor.setString(2, lastName);
-      logger.debug(() -> Util.format(insertAuthor));
-      insertAuthor.executeUpdate();
-      return new Author(Util.getLastId(connection), firstName, lastName);
+      try {
+        insertAuthor.setString(1, firstName);
+        insertAuthor.setString(2, lastName);
+        logger.debug(() -> Util.format(insertAuthor));
+        insertAuthor.executeUpdate();
+        connection.commit();
+        return new Author(getLastId(connection), firstName, lastName);
+      } catch (SQLException e) {
+        logger.catching(Level.ERROR, e);
+        logger.error(
+            "Failed to create author with first name {} and last name {}", firstName, lastName);
+        rollBack(connection);
+        throw e;
+      }
     }
   }
 }

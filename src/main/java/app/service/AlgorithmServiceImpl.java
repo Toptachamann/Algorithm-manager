@@ -146,7 +146,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     if (fieldDao.getFieldByName(fieldName).isPresent()) {
       throw new LogicException("This field of study already exists");
     } else {
-      return fieldDao.insertFieldOfStudy(fieldDescription, fieldDescription);
+      return fieldDao.createFieldOfStudy(fieldDescription, fieldDescription);
     }
   }
 
@@ -156,7 +156,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     if (fieldDao.getFieldByName(fieldName).isPresent()) {
       throw new LogicException("This field of study already exists");
     } else {
-      return fieldDao.insertFieldOfStudy(fieldName);
+      return fieldDao.createFieldOfStudy(fieldName);
     }
   }
 

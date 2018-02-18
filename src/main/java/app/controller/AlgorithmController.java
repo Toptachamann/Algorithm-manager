@@ -57,12 +57,11 @@ public class AlgorithmController extends AbstractController {
 
   public void initialize() {
     initTableView();
-
     designParadigmCB.setConverter(
         new StringConverter<DesignParadigm>() {
           @Override
           public String toString(DesignParadigm object) {
-            return object.getParadigm();
+            return object == null ? null : object.getParadigm();
           }
 
           @Override
@@ -70,7 +69,7 @@ public class AlgorithmController extends AbstractController {
             return designParadigmCB
                 .getItems()
                 .stream()
-                .filter(dp -> dp.getParadigm().equalsIgnoreCase(string))
+                .filter(dp -> StringUtils.equalsIgnoreCase(dp.getParadigm(), string))
                 .findFirst()
                 .orElse(null);
           }
@@ -79,7 +78,7 @@ public class AlgorithmController extends AbstractController {
         new StringConverter<FieldOfStudy>() {
           @Override
           public String toString(FieldOfStudy object) {
-            return object.getField();
+            return object == null ? null : object.getField();
           }
 
           @Override
@@ -87,7 +86,7 @@ public class AlgorithmController extends AbstractController {
             return fieldOfStudyCB
                 .getItems()
                 .stream()
-                .filter(fos -> fos.getField().equals(string))
+                .filter(fos -> StringUtils.equalsIgnoreCase(fos.getField(), string))
                 .findFirst()
                 .orElse(null);
           }
@@ -135,16 +134,20 @@ public class AlgorithmController extends AbstractController {
           }
         });*/
 
-    newParadigm = new NewItemBoxController("New design paradigm",
-        "Enter new design paradigm parameters",
-        "Design paradigm",
-        "Enter design paradigm",
-        "Enter paradigm description");
-    newField = new NewItemBoxController("New field of study",
-        "Enter field of study parameters",
-        "Field of Study",
-        "Enter field of study",
-        "Enter field's of study description");
+    newParadigm =
+        new NewItemBoxController(
+            "New design paradigm",
+            "Enter new design paradigm parameters",
+            "Design paradigm",
+            "Enter design paradigm",
+            "Enter paradigm description");
+    newField =
+        new NewItemBoxController(
+            "New field of study",
+            "Enter field of study parameters",
+            "Field of Study",
+            "Enter field of study",
+            "Enter field's of study description");
 
     addParadigmButton.setOnAction(
         e -> {
@@ -170,10 +173,7 @@ public class AlgorithmController extends AbstractController {
             }
           } catch (SQLException e1) {
             logger.error(e1);
-            error.setContentText(
-                "Addition of the new design paradigm failed due to some internal error.\n"
-                    + "See logs for details.");
-            error.showAndWait();
+            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             info.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
@@ -200,7 +200,7 @@ public class AlgorithmController extends AbstractController {
                           retrievedName.trim(), retrievedDescription.trim());
                 }
                 fieldOfStudyCB.getItems().add(fieldOfStudy);
-               }
+              }
             }
           } catch (SQLException e1) {
             logger.error(e1);

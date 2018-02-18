@@ -16,6 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
+import javafx.util.converter.IntegerStringConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -113,7 +114,7 @@ public class TextbookController extends AbstractController {
             } else if (!StringUtils.isBlank(volumeStr) && !volumeStr.matches(numberPattern)) {
               info.setContentText("Book's volume value is entered wrong");
               info.showAndWait();
-            } else if (StringUtils.isBlank(editionStr) || editionStr.matches(numberPattern)) {
+            } else if (StringUtils.isBlank(editionStr) || !editionStr.matches(numberPattern)) {
               info.setContentText("Book's edition isn't specified or isn't numeric value");
               info.showAndWait();
             } else if (authors.size() == 0) {
@@ -124,7 +125,7 @@ public class TextbookController extends AbstractController {
               Integer edition = Integer.valueOf(editionStr);
               textbookTableView
                   .getItems()
-                  .add(textbookService.createTextbook(title, edition, volume, authors));
+                  .add(textbookService.createTextbook(title, volume, edition, authors));
               textbookTableView.scrollTo(textbookTableView.getItems().size() - 1);
             }
           } catch (SQLException e1) {
@@ -155,18 +156,24 @@ public class TextbookController extends AbstractController {
     titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     volumeColumn.setCellFactory(param -> new VolumeCell());
     editionColumn.setCellFactory(
-        param ->
-            new TableCell<Textbook, Integer>() {
+        TextFieldTableCell.forTableColumn(
+            new IntegerStringConverter() {
               @Override
-              protected void updateItem(Integer item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                  setText(null);
+              public Integer fromString(String value) {
+                if (StringUtils.isBlank(value)) {
+                  return null;
+                } else if (!value.matches(numberPattern)) {
+                  return null;
                 } else {
-                  setText(item.toString());
+                  return Integer.valueOf(value);
                 }
               }
-            });
+
+              @Override
+              public String toString(Integer value) {
+                return super.toString(value);
+              }
+            }));
     authorColumn.setCellFactory(param -> new AuthorCell());
     textbookTableView.setOnKeyReleased(
         e -> {
@@ -174,7 +181,7 @@ public class TextbookController extends AbstractController {
             Textbook textbook = textbookTableView.getSelectionModel().getSelectedItem();
             if (textbook != null) {
               confirm.setContentText(
-                  "Do you really want to delete thid book?\n" + "Operation is undoable.");
+                  "Do you really want to delete this book?\n" + "Operation is undoable.");
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                 try {
@@ -218,7 +225,7 @@ public class TextbookController extends AbstractController {
         e -> {
           Integer newEdition = e.getNewValue();
           if (newEdition == null || newEdition < 1) {
-            info.setContentText("Edition should be specified and should be greater than 0");
+            info.setContentText("Edition should be numeric value and should be greater than 0");
             info.showAndWait();
             textbookTableView.refresh();
           } else {
@@ -314,7 +321,7 @@ public class TextbookController extends AbstractController {
 
     @Override
     public void startEdit() {
-      if (isEditable()) {
+      if (!isEmpty()) {
         super.startEdit();
         setText(null);
         setGraphic(textField);
@@ -329,7 +336,7 @@ public class TextbookController extends AbstractController {
       try {
         Textbook textbook = getTableView().getItems().get(getTableRow().getIndex());
         List<Author> newAuthors = textbookService.setAuthors(textbook, newValue);
-        setItem(newAuthors);
+        textbook.setAuthors(newAuthors);
         updateItem(newAuthors, false);
       } catch (SQLException e) {
         logger.error(e);
@@ -428,7 +435,7 @@ public class TextbookController extends AbstractController {
       if (!isEmpty()) {
         super.startEdit();
         setText(null);
-        textField.setText(getText());
+        textField.setText(getString());
         setGraphic(textField);
         textField.requestFocus();
       }

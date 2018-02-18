@@ -26,8 +26,9 @@ public class ReferenceController extends AbstractController {
 
   private static final Logger logger = LogManager.getLogger(ReferenceController.class);
   @FXML private ComboBox<Algorithm> areaAlgorithmCB;
-  @FXML private Button addAreaButton;
+  @FXML private Button addApplicationButton;
   @FXML private Button searchApplicationsButton;
+  @FXML private Button deleteApplicationButton;
   @FXML private ComboBox<AreaOfUse> areaOfUseCB;
   @FXML private Button createAreaButton;
   @FXML private Button searchAlgorithmsButton;
@@ -57,6 +58,67 @@ public class ReferenceController extends AbstractController {
             "Area of use",
             "Enter area of use",
             "Area description");
+    addApplicationButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
+            AreaOfUse areaOfUse = areaOfUseCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("Select an algorithm to specify its area of use");
+              info.showAndWait();
+            } else if (areaOfUse == null) {
+              info.setContentText("Select an area of use to connect it to specified algorithm");
+              info.showAndWait();
+            } else {
+              algorithmService.createApplication(algorithm, areaOfUse);
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          } catch (LogicException e1) {
+            logger.warn(e1);
+            super.warn(e1);
+          }
+        });
+    searchApplicationsButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("Select an algorithm to find its practical application");
+              info.showAndWait();
+            } else {
+              displayApplications(algorithm, algorithmService.getAreasByAlgorithm(algorithm));
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          }
+        });
+    deleteApplicationButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
+            AreaOfUse areaOfUse = areaOfUseCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("To delete an algorithmic application select an algorithm first");
+              info.showAndWait();
+            } else if (areaOfUse == null) {
+              info.setContentText(
+                  "Select an area of use to delete an application of the specified algorithm");
+              info.showAndWait();
+            } else {
+              algorithmService.deleteApplication(algorithm, areaOfUse);
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          } catch (LogicException e1) {
+            logger.warn(e1);
+            super.warn(e1);
+          }
+        });
+
     createAreaButton.setOnAction(
         e -> {
           try {
@@ -65,7 +127,9 @@ public class ReferenceController extends AbstractController {
               String name = newArea.getRetrievedName();
               String description = newArea.getRetrievedDescription();
               if (StringUtils.isBlank(name)) {
-
+                info.setContentText(
+                    "Area of use should have at least a name.\nSpecify it at area text field.");
+                info.showAndWait();
               } else {
                 AreaOfUse newArea;
                 if (StringUtils.isBlank(description)) {
@@ -81,8 +145,7 @@ public class ReferenceController extends AbstractController {
             super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
-            info.setContentText("Area of use text field should have a name.");
-            info.showAndWait();
+            super.warn(e1);
           }
         });
     searchAlgorithmsButton.setOnAction(
@@ -95,45 +158,6 @@ public class ReferenceController extends AbstractController {
               info.showAndWait();
             } else {
               displayAlgorithms(areaOfUse, algorithmService.getAlgorithmsByArea(areaOfUse));
-            }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
-          }
-        });
-    addAreaButton.setOnAction(
-        e -> {
-          try {
-            Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
-            AreaOfUse areaOfUse = areaOfUseCB.getSelectionModel().getSelectedItem();
-            if (algorithm == null) {
-              info.setContentText("Select an algorithm to specify its area of use");
-              info.showAndWait();
-            } else if (areaOfUse == null) {
-              info.setContentText("Select an area of use to connect it to specified algorithm");
-              info.showAndWait();
-            } else {
-              algorithmService.createAlgorithmApplication(algorithm, areaOfUse);
-            }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
-          } catch (LogicException e1) {
-            logger.warn(e1);
-            info.setContentText("This algorithm application does already exist");
-            info.showAndWait();
-          }
-        });
-
-    searchApplicationsButton.setOnAction(
-        e -> {
-          try {
-            Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
-            if (algorithm == null) {
-              info.setContentText("Select an algorithm to find its practical application");
-              info.showAndWait();
-            } else {
-              displayApplications(algorithm, algorithmService.getAreasByAlgorithm(algorithm));
             }
           } catch (SQLException e1) {
             logger.error(e1);
@@ -165,18 +189,80 @@ public class ReferenceController extends AbstractController {
             super.error();
           }
         });
-    areaAlgorithmCB.setOnMouseReleased(
+
+    createReferenceButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
+            Textbook textbook = bookCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("To create a reference to an algorithm select it first");
+              info.showAndWait();
+            } else if (textbook == null) {
+              info.setContentText("To create a reference you have to select a book");
+              info.showAndWait();
+            } else {
+              textbookService.createReference(algorithm, textbook);
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          } catch (LogicException e1) {
+            logger.warn(e1);
+            super.warn(e1);
+          }
+        });
+    searchReferencesButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("Select an algorithm to find its applications");
+              info.showAndWait();
+            } else {
+              displayReferences(algorithm, textbookService.getReferences(algorithm));
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          }
+        });
+    deleteReferenceButton.setOnAction(
+        e -> {
+          try {
+            Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
+            Textbook textbook = bookCB.getSelectionModel().getSelectedItem();
+            if (algorithm == null) {
+              info.setContentText("To delete a reference select an algorithm first");
+              info.showAndWait();
+            } else if (textbook == null) {
+              info.setContentText(
+                  "To delete a reference to the selected algorithm you have to select a book");
+              info.showAndWait();
+            } else {
+              textbookService.deleteReference(algorithm, textbook);
+            }
+          } catch (SQLException e1) {
+            logger.error(e1);
+            super.error();
+          } catch (LogicException e1) {
+            logger.warn(e1);
+            super.warn(e1);
+          }
+        });
+
+    areaAlgorithmCB.setOnMouseClicked(
         e -> {
           try {
             loadAlgorithms();
           } catch (SQLException e1) {
             logger.error(e1);
             error.setContentText(
-                "List of algorithms isn't synchronized anymore.\nProbably, database connection is lost");
+                "List of algorithms isn't synchronized anymore.\nCheck your database connection.");
             error.showAndWait();
           }
         });
-    refAlgorithmCB.setOnMouseReleased(
+    refAlgorithmCB.setOnMouseClicked(
         e -> {
           try {
             loadAlgorithms();
@@ -188,7 +274,7 @@ public class ReferenceController extends AbstractController {
             error.showAndWait();
           }
         });
-    areaOfUseCB.setOnMouseReleased(
+    areaOfUseCB.setOnMouseClicked(
         e -> {
           try {
             loadAreas();
@@ -199,7 +285,7 @@ public class ReferenceController extends AbstractController {
                     + "Check your database connection.");
           }
         });
-    bookCB.setOnMouseReleased(
+    bookCB.setOnMouseClicked(
         e -> {
           try {
             loadBooks();
@@ -218,7 +304,7 @@ public class ReferenceController extends AbstractController {
         new StringConverter<AreaOfUse>() {
           @Override
           public String toString(AreaOfUse areaOfUse) {
-            return areaOfUse.getAreaOfUse();
+            return areaOfUse == null ? null : areaOfUse.getAreaOfUse();
           }
 
           @Override
@@ -236,16 +322,13 @@ public class ReferenceController extends AbstractController {
         new StringConverter<Textbook>() {
           @Override
           public String toString(Textbook textbook) {
-            if (textbook.getVolume() != null) {
-              return textbook.getTitle()
-                  + " Vol. "
-                  + textbook.getVolume()
-                  + " "
-                  + textbook.getEdition()
-                  + " edition";
-            } else {
-              return textbook.getTitle() + " " + textbook.getEdition() + " edition";
+            if (textbook == null) {
+              return null;
             }
+            return textbook.getTitle()
+                + (textbook.getVolume() == null ? " " : " Vol. " + textbook.getVolume() + " ")
+                + textbook.getEdition()
+                + " edition";
           }
 
           @Override
@@ -253,7 +336,9 @@ public class ReferenceController extends AbstractController {
             return bookCB
                 .getItems()
                 .stream()
-                .filter(b -> string.equalsIgnoreCase(b.getTitle()))
+                .filter(
+                    b ->
+                        StringUtils.startsWithIgnoreCase(string, b.getTitle()))
                 .findFirst()
                 .orElse(null);
           }
@@ -270,14 +355,14 @@ public class ReferenceController extends AbstractController {
             + (areas.size() == 0
                 ? "no practical applications specified yet"
                 : "following practical applications:"));
-    for (AreaOfUse areaOfUse : areas) {
-      values.add(
-          "\t"
-              + areaOfUse.getAreaOfUse()
-              + (StringUtils.isBlank(areaOfUse.getDescription())
-                  ? ""
-                  : "\n\t\t(" + areaOfUse.getDescription() + ")"));
-    }
+    areas.forEach(
+        a ->
+            values.add(
+                "\t"
+                    + a.getAreaOfUse()
+                    + (StringUtils.isBlank(a.getDescription())
+                        ? ""
+                        : "\n\t\t(" + a.getDescription() + ")")));
     areaListView.setItems(values);
   }
 
@@ -285,18 +370,40 @@ public class ReferenceController extends AbstractController {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
         area.getAreaOfUse()
+            + (area.getDescription() == null ? " " : " (" + area.getDescription() + ") (")
             + (algorithms.size() == 0
-                ? " has no connected algorithms yet"
-                : " has following practical algorithmic solutions:"));
-    for (Algorithm algorithm : algorithms) {
-      values.add(
-          "\t"
-              + algorithm.getName()
-              + (StringUtils.containsIgnoreCase(algorithm.getName(), "algorithm")
-                  ? " "
-                  : " algorithm "));
-    }
+                ? "has no connected algorithms yet"
+                : "has following practical algorithmic solutions:"));
+    algorithms.forEach(
+        a ->
+            values.add(
+                "\t"
+                    + a.getName()
+                    + (StringUtils.containsIgnoreCase(a.getName(), "algorithm")
+                        ? " "
+                        : " algorithm ")));
     areaListView.setItems(values);
+  }
+
+  private void displayReferences(Algorithm algorithm, List<Textbook> textbooks) {
+    ObservableList<String> values = FXCollections.observableArrayList();
+    values.add(
+        algorithm.getName()
+            + (StringUtils.containsIgnoreCase(algorithm.getName(), "algorithm")
+                ? " "
+                : " algorithm ")
+            + (textbooks.size() == 0
+                ? "has no book references specified yet"
+                : "is referenced in the following books:"));
+    textbooks.forEach(
+        t ->
+            values.add(
+                "\t"
+                    + t.getTitle()
+                    + (t.getVolume() == null ? " " : " Vol. " + t.getVolume() + " ")
+                    + t.getEdition()
+                    + " edition"));
+    referenceListView.setItems(values);
   }
 
   private void loadData() {
@@ -336,7 +443,7 @@ public class ReferenceController extends AbstractController {
   private class AlgorithmStringConverter extends StringConverter<Algorithm> {
     @Override
     public String toString(Algorithm algorithm) {
-      return algorithm.getName();
+      return algorithm == null ? null : algorithm.getName();
     }
 
     @Override
@@ -344,7 +451,7 @@ public class ReferenceController extends AbstractController {
       return areaAlgorithmCB
           .getItems()
           .stream()
-          .filter(a -> string.equalsIgnoreCase(a.getName()))
+          .filter(a -> StringUtils.equalsIgnoreCase(a.getName(), string))
           .findFirst()
           .orElse(null);
     }

@@ -3,6 +3,7 @@ package app.dao;
 import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.AreaOfUse;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AreaDaoImpl implements AreaDao {
+public class AreaDaoImpl extends AbstractDao implements AreaDao {
   private static final Logger logger = LogManager.getLogger(AreaDaoImpl.class);
 
   private Connection connection;
@@ -62,27 +63,54 @@ public class AreaDaoImpl implements AreaDao {
 
   @Override
   public AreaOfUse createAreaOfUse(String area, String description) throws SQLException {
-    createArea.setString(1, area);
-    createArea.setString(2, description);
-    logger.debug(() -> Util.format(createArea));
-    createArea.executeUpdate();
-    return new AreaOfUse(Util.getLastId(connection), area, description);
+    try {
+      createArea.setString(1, area);
+      createArea.setString(2, description);
+      logger.debug(() -> Util.format(createArea));
+      createArea.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new AreaOfUse(id, area, description);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to create area of use {} with description {}", area, description);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public AreaOfUse createAreaOfUse(String area) throws SQLException {
-    createAreaByName.setString(1, area);
-    logger.debug(() -> Util.format(createAreaByName));
-    createAreaByName.executeUpdate();
-    return new AreaOfUse(Util.getLastId(connection), area);
+    try {
+      createAreaByName.setString(1, area);
+      logger.debug(() -> Util.format(createAreaByName));
+      createAreaByName.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new AreaOfUse(id, area);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to create area {}", area);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public void createApplication(int algorithmId, int areaId) throws SQLException {
-    createApp.setInt(1, algorithmId);
-    createApp.setInt(2, areaId);
-    logger.debug(() -> Util.format(createApp));
-    createApp.executeUpdate();
+    try {
+      createApp.setInt(1, algorithmId);
+      createApp.setInt(2, areaId);
+      logger.debug(() -> Util.format(createApp));
+      createApp.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create application. Algorithm id = {}, area id = {}", algorithmId, areaId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
@@ -144,16 +172,35 @@ public class AreaDaoImpl implements AreaDao {
 
   @Override
   public void deleteAreaOfUse(int id) throws SQLException {
-    deleteAreaById.setInt(1, id);
-    logger.debug(() -> Util.format(deleteAreaById));
-    deleteAreaById.executeUpdate();
+    try {
+      deleteAreaById.setInt(1, id);
+      logger.debug(() -> Util.format(deleteAreaById));
+      deleteAreaById.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete area of use with id {}", id);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public void deleteApplication(int algorithmId, int areaId) throws SQLException {
-    deleteApplication.setInt(1, algorithmId);
-    deleteApplication.setInt(2, areaId);
-    logger.debug(() -> Util.format(deleteApplication));
-    deleteApplication.executeUpdate();
+    try {
+      deleteApplication.setInt(1, algorithmId);
+      deleteApplication.setInt(2, areaId);
+      logger.debug(() -> Util.format(deleteApplication));
+      deleteApplication.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to delete algorithm application, algorithm id = {}, areaId = {}",
+          algorithmId,
+          areaId);
+      rollBack(connection);
+      throw e;
+    }
   }
 }

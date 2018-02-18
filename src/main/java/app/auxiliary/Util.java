@@ -25,11 +25,6 @@ public class Util {
     return "'%" + str + "%'";
   }
 
-  public static int getLastId(Connection connection) throws SQLException {
-    ResultSet set = connection.createStatement().executeQuery("SELECT LAST_INSERT_ID()");
-    set.next();
-    return set.getInt(1);
-  }
   public static String format(String sql){
     return formatter.format(sql);
   }

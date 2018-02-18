@@ -23,6 +23,7 @@ public class Connector {
       connection =
           DriverManager.getConnection(
               "jdbc:mysql://localhost/algorithms?" + "user=timofey&password=pass");
+      connection.setAutoCommit(false);
     }
     return connection;
   }

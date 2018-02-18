@@ -6,6 +6,7 @@ import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AlgorithmDaoImpl implements AlgorithmDao {
+public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private static final Logger logger = LogManager.getLogger(AlgorithmDaoImpl.class);
 
   private Connection connection;
@@ -84,14 +85,22 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
   public Algorithm insertAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException {
-    insertAlgorithm.setString(1, name);
-    insertAlgorithm.setString(2, complexity);
-    insertAlgorithm.setInt(3, designParadigm.getId());
-    insertAlgorithm.setInt(4, fieldOfStudy.getId());
-    logger.debug(() -> Util.format(insertAlgorithm));
-    insertAlgorithm.executeUpdate();
-    int id = Util.getLastId(connection);
-    return new Algorithm(id, name, complexity, designParadigm, fieldOfStudy);
+    try {
+      insertAlgorithm.setString(1, name);
+      insertAlgorithm.setString(2, complexity);
+      insertAlgorithm.setInt(3, designParadigm.getId());
+      insertAlgorithm.setInt(4, fieldOfStudy.getId());
+      logger.debug(() -> Util.format(insertAlgorithm));
+      insertAlgorithm.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new Algorithm(id, name, complexity, designParadigm, fieldOfStudy);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to insert an algorithm {}", name);
+      connection.rollback();
+      throw e;
+    }
   }
 
   @Override
@@ -154,39 +163,70 @@ public class AlgorithmDaoImpl implements AlgorithmDao {
 
   @Override
   public void deleteById(int id) throws SQLException {
-    deleteById.setInt(1, id);
-    logger.debug(() -> Util.format(deleteById));
-    deleteById.executeUpdate();
+    try {
+      deleteById.setInt(1, id);
+      logger.debug(() -> Util.format(deleteById));
+      deleteById.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete an algorithm by id {}", id);
+      connection.rollback();
+      throw e;
+    }
   }
 
   @Override
   public void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException {
-    setParadigm.setInt(1, paradigmId);
-    setParadigm.setInt(2, algorithmId);
-    logger.debug(() -> Util.format(setParadigm));
-    setParadigm.executeUpdate();
+    try {
+      setParadigm.setInt(1, paradigmId);
+      setParadigm.setInt(2, algorithmId);
+      logger.debug(() -> Util.format(setParadigm));
+      setParadigm.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to set paradigm id {} to algorithm with id {}", paradigmId, algorithmId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException {
-    setField.setInt(1, fieldId);
-    setField.setInt(2, algorithmId);
-    logger.debug(() -> Util.format(setField));
-    setField.executeUpdate();
+    try{
+      setField.setInt(1, fieldId);
+      setField.setInt(2, algorithmId);
+      logger.debug(() -> Util.format(setField));
+      setField.executeUpdate();
+      connection.commit();
+    } catch (SQLException e){
+      logger.catching(Level.ERROR, e);
+      logger.info("Failed to set field of study id {} to algorithm with id {}", fieldId, algorithmId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override
   public void updateEntry(String column, String value, int id) throws SQLException {
-    String query =
-        "UPDATE algorithm SET "
-            + column
-            + " = "
-            + Util.fixForString(value)
-            + " WHERE algorithm_id = "
-            + id;
-    logger.debug(() -> Util.format(query));
-    Statement statement = connection.createStatement();
-    statement.executeUpdate(query);
+    try{
+      String query =
+          "UPDATE algorithm SET "
+              + column
+              + " = "
+              + Util.fixForString(value)
+              + " WHERE algorithm_id = "
+              + id;
+      logger.debug(() -> Util.format(query));
+      Statement statement = connection.createStatement();
+      statement.executeUpdate(query);
+    } catch (SQLException e){
+      logger.catching(Level.ERROR, e);
+      logger.info("Failed to update value {} of column {} where id = {}", value, column, id);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   @Override

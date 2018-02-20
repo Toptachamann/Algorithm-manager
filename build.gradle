@@ -3,11 +3,30 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'groovy'
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = 'app.App'
 
 repositories {
   mavenCentral()
+}
+
+version = '0.1.0'
+
+jar {
+  manifest{
+    attributes(
+        'Main-Class': 'app.App'
+    )
+  }
+  baseName = project.name
+  version = '0.1.0'
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
 }
 
 dependencies {

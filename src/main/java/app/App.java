@@ -20,11 +20,6 @@ public class App extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    try{
-      Class.forName("org.springframework.context.ApplicationContext");
-    }catch (ClassNotFoundException e){
-      e.printStackTrace();
-    }
     ApplicationContext context = new ClassPathXmlApplicationContext("/META-INF/beans.xml");
     FXMLLoader loader = new FXMLLoader(getClass().getResource("/main_frame.fxml"));
     loader.setControllerFactory(context::getBean);

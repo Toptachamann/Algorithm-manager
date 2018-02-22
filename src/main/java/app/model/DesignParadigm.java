@@ -10,16 +10,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "design_paradigm")
+@Table(name = "design_paradigm",
+    uniqueConstraints = {@UniqueConstraint(columnNames = "paradigm")})
 public class DesignParadigm {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "paradigm_id")
   private int id;
 
-  @Column(name = "paradigm")
+  @Column(name = "paradigm", unique = true, nullable = false, length = 50)
   private String paradigm;
 
   @Column(name = "description")
@@ -36,7 +38,8 @@ public class DesignParadigm {
     this.description = description;
   }
 
-  public DesignParadigm() {}
+  public DesignParadigm() {
+  }
 
   @Override
   public boolean equals(Object o) {

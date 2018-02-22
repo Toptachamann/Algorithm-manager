@@ -4,9 +4,25 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "field_of_study")
 public class FieldOfStudy {
+  @Id
+  @Column(name = "field_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
+  @Column(name = "field", nullable = false, unique = true, length = 50)
   private String field;
+
+  @Column(name = "description")
   private String description;
 
   public FieldOfStudy(int id, String field, String description) {
@@ -16,7 +32,8 @@ public class FieldOfStudy {
     this.description = description;
   }
 
-  public FieldOfStudy() {}
+  public FieldOfStudy() {
+  }
 
   public FieldOfStudy(int id, String field) {
 

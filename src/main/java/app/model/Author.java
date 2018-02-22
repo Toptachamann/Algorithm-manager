@@ -4,12 +4,30 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "author")
 public class Author {
+
+  @Id
+  @Column(name = "author_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
+  @Column(name = "first_name", nullable = false, length = 50)
   private String firstName;
+
+  @Column(name = "last_name", nullable = false, length = 50)
   private String lastName;
 
-  public Author() {}
+  public Author() {
+  }
 
   public Author(int id, String firstName, String lastName) {
 

@@ -1,4 +1,4 @@
-group 'com.pure.jdbc.laba'
+group 'com.algorithm.manager'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'groovy'

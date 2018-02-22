@@ -5,14 +5,33 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "book")
 public class Textbook {
+  @Id
+  @Column(name = "book_id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
+
+  @Column(name = "title", nullable = false, length = 50)
   private String title;
+
+  @Column(name = "volume")
   private Integer volume;
+
+  @Column(name = "edition")
   private Integer edition;
+  @Transient
   private List<Author> authors;
 
   public Textbook() {}
@@ -47,10 +66,6 @@ public class Textbook {
 
   public void addAuthor(Author author) {
     this.authors.add(author);
-  }
-
-  public void addAuthors(List<Author> authors) {
-    this.authors.addAll(authors);
   }
 
   @Override

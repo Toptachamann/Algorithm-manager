@@ -87,7 +87,7 @@ public class TextbookController extends AbstractController {
             List<Author> authors = authorsFromStr(authorsTextField.getText());
             textbookTableView.setItems(
                 FXCollections.observableArrayList(
-                    textbookService.searchTextbooks(title, volume, edition, authors)));
+                    textbookService.searchBooks(title, volume, edition, authors)));
           } catch (SQLException e1) {
             logger.error(e1);
             error.setContentText(
@@ -125,7 +125,7 @@ public class TextbookController extends AbstractController {
               Integer edition = Integer.valueOf(editionStr);
               textbookTableView
                   .getItems()
-                  .add(textbookService.createTextbook(title, volume, edition, authors));
+                  .add(textbookService.createBook(title, volume, edition, authors));
               textbookTableView.scrollTo(textbookTableView.getItems().size() - 1);
             }
           } catch (SQLException e1) {
@@ -185,7 +185,7 @@ public class TextbookController extends AbstractController {
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                 try {
-                  textbookService.deleteTextbook(book);
+                  textbookService.deleteBook(book);
                   textbookTableView.getItems().remove(book);
                 } catch (SQLException e1) {
                   logger.error(e1);
@@ -244,7 +244,7 @@ public class TextbookController extends AbstractController {
 
     try {
       textbookTableView.setItems(
-          FXCollections.observableArrayList(textbookService.getAllTextbooks()));
+          FXCollections.observableArrayList(textbookService.getAllBooks()));
     } catch (SQLException e) {
       logger.error(e);
       info.setContentText(

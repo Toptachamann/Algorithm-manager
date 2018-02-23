@@ -3,11 +3,11 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
-    <bean id="algorithmDao" class="app.dao.AlgorithmDaoImpl"/>
-    <bean id="paradigmDao" class="app.dao.ParadigmDaoImpl"/>
-    <bean id="fieldDao" class="app.dao.FieldDaoImpl"/>
-    <bean id="areaDao" class="app.dao.AreaDaoImpl"/>
-    <bean id="applicationDao" class="app.dao.AlgorithmApplicationDaoImpl"/>
+    <bean id="algorithmDao" class="app.dao.jdbc.AlgorithmDaoImpl"/>
+    <bean id="paradigmDao" class="app.dao.jdbc.ParadigmDaoImpl"/>
+    <bean id="fieldDao" class="app.dao.jdbc.FieldDaoImpl"/>
+    <bean id="areaDao" class="app.dao.jdbc.AreaDaoImpl"/>
+    <bean id="applicationDao" class="app.dao.jdbc.ApplicationDaoImpl"/>
     <bean id="algorithmService" class="app.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="algorithmDao"/>
         <constructor-arg name="paradigmDao" ref="paradigmDao"/>
@@ -21,11 +21,11 @@
     </bean>
 
 
-    <bean id="textbookDao" class="app.dao.TextbookDaoImpl"/>
-    <bean id="authorDao" class="app.dao.AuthorDaoImpl"/>
-    <bean id="referenceDao" class="app.dao.AlgorithmReferenceDaoImpl"/>
-    <bean id="textbookService" class="app.service.TextbookServiceImpl">
-        <constructor-arg name="textbookDao" ref="textbookDao"/>
+    <bean id="bookDao" class="app.dao.jdbc.BookDaoImpl"/>
+    <bean id="authorDao" class="app.dao.jdbc.AuthorDaoImpl"/>
+    <bean id="referenceDao" class="app.dao.jdbc.ReferenceDaoImpl"/>
+    <bean id="textbookService" class="app.service.BookServiceImpl">
+        <constructor-arg name="bookDao" ref="bookDao"/>
         <constructor-arg name="authorDao" ref="authorDao"/>
         <constructor-arg name="referenceDao" ref="referenceDao"/>
     </bean>

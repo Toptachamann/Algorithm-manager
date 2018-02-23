@@ -18,12 +18,15 @@ public class AreaOfUse {
   @Column(name = "area_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
-
   @Column(name = "area", length = 50, nullable = false, unique = true)
   private String areaOfUse;
-
   @Column(name = "description")
   private String description;
+
+  public AreaOfUse(String areaOfUse, String description) {
+    this.areaOfUse = areaOfUse;
+    this.description = description;
+  }
 
   public AreaOfUse(int id, String areaOfUse) {
     this.id = id;
@@ -44,8 +47,7 @@ public class AreaOfUse {
     this.description = description;
   }
 
-  public AreaOfUse() {
-  }
+  public AreaOfUse() {}
 
   @Override
   public String toString() {

@@ -21,9 +21,18 @@ public class FieldOfStudy {
 
   @Column(name = "field", nullable = false, unique = true, length = 50)
   private String field;
-
   @Column(name = "description")
   private String description;
+
+  public FieldOfStudy(String field) {
+    this.field = field;
+  }
+
+  public FieldOfStudy(String field, String description) {
+
+    this.field = field;
+    this.description = description;
+  }
 
   public FieldOfStudy(int id, String field, String description) {
 
@@ -32,8 +41,7 @@ public class FieldOfStudy {
     this.description = description;
   }
 
-  public FieldOfStudy() {
-  }
+  public FieldOfStudy() {}
 
   public FieldOfStudy(int id, String field) {
 

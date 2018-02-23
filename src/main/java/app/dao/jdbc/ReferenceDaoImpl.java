@@ -1,26 +1,26 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.ReferenceDao;
+import app.model.Algorithm;
+import app.model.Book;
+import app.model.Reference;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AlgorithmReferenceDaoImpl extends AbstractDao implements AlgorithmReferenceDao {
-  private static final Logger logger = LogManager.getLogger(AlgorithmReferenceDaoImpl.class);
+public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
+  private static final Logger logger = LogManager.getLogger(ReferenceDaoImpl.class);
 
-  private Connection connection;
   private PreparedStatement countReferences;
   private PreparedStatement createReference;
   private PreparedStatement deleteReference;
 
-  public AlgorithmReferenceDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
+  public ReferenceDaoImpl() throws SQLException {
     countReferences =
         connection.prepareStatement(
             "SELECT COUNT(*) FROM algorithm_reference WHERE ref_algorithm_id = ? AND ref_book_id = ?");
@@ -33,9 +33,28 @@ public class AlgorithmReferenceDaoImpl extends AbstractDao implements AlgorithmR
   }
 
   @Override
-  public boolean containsReference(int algorithmId, int bookId) throws SQLException {
-    countReferences.setInt(1, algorithmId);
-    countReferences.setInt(2, bookId);
+  public Reference createReference(Algorithm algorithm, Book book) throws SQLException {
+    try {
+      createReference.setInt(1, algorithm.getId());
+      createReference.setInt(2, book.getId());
+      logger.debug(() -> Util.format(createReference));
+      createReference.executeUpdate();
+      int id = getLastId(connection);
+      connection.commit();
+      return new Reference(id, algorithm, book);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create reference with algorithm_id = {} and book_id = {}", algorithm, book);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public boolean containsReference(Algorithm algorithm, Book book) throws SQLException {
+    countReferences.setInt(1, algorithm.getId());
+    countReferences.setInt(2, book.getId());
     logger.debug(() -> Util.format(countReferences));
     ResultSet set = countReferences.executeQuery();
     set.next();
@@ -43,38 +62,17 @@ public class AlgorithmReferenceDaoImpl extends AbstractDao implements AlgorithmR
   }
 
   @Override
-  public void createReference(int algorithmId, int bookId) throws SQLException {
+  public void deleteReference(Algorithm algorithm, Book book) throws SQLException {
     try {
-      createReference.setInt(1, algorithmId);
-      createReference.setInt(2, bookId);
-      logger.debug(() -> Util.format(createReference));
-      createReference.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create reference with algorithm_id = {} and book_id = {}",
-          algorithmId,
-          bookId);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void deleteReference(int algorithmId, int bookId) throws SQLException {
-    try {
-      deleteReference.setInt(1, algorithmId);
-      deleteReference.setInt(2, bookId);
+      deleteReference.setInt(1, algorithm.getId());
+      deleteReference.setInt(2, book.getId());
       logger.debug(() -> Util.format(deleteReference));
       deleteReference.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
-          "Failed to delete reference with algorithm_id = {} and book_id = {}",
-          algorithmId,
-          bookId);
+          "Failed to delete reference with algorithm_id = {} and book_id = {}", algorithm, book);
       rollBack(connection);
       throw e;
     }

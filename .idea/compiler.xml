@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true">
+        <sourceTestOutputDir name="generated-test" />
+        <processorPath>
+          <entry name="$PROJECT_DIR$/../JARs/hibernate-jpamodelgen-1.3.0.final.jar/hibernate-jpamodelgen-1.3.0.final.jar" />
+        </processorPath>
+      </profile>
+    </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Algorithm_main" target="1.8" />
       <module name="Algorithm_manager_main" target="1.8" />

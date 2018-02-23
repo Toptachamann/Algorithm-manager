@@ -1,27 +1,26 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.ApplicationDao;
+import app.model.Algorithm;
+import app.model.Application;
+import app.model.AreaOfUse;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class AlgorithmApplicationDaoImpl extends AbstractDao implements AlgorithmApplicationDao {
-  private static final Logger logger = LogManager.getLogger(AlgorithmApplicationDaoImpl.class);
-
-  private Connection connection;
+public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
+  private static final Logger logger = LogManager.getLogger(ApplicationDaoImpl.class);
 
   private PreparedStatement createApp;
   private PreparedStatement containsApp;
   private PreparedStatement deleteApplication;
 
-  public AlgorithmApplicationDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
+  public ApplicationDaoImpl() throws SQLException {
     createApp =
         connection.prepareStatement(
             "INSERT INTO algorithm_application (app_algorithm_id, app_area_id) VALUE (?, ?)");
@@ -34,26 +33,28 @@ public class AlgorithmApplicationDaoImpl extends AbstractDao implements Algorith
   }
 
   @Override
-  public void createApplication(int algorithmId, int areaId) throws SQLException {
+  public Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws SQLException {
     try {
-      createApp.setInt(1, algorithmId);
-      createApp.setInt(2, areaId);
+      createApp.setInt(1, algorithm.getId());
+      createApp.setInt(2, areaOfUse.getId());
       logger.debug(() -> Util.format(createApp));
       createApp.executeUpdate();
+      int id = getLastId(connection);
       connection.commit();
+      return new Application(id, algorithm, areaOfUse);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create application. Algorithm id = {}, area id = {}", algorithmId, areaId);
+      logger.error("Failed to create application. Algorithm = {}, area = {}", algorithm, areaOfUse);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public boolean containsApplication(int algorithmId, int areaId) throws SQLException {
-    containsApp.setInt(1, algorithmId);
-    containsApp.setInt(2, areaId);
+  public boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException {
+    containsApp.setInt(1, algorithm.getId());
+    containsApp.setInt(2, areaOfUse.getId());
     logger.debug(() -> Util.format(containsApp));
     ResultSet set = containsApp.executeQuery();
     set.next();
@@ -61,10 +62,10 @@ public class AlgorithmApplicationDaoImpl extends AbstractDao implements Algorith
   }
 
   @Override
-  public void deleteApplication(int algorithmId, int areaId) throws SQLException {
+  public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException {
     try {
-      deleteApplication.setInt(1, algorithmId);
-      deleteApplication.setInt(2, areaId);
+      deleteApplication.setInt(1, algorithm.getId());
+      deleteApplication.setInt(2, areaOfUse.getId());
       logger.debug(() -> Util.format(deleteApplication));
       deleteApplication.executeUpdate();
       connection.commit();
@@ -72,8 +73,8 @@ public class AlgorithmApplicationDaoImpl extends AbstractDao implements Algorith
       logger.catching(Level.ERROR, e);
       logger.error(
           "Failed to delete algorithm application, algorithm id = {}, areaId = {}",
-          algorithmId,
-          areaId);
+          algorithm,
+          areaOfUse);
       rollBack(connection);
       throw e;
     }

@@ -1,4 +1,4 @@
-package app.dao;
+package app.dao.interf;
 
 import app.model.Algorithm;
 import app.model.DesignParadigm;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlgorithmDao {
-  Algorithm insertAlgorithm(
+  Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException;
 

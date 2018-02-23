@@ -1,4 +1,4 @@
-package app.dao;
+package app.dao.interf;
 
 import app.model.Author;
 

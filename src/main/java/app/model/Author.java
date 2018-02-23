@@ -26,12 +26,16 @@ public class Author {
   @Column(name = "last_name", nullable = false, length = 50)
   private String lastName;
 
-  public Author() {
-  }
+  public Author() {}
 
   public Author(int id, String firstName, String lastName) {
 
     this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+
+  public Author(String firstName, String lastName) {
     this.firstName = firstName;
     this.lastName = lastName;
   }

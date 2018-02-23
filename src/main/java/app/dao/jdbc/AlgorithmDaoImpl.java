@@ -1,7 +1,7 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.AlgorithmDao;
 import app.model.Algorithm;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
@@ -22,18 +22,16 @@ import java.util.Optional;
 public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private static final Logger logger = LogManager.getLogger(AlgorithmDaoImpl.class);
 
-  private Connection connection;
-  private PreparedStatement insertAlgorithm;
+  private PreparedStatement createAlgorithm;
   private PreparedStatement allAlgorithms;
-  private PreparedStatement getAlgoByName;
+  private PreparedStatement getAlgorithmByName;
   private PreparedStatement getAlgorithmsByArea;
   private PreparedStatement setParadigm;
   private PreparedStatement setField;
   private PreparedStatement deleteById;
 
   public AlgorithmDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
-    insertAlgorithm =
+    createAlgorithm =
         connection.prepareStatement(
             "INSERT INTO algorithm (algorithm, complexity, algo_paradigm_id, algo_field_id) VALUE (?, ?, ?, ?)");
     String bigQuery =
@@ -43,7 +41,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
             + "    INNER JOIN design_paradigm as dp ON algo_paradigm_id = paradigm_id)\n"
             + "    INNER JOIN field_of_study as fos ON algo_field_id = field_id)";
     allAlgorithms = connection.prepareStatement(bigQuery);
-    getAlgoByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
+    getAlgorithmByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
     getAlgorithmsByArea =
         connection.prepareStatement(
             "SELECT \n"
@@ -82,23 +80,23 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public Algorithm insertAlgorithm(
+  public Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException {
     try {
-      insertAlgorithm.setString(1, name);
-      insertAlgorithm.setString(2, complexity);
-      insertAlgorithm.setInt(3, designParadigm.getId());
-      insertAlgorithm.setInt(4, fieldOfStudy.getId());
-      logger.debug(() -> Util.format(insertAlgorithm));
-      insertAlgorithm.executeUpdate();
+      createAlgorithm.setString(1, name);
+      createAlgorithm.setString(2, complexity);
+      createAlgorithm.setInt(3, designParadigm.getId());
+      createAlgorithm.setInt(4, fieldOfStudy.getId());
+      logger.debug(() -> Util.format(createAlgorithm));
+      createAlgorithm.executeUpdate();
       int id = getLastId(connection);
       connection.commit();
       return new Algorithm(id, name, complexity, designParadigm, fieldOfStudy);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error("Failed to insert an algorithm {}", name);
-      connection.rollback();
+      super.rollBack(connection);
       throw e;
     }
   }
@@ -112,9 +110,9 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
 
   @Override
   public Optional<Algorithm> getAlgorithmByName(String name) throws SQLException {
-    getAlgoByName.setString(1, name);
-    logger.debug(() -> Util.format(getAlgoByName));
-    List<Algorithm> list = algorithmFromResultSet(getAlgoByName.executeQuery());
+    getAlgorithmByName.setString(1, name);
+    logger.debug(() -> Util.format(getAlgorithmByName));
+    List<Algorithm> list = algorithmFromResultSet(getAlgorithmByName.executeQuery());
     if (list.size() == 1) {
       return Optional.of(list.get(0));
     } else {

@@ -40,39 +40,43 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.AbstractDao">
+        <Logger name="org.hibernate" level="error" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.AlgorithmDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.AbstractDao">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.ParadigmDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.AlgorithmDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.FieldDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.ParadigmDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.AreaDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.FieldDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.jdbc.AreaDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="all"/>
             <AppenderRef ref="ERROR" level="error"/>
         </Logger>
-        <Logger name="app.dao.AlgorithmApplicationDaoImpl" aditivity="true">
+        <Logger name="app.dao.jdbc.ApplicationDaoImpl" aditivity="true">
             <AppenderRef ref="ALL" level="all"/>
             <AppenderRef ref="ERROR" level="error"/>
         </Logger>
-        <Logger name="app.dao.TextbookDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.BookDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.AuthorDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.AuthorDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.AlgorithmReferenceDaoImpl" additivity="true">
+        <Logger name="app.dao.jdbc.ReferenceDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
@@ -80,7 +84,7 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.service.TextbookServiceImpl" additivity="true">
+        <Logger name="app.service.BookServiceImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>

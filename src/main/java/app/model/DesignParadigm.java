@@ -36,7 +36,16 @@ public class DesignParadigm {
     this.description = description;
   }
 
-  public DesignParadigm() {
+  public DesignParadigm() {}
+
+  public DesignParadigm(String paradigm, String description) {
+    this.paradigm = paradigm;
+    this.description = description;
+  }
+
+  public DesignParadigm(String paradigm) {
+
+    this.paradigm = paradigm;
   }
 
   @Override

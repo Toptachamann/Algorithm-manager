@@ -10,15 +10,15 @@ import java.util.List;
 
 public interface TextbookService {
 
-  Book createTextbook(String title, Integer volumeStr, Integer editionStr, List<Author> authors)
+  Book createBook(String title, Integer volumeStr, Integer editionStr, List<Author> authors)
   throws SQLException;
 
-  List<Book> getAllTextbooks() throws SQLException;
+  List<Book> getAllBooks() throws SQLException;
 
-  List<Book> searchTextbooks(String title, Integer editionStr, Integer volumeStr, List<Author> authors)
+  List<Book> searchBooks(String title, Integer editionStr, Integer volumeStr, List<Author> authors)
   throws SQLException;
 
-  void deleteTextbook(Book book) throws SQLException;
+  void deleteBook(Book book) throws SQLException;
 
   Author createAuthor(String firstName, String lastName) throws SQLException;
 

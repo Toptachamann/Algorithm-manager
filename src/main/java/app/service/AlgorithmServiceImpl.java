@@ -1,11 +1,11 @@
 package app.service;
 
 import app.auxiliary.LogicException;
-import app.dao.AlgorithmApplicationDao;
-import app.dao.AlgorithmDao;
-import app.dao.AreaDao;
-import app.dao.FieldDao;
-import app.dao.ParadigmDao;
+import app.dao.interf.ApplicationDao;
+import app.dao.interf.AlgorithmDao;
+import app.dao.interf.AreaDao;
+import app.dao.interf.FieldDao;
+import app.dao.interf.ParadigmDao;
 import app.model.Algorithm;
 import app.model.AreaOfUse;
 import app.model.DesignParadigm;
@@ -26,14 +26,14 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   private ParadigmDao paradigmDao;
   private FieldDao fieldDao;
   private AreaDao areaDao;
-  private AlgorithmApplicationDao applicationDao;
+  private ApplicationDao applicationDao;
 
   public AlgorithmServiceImpl(
       AlgorithmDao algorithmDao,
       ParadigmDao paradigmDao,
       FieldDao fieldDao,
       AreaDao areaDao,
-      AlgorithmApplicationDao applicationDao) {
+      ApplicationDao applicationDao) {
     this.algorithmDao = algorithmDao;
     this.paradigmDao = paradigmDao;
     this.fieldDao = fieldDao;
@@ -55,7 +55,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     } else if (algorithm.isPresent()) {
       throw new LogicException("Algorithm with this name is already present");
     }
-    return algorithmDao.insertAlgorithm(name, complexity, designParadigm, fieldOfStudy);
+    return algorithmDao.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
   }
 
   @Override
@@ -241,20 +241,20 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   @Override
   public void createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException {
-    if (applicationDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
+    if (applicationDao.containsApplication(algorithm, areaOfUse)) {
       throw new LogicException("This algorithm application does already exist");
     } else {
-      applicationDao.createApplication(algorithm.getId(), areaOfUse.getId());
+      applicationDao.createApplication(algorithm, areaOfUse);
     }
   }
 
   @Override
   public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException {
-    if (!applicationDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
+    if (!applicationDao.containsApplication(algorithm, areaOfUse)) {
       throw new LogicException("This application didn't exist");
     } else {
-      applicationDao.deleteApplication(algorithm.getId(), areaOfUse.getId());
+      applicationDao.deleteApplication(algorithm, areaOfUse);
     }
   }
 }

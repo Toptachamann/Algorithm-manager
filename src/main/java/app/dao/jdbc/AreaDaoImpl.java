@@ -1,13 +1,12 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.AreaDao;
 import app.model.AreaOfUse;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,8 +17,6 @@ import java.util.Optional;
 public class AreaDaoImpl extends AbstractDao implements AreaDao {
   private static final Logger logger = LogManager.getLogger(AreaDaoImpl.class);
 
-  private Connection connection;
-
   private PreparedStatement createAreaByName;
   private PreparedStatement createArea;
   private PreparedStatement getAllAreas;
@@ -29,7 +26,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   private PreparedStatement deleteAreaById;
 
   public AreaDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
     createArea =
         connection.prepareStatement("INSERT INTO area_of_use (area, description) VALUE (?, ?)");
     createAreaByName = connection.prepareStatement("INSERT INTO area_of_use (area) VALUE (?)");
@@ -83,7 +79,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
       throw e;
     }
   }
-
 
   @Override
   public List<AreaOfUse> getAllAreas() throws SQLException {
@@ -146,6 +141,4 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
       throw e;
     }
   }
-
-
 }

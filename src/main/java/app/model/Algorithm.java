@@ -20,17 +20,38 @@ public class Algorithm {
   @Column(name = "complexity", nullable = false, length = 50)
   private String complexity;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, optional = false,
-      targetEntity = DesignParadigm.class)
-  @JoinColumn(name = "algo_paradigm_id", referencedColumnName = "paradigm_id",
-      nullable = false, foreignKey = @ForeignKey(name = "fk_paradigm_algorithm"))
+  @ManyToOne(
+    cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
+    optional = false,
+    targetEntity = DesignParadigm.class
+  )
+  @JoinColumn(
+    name = "algo_paradigm_id",
+    referencedColumnName = "paradigm_id",
+    nullable = false,
+    foreignKey = @ForeignKey(name = "fk_paradigm_algorithm")
+  )
   private DesignParadigm designParadigm;
-
-  @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH}, optional = false,
-      targetEntity = FieldOfStudy.class)
-  @JoinColumn(name = "algo_field_id", referencedColumnName = "field_id",
-      nullable = false, foreignKey = @ForeignKey(name = "fk_field_id"))
+  @ManyToOne(
+    cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
+    optional = false,
+    targetEntity = FieldOfStudy.class
+  )
+  @JoinColumn(
+    name = "algo_field_id",
+    referencedColumnName = "field_id",
+    nullable = false,
+    foreignKey = @ForeignKey(name = "fk_field_id")
+  )
   private FieldOfStudy fieldOfStudy;
+
+  public Algorithm(
+      String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy) {
+    this.name = name;
+    this.complexity = complexity;
+    this.designParadigm = designParadigm;
+    this.fieldOfStudy = fieldOfStudy;
+  }
 
   public Algorithm(
       int id,
@@ -45,8 +66,7 @@ public class Algorithm {
     this.fieldOfStudy = fieldOfStudy;
   }
 
-  public Algorithm() {
-  }
+  public Algorithm() {}
 
   @Override
   public String toString() {

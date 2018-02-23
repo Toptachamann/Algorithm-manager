@@ -1,13 +1,12 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.AuthorDao;
 import app.model.Author;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,14 +16,11 @@ import java.util.List;
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
 
-  private Connection connection;
-
   private PreparedStatement getAuthorByName;
   private PreparedStatement getAuthorId;
   private PreparedStatement insertAuthor;
 
   public AuthorDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
     insertAuthor =
         connection.prepareStatement("INSERT INTO author (first_name, last_name) VALUE (?, ?)");
     getAuthorByName =

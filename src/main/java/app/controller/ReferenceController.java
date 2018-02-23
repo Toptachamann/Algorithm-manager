@@ -435,7 +435,7 @@ public class ReferenceController extends AbstractController {
 
   private void loadBooks() throws SQLException {
     ObservableList<Book> books =
-        FXCollections.observableArrayList(textbookService.getAllTextbooks());
+        FXCollections.observableArrayList(textbookService.getAllBooks());
     books.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
     bookCB.setItems(books);
   }

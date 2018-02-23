@@ -1,7 +1,7 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.FieldDao;
 import app.model.FieldOfStudy;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +18,6 @@ import java.util.Optional;
 public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private static final Logger logger = LogManager.getLogger(FieldDaoImpl.class);
 
-  private Connection connection;
 
   private PreparedStatement createFieldByName;
   private PreparedStatement createField;
@@ -28,7 +27,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private PreparedStatement updateFieldOfStudy;
 
   public FieldDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
     allFieldsOfStudy = connection.prepareStatement("SELECT * FROM field_of_study");
     createFieldByName = connection.prepareStatement("INSERT INTO field_of_study (field) VALUE (?)");
     createField =

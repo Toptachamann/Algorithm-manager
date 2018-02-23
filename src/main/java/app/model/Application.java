@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "algorithm_application")
-public class AlgorithmApplication {
+public class Application {
 
   @Id
   @Column(name = "application_id")
@@ -24,12 +24,18 @@ public class AlgorithmApplication {
       nullable = false, foreignKey = @ForeignKey(name = "fk_area_application"))
   private AreaOfUse areaOfUse;
 
-  public AlgorithmApplication(Algorithm algorithm, AreaOfUse areaOfUse) {
+  public Application(int applicationId, Algorithm algorithm, AreaOfUse areaOfUse) {
+    this.applicationId = applicationId;
     this.algorithm = algorithm;
     this.areaOfUse = areaOfUse;
   }
 
-  public AlgorithmApplication() {
+  public Application(Algorithm algorithm, AreaOfUse areaOfUse) {
+    this.algorithm = algorithm;
+    this.areaOfUse = areaOfUse;
+  }
+
+  public Application() {
 
   }
 
@@ -48,7 +54,7 @@ public class AlgorithmApplication {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    AlgorithmApplication that = (AlgorithmApplication) o;
+    Application that = (Application) o;
 
     return new EqualsBuilder()
         .append(applicationId, that.applicationId)

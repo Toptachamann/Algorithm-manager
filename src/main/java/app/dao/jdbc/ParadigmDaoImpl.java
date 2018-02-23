@@ -1,7 +1,7 @@
-package app.dao;
+package app.dao.jdbc;
 
-import app.auxiliary.Connector;
 import app.auxiliary.Util;
+import app.dao.interf.ParadigmDao;
 import app.model.DesignParadigm;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +18,6 @@ import java.util.Optional;
 public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private static final Logger logger = LogManager.getLogger(ParadigmDaoImpl.class);
 
-  private Connection connection;
 
   private PreparedStatement createParadigmByName;
   private PreparedStatement createParadigm;
@@ -28,7 +27,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private PreparedStatement updateParadigm;
 
   public ParadigmDaoImpl() throws SQLException {
-    connection = Connector.getConnection();
     createParadigm =
         connection.prepareStatement(
             "INSERT INTO design_paradigm (paradigm, description) VALUE (?, ?)");

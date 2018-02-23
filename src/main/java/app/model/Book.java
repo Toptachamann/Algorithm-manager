@@ -25,14 +25,25 @@ public class Book {
 
   @Column(name = "edition")
   private int edition;
-
-  @ManyToMany(cascade = {CascadeType.PERSIST}, targetEntity = Author.class)
-  @JoinTable(name = "textbook", joinColumns = @JoinColumn(name = "txtbk_book_id"),
-      inverseJoinColumns = @JoinColumn(name = "txtbk_author_id"))
+  @ManyToMany(
+    cascade = {CascadeType.PERSIST},
+    targetEntity = Author.class
+  )
+  @JoinTable(
+    name = "textbook",
+    joinColumns = @JoinColumn(name = "txtbk_book_id"),
+    inverseJoinColumns = @JoinColumn(name = "txtbk_author_id")
+  )
   private List<Author> authors;
 
-  public Book() {
+  public Book(String title, Integer volume, int edition, List<Author> authors) {
+    this.title = title;
+    this.volume = volume;
+    this.edition = edition;
+    this.authors = authors;
   }
+
+  public Book() {}
 
   public Book(
       Integer id, String title, @Nullable Integer volume, Integer edition, List<Author> authors) {

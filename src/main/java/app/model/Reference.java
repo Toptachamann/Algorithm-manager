@@ -8,27 +8,45 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "algorithm_reference")
-public class AlgorithmReference {
+public class Reference {
   @Id
   @Column(name = "reference_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int referenceId;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
-  @JoinColumn(name = "ref_algorithm_id", referencedColumnName = "algorithm_id",
-      nullable = false, foreignKey = @ForeignKey(name = "fk_algorithm_reference"))
+  @ManyToOne(
+    cascade = {CascadeType.PERSIST},
+    optional = false
+  )
+  @JoinColumn(
+    name = "ref_algorithm_id",
+    referencedColumnName = "algorithm_id",
+    nullable = false,
+    foreignKey = @ForeignKey(name = "fk_algorithm_reference")
+  )
   private Algorithm algorithm;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
-  @JoinColumn(name = "ref_book_id", referencedColumnName = "book_id",
-      nullable = false, foreignKey = @ForeignKey(name = "fk_book_reference"))
+  @ManyToOne(
+    cascade = {CascadeType.PERSIST},
+    optional = false
+  )
+  @JoinColumn(
+    name = "ref_book_id",
+    referencedColumnName = "book_id",
+    nullable = false,
+    foreignKey = @ForeignKey(name = "fk_book_reference")
+  )
   private Book bookId;
 
-  public AlgorithmReference() {
+  public Reference() {}
 
+  public Reference(int referenceId, Algorithm algorithm, Book bookId) {
+    this.referenceId = referenceId;
+    this.algorithm = algorithm;
+    this.bookId = bookId;
   }
 
-  public AlgorithmReference(Algorithm algorithm, Book bookId) {
+  public Reference(Algorithm algorithm, Book bookId) {
     this.algorithm = algorithm;
     this.bookId = bookId;
   }
@@ -48,18 +66,14 @@ public class AlgorithmReference {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    AlgorithmReference that = (AlgorithmReference) o;
+    Reference that = (Reference) o;
 
-    return new EqualsBuilder()
-        .append(referenceId, that.referenceId)
-        .isEquals();
+    return new EqualsBuilder().append(referenceId, that.referenceId).isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(referenceId)
-        .toHashCode();
+    return new HashCodeBuilder(17, 37).append(referenceId).toHashCode();
   }
 
   public int getReferenceId() {

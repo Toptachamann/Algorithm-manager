@@ -5,23 +5,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "book")
-public class Textbook {
+public class Book {
   @Id
   @Column(name = "book_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private int id;
 
   @Column(name = "title", nullable = false, length = 50)
   private String title;
@@ -30,13 +24,17 @@ public class Textbook {
   private Integer volume;
 
   @Column(name = "edition")
-  private Integer edition;
-  @Transient
+  private int edition;
+
+  @ManyToMany(cascade = {CascadeType.PERSIST}, targetEntity = Author.class)
+  @JoinTable(name = "textbook", joinColumns = @JoinColumn(name = "txtbk_book_id"),
+      inverseJoinColumns = @JoinColumn(name = "txtbk_author_id"))
   private List<Author> authors;
 
-  public Textbook() {}
+  public Book() {
+  }
 
-  public Textbook(
+  public Book(
       Integer id, String title, @Nullable Integer volume, Integer edition, List<Author> authors) {
     this.id = id;
     this.title = title;
@@ -45,7 +43,7 @@ public class Textbook {
     this.authors = authors;
   }
 
-  public Textbook(Integer id, String title, @Nullable Integer volume, Integer edition) {
+  public Book(Integer id, String title, @Nullable Integer volume, Integer edition) {
     this.id = id;
     this.title = title;
     this.volume = volume;
@@ -74,9 +72,9 @@ public class Textbook {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    Textbook textbook = (Textbook) o;
+    Book book = (Book) o;
 
-    return new EqualsBuilder().append(id, textbook.id).isEquals();
+    return new EqualsBuilder().append(id, book.id).isEquals();
   }
 
   @Override

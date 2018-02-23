@@ -22,14 +22,11 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
 
   private PreparedStatement createAreaByName;
   private PreparedStatement createArea;
-  private PreparedStatement createApp;
   private PreparedStatement getAllAreas;
   private PreparedStatement getAreaById;
   private PreparedStatement getAreaByName;
   private PreparedStatement getAreasByAlgo;
-  private PreparedStatement containsApp;
   private PreparedStatement deleteAreaById;
-  private PreparedStatement deleteApplication;
 
   public AreaDaoImpl() throws SQLException {
     connection = Connector.getConnection();
@@ -48,17 +45,8 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
             "SELECT area_id, area, description "
                 + "FROM (SELECT app_area_id FROM algorithm_application WHERE app_algorithm_id = ?) AS areas "
                 + "INNER JOIN area_of_use ON areas.app_area_id = area_id");
-    createApp =
-        connection.prepareStatement(
-            "INSERT INTO algorithm_application (app_algorithm_id, app_area_id) VALUE (?, ?)");
-    containsApp =
-        connection.prepareStatement(
-            "SELECT COUNT(*) FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
     deleteAreaById =
         connection.prepareStatement("DELETE FROM algorithms.area_of_use WHERE area_id = ?");
-    deleteApplication =
-        connection.prepareStatement(
-            "DELETE FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
   }
 
   @Override
@@ -96,22 +84,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
-  public void createApplication(int algorithmId, int areaId) throws SQLException {
-    try {
-      createApp.setInt(1, algorithmId);
-      createApp.setInt(2, areaId);
-      logger.debug(() -> Util.format(createApp));
-      createApp.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create application. Algorithm id = {}, area id = {}", algorithmId, areaId);
-      rollBack(connection);
-      throw e;
-    }
-  }
 
   @Override
   public List<AreaOfUse> getAllAreas() throws SQLException {
@@ -161,16 +133,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public boolean containsApplication(int algorithmId, int areaId) throws SQLException {
-    containsApp.setInt(1, algorithmId);
-    containsApp.setInt(2, areaId);
-    logger.debug(() -> Util.format(containsApp));
-    ResultSet set = containsApp.executeQuery();
-    set.next();
-    return set.getInt(1) == 1;
-  }
-
-  @Override
   public void deleteAreaOfUse(int id) throws SQLException {
     try {
       deleteAreaById.setInt(1, id);
@@ -185,22 +147,5 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
-  public void deleteApplication(int algorithmId, int areaId) throws SQLException {
-    try {
-      deleteApplication.setInt(1, algorithmId);
-      deleteApplication.setInt(2, areaId);
-      logger.debug(() -> Util.format(deleteApplication));
-      deleteApplication.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to delete algorithm application, algorithm id = {}, areaId = {}",
-          algorithmId,
-          areaId);
-      rollBack(connection);
-      throw e;
-    }
-  }
+
 }

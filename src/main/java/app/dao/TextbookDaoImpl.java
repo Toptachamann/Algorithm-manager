@@ -4,7 +4,7 @@ import app.auxiliary.Connector;
 import app.auxiliary.Util;
 import app.model.Algorithm;
 import app.model.Author;
-import app.model.Textbook;
+import app.model.Book;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -26,12 +26,9 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
   private Connection connection;
   private PreparedStatement allTextbooks;
   private PreparedStatement createBook;
-  private PreparedStatement countReferences;
-  private PreparedStatement createReference;
   private PreparedStatement connectAlgorithm;
   private PreparedStatement getTextbooksByAlgorithm;
   private PreparedStatement deleteBook;
-  private PreparedStatement deleteReference;
   private PreparedStatement resetAuthors;
 
   public TextbookDaoImpl() throws SQLException {
@@ -47,12 +44,6 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
                 + "ORDER BY book_id, author_id");
     createBook =
         connection.prepareStatement("INSERT INTO book (title, volume, edition) VALUE (?, ?, ?)");
-    countReferences =
-        connection.prepareStatement(
-            "SELECT COUNT(*) FROM algorithm_reference WHERE ref_algorithm_id = ? AND ref_book_id = ?");
-    createReference =
-        connection.prepareStatement(
-            "INSERT INTO algorithm_reference (ref_algorithm_id, ref_book_id) VALUE (?, ?)");
     connectAlgorithm =
         connection.prepareStatement(
             "INSERT INTO algorithm_reference (ref_textbook_id, ref_algorithm_id) "
@@ -65,16 +56,13 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
                 + "INNER JOIN author ON txtbk_author_id = author_id\n"
                 + "ORDER BY book_id, author_id");
     deleteBook = connection.prepareStatement("DELETE FROM book WHERE book_id = ?");
-    deleteReference =
-        connection.prepareStatement(
-            "DELETE FROM algorithm_reference WHERE algorithms.algorithm_reference.ref_algorithm_id = ? AND ref_book_id = ?");
     resetAuthors =
         connection.prepareStatement(
             "DELETE FROM algorithms.textbook WHERE algorithms.textbook.txtbk_book_id = ?");
   }
 
   @Override
-  public Textbook insertTextbook(
+  public Book insertTextbook(
       String title, @Nullable Integer volume, Integer edition, List<Author> authors)
       throws SQLException {
     try {
@@ -89,7 +77,7 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
       int bookId = getLastId(connection);
       addAuthorsToBook(bookId, authors);
       connection.commit();
-      return new Textbook(bookId, title, volume, edition, authors);
+      return new Book(bookId, title, volume, edition, authors);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
@@ -104,14 +92,14 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
   }
 
   @Override
-  public List<Textbook> getTextbooks() throws SQLException {
+  public List<Book> getTextbooks() throws SQLException {
     logger.debug(() -> Util.format(allTextbooks));
     return textbooksFromSet(allTextbooks.executeQuery());
   }
 
-  /*private List<Textbook> loadAlgorithms(List<Textbook> textbooks) throws SQLException {
+  /*private List<Book> loadAlgorithms(List<Book> textbooks) throws SQLException {
     if (textbooks.size() > 0) {
-      textbooks.sort(Comparator.comparingInt(Textbook::getId));
+      textbooks.sort(Comparator.comparingInt(Book::getId));
       StringBuilder builder = new StringBuilder();
       builder
           .append("SELECT \n")
@@ -135,7 +123,7 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
           .append("    algorithm_reference ON ref_algorithm_id = algorithm_id\n")
           .append("WHERE\n")
           .append("    ref_book_id IN (");
-      for (Textbook textbook : textbooks) {
+      for (Book textbook : textbooks) {
         builder.append(textbook.getId()).append(",");
       }
       builder.setCharAt(builder.length() - 1, ')');
@@ -145,7 +133,7 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
       ResultSet set = connection.createStatement().executeQuery(query);
       if (set.next()) {
         for (int i = 0; !set.isAfterLast(); i++) {
-          Textbook textbook = textbooks.get(i);
+          Book textbook = textbooks.get(i);
           int book_id = set.getInt(1);
           if (textbook.getId() != book_id) {
             continue;
@@ -166,7 +154,7 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
   }*/
 
   @Override
-  public List<Textbook> searchTextbook(
+  public List<Book> searchTextbook(
       String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtils.isBlank(title)) {
@@ -319,84 +307,38 @@ public class TextbookDaoImpl extends AbstractDao implements TextbookDao {
     }
   }
 
-  public void addAlgorithm(Textbook textbook, Algorithm algorithm) throws SQLException {
-    connectAlgorithm.setInt(1, textbook.getId());
+  public void addAlgorithm(Book book, Algorithm algorithm) throws SQLException {
+    connectAlgorithm.setInt(1, book.getId());
     connectAlgorithm.setInt(2, algorithm.getId());
     logger.debug(() -> Util.format(connectAlgorithm));
     connectAlgorithm.executeUpdate();
   }
 
-  private List<Textbook> textbooksFromSet(ResultSet set) throws SQLException {
-    List<Textbook> textbooks = new ArrayList<>();
+  private List<Book> textbooksFromSet(ResultSet set) throws SQLException {
+    List<Book> books = new ArrayList<>();
     if (set.next()) {
       for (; !set.isAfterLast(); ) {
         int volume = set.getInt(3);
-        Textbook textbook;
+        Book book;
         if (set.wasNull()) {
-          textbook = new Textbook(set.getInt(1), set.getString(2), null, set.getInt(4));
+          book = new Book(set.getInt(1), set.getString(2), null, set.getInt(4));
         } else {
-          textbook = new Textbook(set.getInt(1), set.getString(2), volume, set.getInt(4));
+          book = new Book(set.getInt(1), set.getString(2), volume, set.getInt(4));
         }
         int id = set.getInt(1);
         do {
-          textbook.addAuthor(new Author(set.getInt(5), set.getString(6), set.getString(7)));
+          book.addAuthor(new Author(set.getInt(5), set.getString(6), set.getString(7)));
         } while (set.next() && set.getInt(1) == id);
-        textbooks.add(textbook);
+        books.add(book);
       }
     }
-    return textbooks;
+    return books;
   }
 
-  @Override
-  public boolean containsReference(int algorithmId, int bookId) throws SQLException {
-    countReferences.setInt(1, algorithmId);
-    countReferences.setInt(2, bookId);
-    logger.debug(() -> Util.format(countReferences));
-    ResultSet set = countReferences.executeQuery();
-    set.next();
-    return set.getInt(1) == 1;
-  }
+
 
   @Override
-  public void createReference(int algorithmId, int bookId) throws SQLException {
-    try {
-      createReference.setInt(1, algorithmId);
-      createReference.setInt(2, bookId);
-      logger.debug(() -> Util.format(createReference));
-      createReference.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create reference with algorithm_id = {} and book_id = {}",
-          algorithmId,
-          bookId);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void deleteReference(int algorithmId, int bookId) throws SQLException {
-    try {
-      deleteReference.setInt(1, algorithmId);
-      deleteReference.setInt(2, bookId);
-      logger.debug(() -> Util.format(deleteBook));
-      deleteReference.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to delete reference with algorithm_id = {} and book_id = {}",
-          algorithmId,
-          bookId);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public List<Textbook> getTextbooksByAlgorithm(int algorithmId) throws SQLException {
+  public List<Book> getTextbooksByAlgorithm(int algorithmId) throws SQLException {
     getTextbooksByAlgorithm.setInt(1, algorithmId);
     logger.debug(() -> Util.format(getTextbooksByAlgorithm));
     return textbooksFromSet(getTextbooksByAlgorithm.executeQuery());

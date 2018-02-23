@@ -19,11 +19,5 @@ public interface AreaDao {
 
   void deleteAreaOfUse(int id) throws SQLException;
 
-  void createApplication(int algorithmId, int areaId) throws SQLException;
-
-  boolean containsApplication(int algorithmId, int areaId) throws SQLException;
-
   List<AreaOfUse> getAreasOfUse(int algorithmId) throws SQLException;
-
-  void deleteApplication(int algorithmId, int areaId) throws SQLException;
 }

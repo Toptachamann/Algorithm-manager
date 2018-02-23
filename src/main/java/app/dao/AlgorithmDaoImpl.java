@@ -180,7 +180,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   public void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException {
     try {
       setParadigm.setInt(1, paradigmId);
-      setParadigm.setInt(2, algorithmId);
+      setParadigm.setInt( 2, algorithmId);
       logger.debug(() -> Util.format(setParadigm));
       setParadigm.executeUpdate();
       connection.commit();
@@ -195,8 +195,8 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   @Override
   public void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException {
     try{
-      setField.setInt(1, fieldId);
       setField.setInt(2, algorithmId);
+      setField.setInt(1, fieldId);
       logger.debug(() -> Util.format(setField));
       setField.executeUpdate();
       connection.commit();

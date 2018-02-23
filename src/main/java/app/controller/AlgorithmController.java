@@ -24,7 +24,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,7 +98,7 @@ public class AlgorithmController extends AbstractController {
           FXCollections.observableArrayList(algorithmService.getDesignParadigms()));
       fieldOfStudyCB.setItems(
           FXCollections.observableArrayList(algorithmService.getAllFieldsOfStudy()));
-    } catch (SQLException e) {
+    } catch (Exception e) {
       logger.error(e);
       info.setContentText("Can't load algorithms' data. Check server connection.");
       info.showAndWait();
@@ -171,13 +170,13 @@ public class AlgorithmController extends AbstractController {
                 designParadigmCB.getItems().add(designParadigm);
               }
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             info.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
             info.showAndWait();
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
     addFieldButton.setOnAction(
@@ -202,16 +201,16 @@ public class AlgorithmController extends AbstractController {
                 fieldOfStudyCB.getItems().add(fieldOfStudy);
               }
             }
-          } catch (SQLException e1) {
+          } catch (LogicException e1) {
+            logger.warn(e1);
+            info.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
+            info.showAndWait();
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "Addition of the new field of study failed due to some internal error.\n"
                     + "See logs for details.");
             error.showAndWait();
-          } catch (LogicException e1) {
-            logger.warn(e1);
-            info.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
-            info.showAndWait();
           }
         });
     addAlgorithmButton.setOnAction(
@@ -239,15 +238,15 @@ public class AlgorithmController extends AbstractController {
               algorithmTableView.getItems().add(algorithm);
               algorithmTableView.scrollTo(algorithmTableView.getItems().size() - 1);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            error.setContentText(
-                "Addition of a new algorithm failed failed due to some internal error.\n"
-                    + "See logs for details.");
           } catch (LogicException e1) {
             logger.warn(e1);
             info.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
             info.showAndWait();
+          } catch (Exception e1) {
+            logger.error(e1);
+            error.setContentText(
+                "Addition of a new algorithm failed failed due to some internal error.\n"
+                    + "See logs for details.");
           }
         });
     searchAlgorithmButton.setOnAction(
@@ -260,7 +259,7 @@ public class AlgorithmController extends AbstractController {
                     designParadigmCB.getSelectionModel().getSelectedItem(),
                     fieldOfStudyCB.getSelectionModel().getSelectedItem());
             algorithmTableView.setItems(FXCollections.observableArrayList(algorithms));
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText("Search failed due to some internal error.\nSee logs for details");
             error.showAndWait();
@@ -328,7 +327,7 @@ public class AlgorithmController extends AbstractController {
                 try {
                   algorithmService.deleteAlgorithm(algorithm);
                   algorithmTableView.getItems().remove(algorithm);
-                } catch (SQLException e1) {
+                } catch (Exception e1) {
                   logger.error(e1);
                   error.setContentText(
                       "Deletion of the algorithm failed due to some internal error.\n"
@@ -352,17 +351,17 @@ public class AlgorithmController extends AbstractController {
               newValue = newValue.trim();
               algorithmService.updateAlgorithmName(algorithm, newValue);
               algorithm.setName(newValue);
-            } catch (SQLException e1) {
+            } catch (LogicException e1) {
+              logger.warn(e1);
+              info.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
+              info.showAndWait();
+            } catch (Exception e1) {
               logger.error(e1);
               error.setContentText(
                   "Algorithm's name wasn't changed due to some internal error.\n"
                       + "See logs for details.");
               error.showAndWait();
               algorithmTableView.refresh();
-            } catch (LogicException e1) {
-              logger.warn(e1);
-              info.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
-              info.showAndWait();
             }
           }
         });
@@ -379,7 +378,7 @@ public class AlgorithmController extends AbstractController {
             newValue = newValue.trim();
             algorithmService.updateAlgorithmComplexity(e.getRowValue(), newValue);
             algorithm.setComplexity(newValue);
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "Algorithm's complexity wasn't changed due to some internal error.\n"
@@ -550,7 +549,7 @@ public class AlgorithmController extends AbstractController {
             AlgorithmController.this.updateList(fieldOfStudyCB.getItems(), oldValue, fieldOfStudy);
             algorithmTableView.refresh();
           }
-        } catch (SQLException e1) {
+        } catch (Exception e1) {
           logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
@@ -661,7 +660,7 @@ public class AlgorithmController extends AbstractController {
                 designParadigmCB.getItems(), oldValue, designParadigm);
             algorithmTableView.refresh();
           }
-        } catch (SQLException e1) {
+        } catch (Exception e1) {
           logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"

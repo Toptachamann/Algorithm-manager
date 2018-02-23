@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParadigmDao {
-  DesignParadigm createParadigm(String paradigm) throws SQLException;
+  DesignParadigm createParadigm(String paradigm) throws Exception;
 
-  DesignParadigm createParadigm(String paradigm, String description) throws SQLException;
+  DesignParadigm createParadigm(String paradigm, String description) throws Exception;
 
-  List<DesignParadigm> getAllDesignParadigms() throws SQLException;
+  List<DesignParadigm> getAllDesignParadigms() throws Exception;
 
-  Optional<DesignParadigm> getParadigmById(int id) throws SQLException;
+  Optional<DesignParadigm> getParadigmById(int id) throws Exception;
 
-  Optional<DesignParadigm> getParadigmByName(String name) throws SQLException;
+  Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
 
-  void updateDesignParadigm(String newName, int id) throws SQLException;
+  void updateDesignParadigm(String newName, int id) throws Exception;
 }

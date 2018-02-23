@@ -5,7 +5,7 @@ import app.model.Algorithm;
 import app.model.AreaOfUse;
 import app.model.Book;
 import app.service.AlgorithmService;
-import app.service.TextbookService;
+import app.service.BookService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,12 +40,12 @@ public class ReferenceController extends AbstractController {
   @FXML private Button deleteReferenceButton;
   @FXML private ListView<String> referenceListView;
   private AlgorithmService algorithmService;
-  private TextbookService textbookService;
+  private BookService bookService;
   private NewItemBoxController newArea;
 
-  public ReferenceController(AlgorithmService algorithmService, TextbookService textbookService) {
+  public ReferenceController(AlgorithmService algorithmService, BookService bookService) {
     this.algorithmService = algorithmService;
-    this.textbookService = textbookService;
+    this.bookService = bookService;
   }
 
   public void initialize() {
@@ -72,12 +71,12 @@ public class ReferenceController extends AbstractController {
             } else {
               algorithmService.createApplication(algorithm, areaOfUse);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             super.warn(e1);
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
     searchApplicationsButton.setOnAction(
@@ -90,7 +89,7 @@ public class ReferenceController extends AbstractController {
             } else {
               displayApplications(algorithm, algorithmService.getAreasByAlgorithm(algorithm));
             }
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             super.error();
           }
@@ -110,12 +109,12 @@ public class ReferenceController extends AbstractController {
             } else {
               algorithmService.deleteApplication(algorithm, areaOfUse);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             super.warn(e1);
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
 
@@ -140,12 +139,12 @@ public class ReferenceController extends AbstractController {
                 areaOfUseCB.getItems().add(newArea);
               }
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             super.warn(e1);
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
     searchAlgorithmsButton.setOnAction(
@@ -159,7 +158,7 @@ public class ReferenceController extends AbstractController {
             } else {
               displayAlgorithms(areaOfUse, algorithmService.getAlgorithmsByArea(areaOfUse));
             }
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             super.error();
           }
@@ -184,7 +183,7 @@ public class ReferenceController extends AbstractController {
                 areaOfUseCB.getItems().remove(index);
               }
             }
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             super.error();
           }
@@ -202,14 +201,14 @@ public class ReferenceController extends AbstractController {
               info.setContentText("To create a reference you have to select a book");
               info.showAndWait();
             } else {
-              textbookService.createReference(algorithm, book);
+              bookService.createReference(algorithm, book);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             super.warn(e1);
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
     searchReferencesButton.setOnAction(
@@ -220,9 +219,9 @@ public class ReferenceController extends AbstractController {
               info.setContentText("Select an algorithm to find its applications");
               info.showAndWait();
             } else {
-              displayReferences(algorithm, textbookService.getReferences(algorithm));
+              displayReferences(algorithm, bookService.getReferences(algorithm));
             }
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             super.error();
           }
@@ -240,14 +239,14 @@ public class ReferenceController extends AbstractController {
                   "To delete a reference to the selected algorithm you have to select a book");
               info.showAndWait();
             } else {
-              textbookService.deleteReference(algorithm, book);
+              bookService.deleteReference(algorithm, book);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            super.error();
           } catch (LogicException e1) {
             logger.warn(e1);
             super.warn(e1);
+          } catch (Exception e1) {
+            logger.error(e1);
+            super.error();
           }
         });
 
@@ -255,7 +254,7 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             loadAlgorithms();
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "List of algorithms isn't synchronized anymore.\nCheck your database connection.");
@@ -266,7 +265,7 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             loadAlgorithms();
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "List of available algorithms isn't synchronized anymore.\n"
@@ -278,7 +277,7 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             loadAreas();
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "List of available areas of use isn't synchronized anymore.\n"
@@ -289,7 +288,7 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             loadBooks();
-          } catch (SQLException e1) {
+          } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
                 "List of available books isn't synchronized anymore.\n"
@@ -336,9 +335,7 @@ public class ReferenceController extends AbstractController {
             return bookCB
                 .getItems()
                 .stream()
-                .filter(
-                    b ->
-                        StringUtils.startsWithIgnoreCase(string, b.getTitle()))
+                .filter(b -> StringUtils.startsWithIgnoreCase(string, b.getTitle()))
                 .findFirst()
                 .orElse(null);
           }
@@ -411,14 +408,14 @@ public class ReferenceController extends AbstractController {
       loadAlgorithms();
       loadAreas();
       loadBooks();
-    } catch (SQLException e) {
+    } catch (Exception e) {
       logger.error(e);
       error.setContentText("Can't load data due to some internal error.\nSee logs for details.");
       error.showAndWait();
     }
   }
 
-  private void loadAlgorithms() throws SQLException {
+  private void loadAlgorithms() throws Exception {
     ObservableList<Algorithm> algorithms =
         FXCollections.observableArrayList(algorithmService.getAllAlgorithms());
     algorithms.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
@@ -426,16 +423,15 @@ public class ReferenceController extends AbstractController {
     refAlgorithmCB.setItems(algorithms);
   }
 
-  private void loadAreas() throws SQLException {
+  private void loadAreas() throws Exception {
     ObservableList<AreaOfUse> areas =
         FXCollections.observableArrayList(algorithmService.getAllAreas());
     areas.sort((a, b) -> a.getAreaOfUse().compareToIgnoreCase(b.getAreaOfUse()));
     areaOfUseCB.setItems(areas);
   }
 
-  private void loadBooks() throws SQLException {
-    ObservableList<Book> books =
-        FXCollections.observableArrayList(textbookService.getAllBooks());
+  private void loadBooks() throws Exception {
+    ObservableList<Book> books = FXCollections.observableArrayList(bookService.getAllBooks());
     books.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
     bookCB.setItems(books);
   }

@@ -1,75 +1,69 @@
 package app.service;
 
-import app.auxiliary.LogicException;
 import app.model.Algorithm;
 import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public interface AlgorithmService {
-  List<Algorithm> getAllAlgorithms() throws SQLException;
+  List<Algorithm> getAllAlgorithms() throws Exception;
 
-  List<DesignParadigm> getDesignParadigms() throws SQLException;
+  List<DesignParadigm> getDesignParadigms() throws Exception;
 
-  List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException;
+  List<FieldOfStudy> getAllFieldsOfStudy() throws Exception;
 
-  DesignParadigm createDesignParadigm(String paradigmName) throws SQLException, LogicException;
+  DesignParadigm createDesignParadigm(String paradigmName) throws Exception;
 
-  DesignParadigm createDesignParadigm(String paradigmName, String description)
-      throws SQLException, LogicException;
+  DesignParadigm createDesignParadigm(String paradigmName, String description) throws Exception;
 
-  Optional<FieldOfStudy> getFieldByName(String name) throws SQLException;
+  Optional<FieldOfStudy> getFieldByName(String name) throws Exception;
 
-  Optional<DesignParadigm> getParadigmByName(String name) throws SQLException;
+  Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
 
-  FieldOfStudy createFieldOfStudy(String fieldName) throws SQLException, LogicException;
+  FieldOfStudy createFieldOfStudy(String fieldName) throws Exception;
 
-  FieldOfStudy createFieldOfStudy(String fieldName, String fieldDescription)
-      throws SQLException, LogicException;
+  FieldOfStudy createFieldOfStudy(String fieldName, String fieldDescription) throws Exception;
 
   Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
-      throws SQLException, LogicException;
+      throws Exception;
 
   List<Algorithm> searchAlgorithm(
       String text, String text1, DesignParadigm selectedItem, FieldOfStudy selectedItem1)
-      throws SQLException;
+      throws Exception;
 
-  void updateAlgorithmName(Algorithm algorithm, String newName) throws SQLException, LogicException;
+  void updateAlgorithmName(Algorithm algorithm, String newName) throws Exception;
 
-  void updateAlgorithmComplexity(Algorithm rowValue, String newComplexity) throws SQLException;
+  void updateAlgorithmComplexity(Algorithm rowValue, String newComplexity) throws Exception;
 
-  DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String paradigm) throws SQLException;
+  DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String paradigm) throws Exception;
 
-  FieldOfStudy updateFieldName(FieldOfStudy newValue, String field) throws SQLException;
+  FieldOfStudy updateFieldName(FieldOfStudy newValue, String field) throws Exception;
 
-  void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException;
+  void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception;
 
-  void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws SQLException;
+  void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws Exception;
 
-  void deleteAlgorithm(Algorithm algorithm) throws SQLException;
+  void deleteAlgorithm(Algorithm algorithm) throws Exception;
 
-  List<AreaOfUse> getAllAreas() throws SQLException;
+  List<AreaOfUse> getAllAreas() throws Exception;
 
-  AreaOfUse createAreaOfUse(String area) throws SQLException, LogicException;
+  AreaOfUse createAreaOfUse(String area) throws Exception;
 
-  AreaOfUse createAreaOfUse(String area, String description) throws SQLException, LogicException;
+  AreaOfUse createAreaOfUse(String area, String description) throws Exception;
 
-  void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException;
+  void deleteAreaOfUse(AreaOfUse areaOfUse) throws Exception;
 
-  Optional<AreaOfUse> getAreaOfUse(String name) throws SQLException;
+  Optional<AreaOfUse> getAreaOfUse(String name) throws Exception;
 
-  void createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
-      throws SQLException, LogicException;
+  void createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws SQLException;
+  List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws Exception;
 
-  List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws SQLException;
+  List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws Exception;
 
-  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse)
-      throws SQLException, LogicException;
+  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 }

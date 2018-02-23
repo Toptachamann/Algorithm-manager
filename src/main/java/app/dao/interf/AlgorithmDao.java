@@ -13,21 +13,21 @@ public interface AlgorithmDao {
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException;
 
-  List<Algorithm> getAllAlgorithms() throws SQLException;
+  List<Algorithm> getAllAlgorithms() throws Exception;
 
-  Optional<Algorithm> getAlgorithmByName(String name) throws SQLException;
+  Optional<Algorithm> getAlgorithmByName(String name) throws Exception;
 
   List<Algorithm> searchAlgorithm(
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
-      throws SQLException;
+      throws Exception;
 
-  void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException;
+  void setDesignParadigm(int paradigmId, int algorithmId) throws Exception;
 
-  void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException;
+  void setFieldOfStudy(int fieldId, int algorithmId) throws Exception;
 
-  void updateEntry(String column, String value, int id) throws SQLException;
+  void updateEntry(String column, String value, int id) throws Exception;
 
-  void deleteById(int id) throws SQLException;
+  void deleteById(int id) throws Exception;
 
-  List<Algorithm> getAlgorithmsByArea(int areaId) throws SQLException;
+  List<Algorithm> getAlgorithmsByArea(int areaId) throws Exception;
 }

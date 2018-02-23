@@ -18,13 +18,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
 
   @Override
   public DesignParadigm createParadigm(String paradigm) {
-    DesignParadigm designParadigm = new DesignParadigm(paradigm);
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(designParadigm);
-    entityManager.getTransaction().commit();
-    entityManager.close();
-    return designParadigm;
+    return createParadigm(paradigm, null);
   }
 
   @Override
@@ -62,6 +56,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
             .createQuery(
                 criteria.select(root).where(builder.equal(root.get(DesignParadigm_.id), id)))
             .getResultList();
+    entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
@@ -78,12 +73,14 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
                     .select(root)
                     .where(builder.equal(root.get(DesignParadigm_.paradigm), name)))
             .getResultList();
+    entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
   @Override
   public void updateDesignParadigm(String newName, int id) {
     EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaUpdate<DesignParadigm> update = builder.createCriteriaUpdate(DesignParadigm.class);
     Root<DesignParadigm> root = update.from(DesignParadigm.class);
@@ -93,5 +90,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
                 .set(DesignParadigm_.paradigm, newName)
                 .where(builder.equal(root.get(DesignParadigm_.id), id)))
         .executeUpdate();
+    entityManager.getTransaction().commit();
+    entityManager.close();
   }
 }

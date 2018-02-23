@@ -8,9 +8,9 @@ import java.sql.SQLException;
 
 public interface ApplicationDao {
 
-  Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException;
+  Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException;
+  boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException;
+  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 }

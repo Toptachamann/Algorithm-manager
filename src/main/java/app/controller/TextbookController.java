@@ -3,7 +3,7 @@ package app.controller;
 import app.auxiliary.InputException;
 import app.model.Author;
 import app.model.Book;
-import app.service.TextbookService;
+import app.service.BookService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class TextbookController extends AbstractController {
 
   private final String numberPattern = "^\\s*[0-9]+\\s*$";
 
-  private TextbookService textbookService;
+  private BookService bookService;
 
   @FXML private TableView<Book> textbookTableView;
   @FXML private TableColumn<Book, Integer> bookIdColumn;
@@ -48,8 +47,8 @@ public class TextbookController extends AbstractController {
   @FXML private Button searchBookButton;
   @FXML private Button addBookButton;
 
-  public TextbookController(TextbookService textbookService) {
-    this.textbookService = textbookService;
+  public TextbookController(BookService bookService) {
+    this.bookService = bookService;
   }
 
   public void initialize() {
@@ -87,18 +86,18 @@ public class TextbookController extends AbstractController {
             List<Author> authors = authorsFromStr(authorsTextField.getText());
             textbookTableView.setItems(
                 FXCollections.observableArrayList(
-                    textbookService.searchBooks(title, volume, edition, authors)));
-          } catch (SQLException e1) {
-            logger.error(e1);
-            error.setContentText(
-                "Can't perform search due to some internal error.\n" + "See logs for details.");
-            error.showAndWait();
+                    bookService.searchBooks(title, volume, edition, authors)));
           } catch (InputException e1) {
             logger.warn(e1);
             info.setContentText(
                 "Authors' first and last names should be specified in sequence, comma separated.\n"
                     + "For example, Vasya Pupkin, Fedya Nozkin");
             info.showAndWait();
+          } catch (Exception e1) {
+            logger.error(e1);
+            error.setContentText(
+                "Can't perform search due to some internal error.\n" + "See logs for details.");
+            error.showAndWait();
           }
         });
     addBookButton.setOnAction(
@@ -125,19 +124,19 @@ public class TextbookController extends AbstractController {
               Integer edition = Integer.valueOf(editionStr);
               textbookTableView
                   .getItems()
-                  .add(textbookService.createBook(title, volume, edition, authors));
+                  .add(bookService.createBook(title, volume, edition, authors));
               textbookTableView.scrollTo(textbookTableView.getItems().size() - 1);
             }
-          } catch (SQLException e1) {
-            logger.error(e1);
-            error.setContentText(
-                "Can't add new algorithm due to some internal error.\n" + "See logs for details.");
-            error.showAndWait();
           } catch (InputException e1) {
             logger.warn(e1);
             error.setContentText(
                 "Authors' first and last names should be specified in sequence, comma separated.\n"
                     + "For example, Vasya Pupkin, Fedya Nozhkin");
+            error.showAndWait();
+          } catch (Exception e1) {
+            logger.error(e1);
+            error.setContentText(
+                "Can't add new algorithm due to some internal error.\n" + "See logs for details.");
             error.showAndWait();
           }
         });
@@ -185,9 +184,9 @@ public class TextbookController extends AbstractController {
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                 try {
-                  textbookService.deleteBook(book);
+                  bookService.deleteBook(book);
                   textbookTableView.getItems().remove(book);
-                } catch (SQLException e1) {
+                } catch (Exception e1) {
                   logger.error(e1);
                   error.setContentText(
                       "Can't delete selected book due to some internal error.\n"
@@ -209,9 +208,9 @@ public class TextbookController extends AbstractController {
             try {
               newTitle = newTitle.trim();
               Book book = textbookTableView.getItems().get(e.getTablePosition().getRow());
-              textbookService.updateTitle(book, newTitle);
+              bookService.updateTitle(book, newTitle);
               book.setTitle(newTitle);
-            } catch (SQLException e1) {
+            } catch (Exception e1) {
               logger.error(e1);
               error.setContentText(
                   "Book's title wasn't updated due to some internal error.\n"
@@ -231,9 +230,9 @@ public class TextbookController extends AbstractController {
           } else {
             try {
               Book book = textbookTableView.getItems().get(e.getTablePosition().getRow());
-              textbookService.updateEdition(book, newEdition);
+              bookService.updateEdition(book, newEdition);
               book.setEdition(newEdition);
-            } catch (SQLException e1) {
+            } catch (Exception e1) {
               logger.error(e1);
               error.setContentText(
                   "Edition wasn't changed due to some internal error.\n" + "See logs for details.");
@@ -243,9 +242,8 @@ public class TextbookController extends AbstractController {
         });
 
     try {
-      textbookTableView.setItems(
-          FXCollections.observableArrayList(textbookService.getAllBooks()));
-    } catch (SQLException e) {
+      textbookTableView.setItems(FXCollections.observableArrayList(bookService.getAllBooks()));
+    } catch (Exception e) {
       logger.error(e);
       info.setContentText(
           "Can't load books' information due to some internal error.\n" + "See logs for details.");
@@ -335,10 +333,10 @@ public class TextbookController extends AbstractController {
       super.commitEdit(newValue);
       try {
         Book book = getTableView().getItems().get(getTableRow().getIndex());
-        List<Author> newAuthors = textbookService.setAuthors(book, newValue);
+        List<Author> newAuthors = bookService.setAuthors(book, newValue);
         book.setAuthors(newAuthors);
         updateItem(newAuthors, false);
-      } catch (SQLException e) {
+      } catch (Exception e) {
         logger.error(e);
         error.setContentText(
             "Authors weren't updated due to some internal error.\n" + "See logs for details.");
@@ -392,9 +390,9 @@ public class TextbookController extends AbstractController {
                 setItem(null);
                 try {
                   Book rowValue = textbookTableView.getItems().get(getIndex());
-                  textbookService.updateVolume(rowValue, null);
+                  bookService.updateVolume(rowValue, null);
                   rowValue.setVolume(null);
-                } catch (SQLException e1) {
+                } catch (Exception e1) {
                   logger.error(e1);
                   error.setContentText(
                       "Can't set book's volume to none due to some internal error.\n"
@@ -451,9 +449,9 @@ public class TextbookController extends AbstractController {
       } else {
         try {
           Book rowValue = textbookTableView.getItems().get(getIndex());
-          textbookService.updateVolume(rowValue, newValue);
+          bookService.updateVolume(rowValue, newValue);
           rowValue.setVolume(newValue);
-        } catch (SQLException e) {
+        } catch (Exception e) {
           logger.error(e);
           error.setContentText(
               "Can't set book's volume to none due to some internal error.\n"

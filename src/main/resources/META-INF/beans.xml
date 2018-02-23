@@ -24,17 +24,17 @@
     <bean id="bookDao" class="app.dao.jdbc.BookDaoImpl"/>
     <bean id="authorDao" class="app.dao.jdbc.AuthorDaoImpl"/>
     <bean id="referenceDao" class="app.dao.jdbc.ReferenceDaoImpl"/>
-    <bean id="textbookService" class="app.service.BookServiceImpl">
+    <bean id="bookService" class="app.service.BookServiceImpl">
         <constructor-arg name="bookDao" ref="bookDao"/>
         <constructor-arg name="authorDao" ref="authorDao"/>
         <constructor-arg name="referenceDao" ref="referenceDao"/>
     </bean>
     <bean id="textbookController" class="app.controller.TextbookController">
-        <constructor-arg name="textbookService" ref="textbookService"/>
+        <constructor-arg name="bookService" ref="bookService"/>
     </bean>
 
     <bean id="referenceController" class="app.controller.ReferenceController">
         <constructor-arg name="algorithmService" ref="algorithmService"/>
-        <constructor-arg name="textbookService" ref="textbookService"/>
+        <constructor-arg name="bookService" ref="bookService"/>
     </bean>
 </beans>

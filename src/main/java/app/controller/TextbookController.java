@@ -2,7 +2,7 @@ package app.controller;
 
 import app.auxiliary.InputException;
 import app.model.Author;
-import app.model.Textbook;
+import app.model.Book;
 import app.service.TextbookService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -35,12 +35,12 @@ public class TextbookController extends AbstractController {
 
   private TextbookService textbookService;
 
-  @FXML private TableView<Textbook> textbookTableView;
-  @FXML private TableColumn<Textbook, Integer> bookIdColumn;
-  @FXML private TableColumn<Textbook, String> titleColumn;
-  @FXML private TableColumn<Textbook, Integer> volumeColumn;
-  @FXML private TableColumn<Textbook, Integer> editionColumn;
-  @FXML private TableColumn<Textbook, List<Author>> authorColumn;
+  @FXML private TableView<Book> textbookTableView;
+  @FXML private TableColumn<Book, Integer> bookIdColumn;
+  @FXML private TableColumn<Book, String> titleColumn;
+  @FXML private TableColumn<Book, Integer> volumeColumn;
+  @FXML private TableColumn<Book, Integer> editionColumn;
+  @FXML private TableColumn<Book, List<Author>> authorColumn;
   @FXML private TextField titleTextField;
   @FXML private TextField authorsTextField;
   @FXML private ComboBox<String> editionCB;
@@ -178,15 +178,15 @@ public class TextbookController extends AbstractController {
     textbookTableView.setOnKeyReleased(
         e -> {
           if (e.getCode().equals(KeyCode.DELETE)) {
-            Textbook textbook = textbookTableView.getSelectionModel().getSelectedItem();
-            if (textbook != null) {
+            Book book = textbookTableView.getSelectionModel().getSelectedItem();
+            if (book != null) {
               confirm.setContentText(
                   "Do you really want to delete this book?\n" + "Operation is undoable.");
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                 try {
-                  textbookService.deleteTextbook(textbook);
-                  textbookTableView.getItems().remove(textbook);
+                  textbookService.deleteTextbook(book);
+                  textbookTableView.getItems().remove(book);
                 } catch (SQLException e1) {
                   logger.error(e1);
                   error.setContentText(
@@ -208,9 +208,9 @@ public class TextbookController extends AbstractController {
           } else {
             try {
               newTitle = newTitle.trim();
-              Textbook textbook = textbookTableView.getItems().get(e.getTablePosition().getRow());
-              textbookService.updateTitle(textbook, newTitle);
-              textbook.setTitle(newTitle);
+              Book book = textbookTableView.getItems().get(e.getTablePosition().getRow());
+              textbookService.updateTitle(book, newTitle);
+              book.setTitle(newTitle);
             } catch (SQLException e1) {
               logger.error(e1);
               error.setContentText(
@@ -230,9 +230,9 @@ public class TextbookController extends AbstractController {
             textbookTableView.refresh();
           } else {
             try {
-              Textbook textbook = textbookTableView.getItems().get(e.getTablePosition().getRow());
-              textbookService.updateEdition(textbook, newEdition);
-              textbook.setEdition(newEdition);
+              Book book = textbookTableView.getItems().get(e.getTablePosition().getRow());
+              textbookService.updateEdition(book, newEdition);
+              book.setEdition(newEdition);
             } catch (SQLException e1) {
               logger.error(e1);
               error.setContentText(
@@ -276,7 +276,7 @@ public class TextbookController extends AbstractController {
     }
   }
 
-  private class AuthorCell extends TableCell<Textbook, List<Author>> {
+  private class AuthorCell extends TableCell<Book, List<Author>> {
     private TextField textField;
 
     AuthorCell() {
@@ -334,9 +334,9 @@ public class TextbookController extends AbstractController {
     public void commitEdit(List<Author> newValue) {
       super.commitEdit(newValue);
       try {
-        Textbook textbook = getTableView().getItems().get(getTableRow().getIndex());
-        List<Author> newAuthors = textbookService.setAuthors(textbook, newValue);
-        textbook.setAuthors(newAuthors);
+        Book book = getTableView().getItems().get(getTableRow().getIndex());
+        List<Author> newAuthors = textbookService.setAuthors(book, newValue);
+        book.setAuthors(newAuthors);
         updateItem(newAuthors, false);
       } catch (SQLException e) {
         logger.error(e);
@@ -371,7 +371,7 @@ public class TextbookController extends AbstractController {
     }
   }
 
-  private class VolumeCell extends TableCell<Textbook, Integer> {
+  private class VolumeCell extends TableCell<Book, Integer> {
     private TextField textField;
 
     VolumeCell() {
@@ -391,7 +391,7 @@ public class TextbookController extends AbstractController {
               if (StringUtils.isBlank(volumeStr)) {
                 setItem(null);
                 try {
-                  Textbook rowValue = textbookTableView.getItems().get(getIndex());
+                  Book rowValue = textbookTableView.getItems().get(getIndex());
                   textbookService.updateVolume(rowValue, null);
                   rowValue.setVolume(null);
                 } catch (SQLException e1) {
@@ -450,7 +450,7 @@ public class TextbookController extends AbstractController {
         cancelEdit();
       } else {
         try {
-          Textbook rowValue = textbookTableView.getItems().get(getIndex());
+          Book rowValue = textbookTableView.getItems().get(getIndex());
           textbookService.updateVolume(rowValue, newValue);
           rowValue.setVolume(newValue);
         } catch (SQLException e) {

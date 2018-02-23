@@ -231,13 +231,13 @@ INSERT INTO `field_of_study` VALUES (1,'Graph theory',NULL),(2,'Searching',NULL)
 UNLOCK TABLES;
 
 --
--- Table structure for table `textbook`
+-- Table structure for table `book`
 --
 
-DROP TABLE IF EXISTS `textbook`;
+DROP TABLE IF EXISTS `book`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `textbook` (
+CREATE TABLE `book` (
   `txtbk_book_id` int(10) NOT NULL,
   `txtbk_author_id` int(10) NOT NULL,
   PRIMARY KEY (`txtbk_book_id`,`txtbk_author_id`),
@@ -248,13 +248,13 @@ CREATE TABLE `textbook` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `textbook`
+-- Dumping data for table `book`
 --
 
-LOCK TABLES `textbook` WRITE;
-/*!40000 ALTER TABLE `textbook` DISABLE KEYS */;
-INSERT INTO `textbook` VALUES (2,1),(3,1),(4,1),(1,2),(1,3),(1,4),(1,5);
-/*!40000 ALTER TABLE `textbook` ENABLE KEYS */;
+LOCK TABLES `book` WRITE;
+/*!40000 ALTER TABLE `book` DISABLE KEYS */;
+INSERT INTO `book` VALUES (2,1),(3,1),(4,1),(1,2),(1,3),(1,4),(1,5);
+/*!40000 ALTER TABLE `book` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

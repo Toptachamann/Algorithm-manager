@@ -1,6 +1,7 @@
 package app.service;
 
 import app.auxiliary.LogicException;
+import app.dao.AlgorithmApplicationDao;
 import app.dao.AlgorithmDao;
 import app.dao.AreaDao;
 import app.dao.FieldDao;
@@ -25,13 +26,19 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   private ParadigmDao paradigmDao;
   private FieldDao fieldDao;
   private AreaDao areaDao;
+  private AlgorithmApplicationDao applicationDao;
 
   public AlgorithmServiceImpl(
-      AlgorithmDao algorithmDao, ParadigmDao paradigmDao, FieldDao fieldDao, AreaDao areaDao) {
+      AlgorithmDao algorithmDao,
+      ParadigmDao paradigmDao,
+      FieldDao fieldDao,
+      AreaDao areaDao,
+      AlgorithmApplicationDao applicationDao) {
     this.algorithmDao = algorithmDao;
     this.paradigmDao = paradigmDao;
     this.fieldDao = fieldDao;
     this.areaDao = areaDao;
+    this.applicationDao = applicationDao;
   }
 
   @Override
@@ -234,20 +241,20 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   @Override
   public void createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException {
-    if (areaDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
+    if (applicationDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
       throw new LogicException("This algorithm application does already exist");
     } else {
-      areaDao.createApplication(algorithm.getId(), areaOfUse.getId());
+      applicationDao.createApplication(algorithm.getId(), areaOfUse.getId());
     }
   }
 
   @Override
   public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException, LogicException {
-    if (!areaDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
+    if (!applicationDao.containsApplication(algorithm.getId(), areaOfUse.getId())) {
       throw new LogicException("This application didn't exist");
     } else {
-      areaDao.deleteApplication(algorithm.getId(), areaOfUse.getId());
+      applicationDao.deleteApplication(algorithm.getId(), areaOfUse.getId());
     }
   }
 }

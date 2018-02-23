@@ -65,7 +65,7 @@ CREATE TABLE algorithm_reference (
   FOREIGN KEY (ref_book_id)
   REFERENCES book (book_id)
 );
-CREATE TABLE textbook (
+CREATE TABLE book (
   textbook_id     INT(10) NOT NULL AUTO_INCREMENT,
   txtbk_book_id   INT(10) NOT NULL,
   txtbk_author_id INT(10) NOT NULL,
@@ -82,7 +82,7 @@ INSERT INTO book (title, volume, edition) VALUES ('The art of computer programmi
   ('The art of computer programming', 2, 3), ('The art of computer programming', 3, 2);
 INSERT INTO author (first_name, last_name) VALUES ('Donald', 'Knuth'), ('Thomas', 'Cormen'),
   ('Charles', 'Leiserson'), ('Ronald', 'Rivest'), ('Clifford', 'Stein');
-INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUES (2, 1), (3, 1), (4, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+INSERT INTO book (txtbk_book_id, txtbk_author_id) VALUES (2, 1), (3, 1), (4, 1), (1, 2), (1, 3), (1, 4), (1, 5);
 INSERT INTO design_paradigm (paradigm) VALUES ('Divide and conquer'), ('Dynamic programming'), ('Greedy strategy');
 INSERT INTO field_of_study (name) VALUES ('graph theory'), ('searching'), ('sorting'),
   ('number theory'), ('linear programming'), ('matrix operations'), ('multithreaded algorithms'),
@@ -107,7 +107,7 @@ ALTER TABLE algorithm_reference
 ALTER TABLE algorithm_reference
   ADD COLUMN ref_textbook_id INT(10) NOT NULL;
 ALTER TABLE algorithm_reference
-  ADD CONSTRAINT `ref_textbook_id` FOREIGN KEY (ref_textbook_id) REFERENCES textbook (textbook_id);
+  ADD CONSTRAINT `ref_textbook_id` FOREIGN KEY (ref_textbook_id) REFERENCES book (textbook_id);
 ALTER TABLE book
   DROP COLUMN year_published;
 ALTER TABLE book
@@ -165,7 +165,7 @@ FROM algorithm;
 SELECT *
 FROM area_of_use;
 SELECT *
-FROM textbook;
+FROM book;
 SELECT
   title,
   volume,
@@ -174,7 +174,7 @@ SELECT
   last_name
 FROM
   ((book
-    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN book ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id);
 SELECT
   algorithm.name,
@@ -210,7 +210,7 @@ SELECT
   last_name
 FROM
   ((book
-    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN book ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id)
 WHERE CONCAT(first_name, last_name) LIKE '%homas%' OR CONCAT(first_name, last_name) LIKE '%les%'
 ORDER BY book_id, author_id;
@@ -218,7 +218,7 @@ ORDER BY book_id, author_id;
 SELECT DISTINCT book_id
 FROM
   ((book
-    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN book ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id)
 WHERE
   CONCAT(first_name, last_name) LIKE '%Thomas%';
@@ -226,7 +226,7 @@ WHERE
 SELECT DISTINCT book_id
 FROM
   ((book
-    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN book ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id)
 WHERE
   1 = 1
@@ -243,7 +243,7 @@ SELECT
   last_name
 FROM
   ((book
-    INNER JOIN textbook ON book_id = txtbk_book_id)
+    INNER JOIN book ON book_id = txtbk_book_id)
     INNER JOIN author ON txtbk_author_id = author_id)
 ORDER BY book_id, author_id;
 
@@ -263,17 +263,17 @@ FROM
       b1.volume
     FROM
       ((author AS a1
-        INNER JOIN textbook AS t1 ON a1.author_id = t1.txtbk_author_id)
+        INNER JOIN book AS t1 ON a1.author_id = t1.txtbk_author_id)
         INNER JOIN book AS b1 ON t1.txtbk_book_id = b1.book_id)
     WHERE
       CONCAT(a1.first_name, a1.first_name) LIKE '%Charles%') AS b2
-    INNER JOIN textbook AS t2 ON b2.book_id = t2.txtbk_book_id)
+    INNER JOIN book AS t2 ON b2.book_id = t2.txtbk_book_id)
   INNER JOIN author AS a2 ON a2.author_id = t2.txtbk_author_id
 ORDER BY b2.book_id, a2.author_id;
 
 
 SELECT *
-FROM book AS b INNER JOIN textbook AS t ON b.book_id = t.txtbk_book_id;
+FROM book AS b INNER JOIN book AS t ON b.book_id = t.txtbk_book_id;
 
 SELECT
   algorithm_id,
@@ -337,7 +337,7 @@ ORDER BY algorithm_id;
 
 select book_id, title, volume, edition, author_id, first_name, last_name
 from (select ref_book_id from algorithm_reference where ref_algorithm_id = 1) as algos
-inner join book on algos.ref_book_id = book_id inner join textbook on book_id = txtbk_book_id 
+inner join book on algos.ref_book_id = book_id inner join book on book_id = txtbk_book_id
 inner join author on txtbk_author_id = author_id
 order by book_id, author_id;
 

@@ -3,7 +3,7 @@ package app.controller;
 import app.auxiliary.LogicException;
 import app.model.Algorithm;
 import app.model.AreaOfUse;
-import app.model.Textbook;
+import app.model.Book;
 import app.service.AlgorithmService;
 import app.service.TextbookService;
 import javafx.collections.FXCollections;
@@ -35,7 +35,7 @@ public class ReferenceController extends AbstractController {
   @FXML private Button deleteAreaButton;
   @FXML private ListView<String> areaListView;
   @FXML private ComboBox<Algorithm> refAlgorithmCB;
-  @FXML private ComboBox<Textbook> bookCB;
+  @FXML private ComboBox<Book> bookCB;
   @FXML private Button createReferenceButton;
   @FXML private Button searchReferencesButton;
   @FXML private Button deleteReferenceButton;
@@ -194,15 +194,15 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
-            Textbook textbook = bookCB.getSelectionModel().getSelectedItem();
+            Book book = bookCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
               info.setContentText("To create a reference to an algorithm select it first");
               info.showAndWait();
-            } else if (textbook == null) {
+            } else if (book == null) {
               info.setContentText("To create a reference you have to select a book");
               info.showAndWait();
             } else {
-              textbookService.createReference(algorithm, textbook);
+              textbookService.createReference(algorithm, book);
             }
           } catch (SQLException e1) {
             logger.error(e1);
@@ -231,16 +231,16 @@ public class ReferenceController extends AbstractController {
         e -> {
           try {
             Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
-            Textbook textbook = bookCB.getSelectionModel().getSelectedItem();
+            Book book = bookCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
               info.setContentText("To delete a reference select an algorithm first");
               info.showAndWait();
-            } else if (textbook == null) {
+            } else if (book == null) {
               info.setContentText(
                   "To delete a reference to the selected algorithm you have to select a book");
               info.showAndWait();
             } else {
-              textbookService.deleteReference(algorithm, textbook);
+              textbookService.deleteReference(algorithm, book);
             }
           } catch (SQLException e1) {
             logger.error(e1);
@@ -319,20 +319,20 @@ public class ReferenceController extends AbstractController {
         });
 
     bookCB.setConverter(
-        new StringConverter<Textbook>() {
+        new StringConverter<Book>() {
           @Override
-          public String toString(Textbook textbook) {
-            if (textbook == null) {
+          public String toString(Book book) {
+            if (book == null) {
               return null;
             }
-            return textbook.getTitle()
-                + (textbook.getVolume() == null ? " " : " Vol. " + textbook.getVolume() + " ")
-                + textbook.getEdition()
+            return book.getTitle()
+                + (book.getVolume() == null ? " " : " Vol. " + book.getVolume() + " ")
+                + book.getEdition()
                 + " edition";
           }
 
           @Override
-          public Textbook fromString(String string) {
+          public Book fromString(String string) {
             return bookCB
                 .getItems()
                 .stream()
@@ -385,17 +385,17 @@ public class ReferenceController extends AbstractController {
     areaListView.setItems(values);
   }
 
-  private void displayReferences(Algorithm algorithm, List<Textbook> textbooks) {
+  private void displayReferences(Algorithm algorithm, List<Book> books) {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
         algorithm.getName()
             + (StringUtils.containsIgnoreCase(algorithm.getName(), "algorithm")
                 ? " "
                 : " algorithm ")
-            + (textbooks.size() == 0
+            + (books.size() == 0
                 ? "has no book references specified yet"
                 : "is referenced in the following books:"));
-    textbooks.forEach(
+    books.forEach(
         t ->
             values.add(
                 "\t"
@@ -434,10 +434,10 @@ public class ReferenceController extends AbstractController {
   }
 
   private void loadBooks() throws SQLException {
-    ObservableList<Textbook> textbooks =
+    ObservableList<Book> books =
         FXCollections.observableArrayList(textbookService.getAllTextbooks());
-    textbooks.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
-    bookCB.setItems(textbooks);
+    books.sort((a, b) -> a.getTitle().compareToIgnoreCase(b.getTitle()));
+    bookCB.setItems(books);
   }
 
   private class AlgorithmStringConverter extends StringConverter<Algorithm> {

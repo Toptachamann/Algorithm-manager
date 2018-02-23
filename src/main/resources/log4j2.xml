@@ -8,11 +8,13 @@
     </Properties>
     <Appenders>
         <Console name="STDOUT">
-            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <PatternLayout
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
         </Console>
         <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
-            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <PatternLayout
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="500 MB"/>
@@ -21,7 +23,8 @@
         </RollingFile>
         <RollingFile name="ERROR" fileName="${baseDir}/${error_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
-            <PatternLayout pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+            <PatternLayout
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="5 MB"/>
@@ -41,10 +44,6 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="org.springframework.core.env.StandardEnvironment">
-            <AppenderRef ref="ALL" level="FATAL"/>
-            <AppenderRef ref="ERROR" level="FATAL"/>
-        </Logger>
         <Logger name="app.dao.AlgorithmDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
@@ -57,11 +56,23 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
+        <Logger name="app.dao.AreaDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="all"/>
+            <AppenderRef ref="ERROR" level="error"/>
+        </Logger>
+        <Logger name="app.dao.AlgorithmApplicationDaoImpl" aditivity="true">
+            <AppenderRef ref="ALL" level="all"/>
+            <AppenderRef ref="ERROR" level="error"/>
+        </Logger>
         <Logger name="app.dao.TextbookDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
         <Logger name="app.dao.AuthorDaoImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="app.dao.AlgorithmReferenceDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>

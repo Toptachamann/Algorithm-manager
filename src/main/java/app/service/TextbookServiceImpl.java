@@ -1,11 +1,12 @@
 package app.service;
 
 import app.auxiliary.LogicException;
+import app.dao.AlgorithmReferenceDao;
 import app.dao.AuthorDao;
 import app.dao.TextbookDao;
 import app.model.Algorithm;
 import app.model.Author;
-import app.model.Textbook;
+import app.model.Book;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -18,17 +19,20 @@ import java.util.List;
 public class TextbookServiceImpl implements TextbookService {
   private static final Logger logger = LogManager.getLogger(TextbookServiceImpl.class);
 
-  private final TextbookDao textbookDao;
-  private final AuthorDao authorDao;
+  private TextbookDao textbookDao;
+  private AuthorDao authorDao;
+  private AlgorithmReferenceDao referenceDao;
 
-  public TextbookServiceImpl(TextbookDao textbookDao, AuthorDao authorDao) {
+  public TextbookServiceImpl(
+      TextbookDao textbookDao, AuthorDao authorDao, AlgorithmReferenceDao referenceDao) {
     this.textbookDao = textbookDao;
     this.authorDao = authorDao;
+    this.referenceDao = referenceDao;
   }
 
   @Override
-  public Textbook createTextbook(
-      String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
+  public Book createTextbook(String title, Integer volume, Integer edition, List<Author> authors)
+      throws SQLException {
     return textbookDao.insertTextbook(title, volume, edition, fixIds(authors));
   }
 
@@ -38,12 +42,12 @@ public class TextbookServiceImpl implements TextbookService {
   }
 
   @Override
-  public List<Textbook> getAllTextbooks() throws SQLException {
+  public List<Book> getAllTextbooks() throws SQLException {
     return textbookDao.getTextbooks();
   }
 
   @Override
-  public List<Textbook> searchTextbooks(
+  public List<Book> searchTextbooks(
       String title, Integer edition, Integer volume, List<Author> authors) throws SQLException {
     return textbookDao.searchTextbook(title, edition, volume, authors);
   }
@@ -57,61 +61,59 @@ public class TextbookServiceImpl implements TextbookService {
   }
 
   @Override
-  public void updateTitle(Textbook textbook, String newValue) throws SQLException {
+  public void updateTitle(Book book, String newValue) throws SQLException {
     Validate.isTrue(!StringUtils.isBlank(newValue));
-    textbookDao.updateBook("title", newValue, textbook.getId());
+    textbookDao.updateBook("title", newValue, book.getId());
   }
 
   @Override
-  public void updateVolume(Textbook textbook, Integer volume) throws SQLException {
+  public void updateVolume(Book book, Integer volume) throws SQLException {
     if (volume == null) {
-      textbookDao.updateBook("volume", null, textbook.getId());
+      textbookDao.updateBook("volume", null, book.getId());
     } else {
       Validate.isTrue(volume > 0);
-      textbookDao.updateBook("volume", volume, textbook.getId());
+      textbookDao.updateBook("volume", volume, book.getId());
     }
   }
 
   @Override
-  public void updateEdition(Textbook textbook, Integer edition) throws SQLException {
+  public void updateEdition(Book book, Integer edition) throws SQLException {
     Validate.isTrue(edition > 0);
-    textbookDao.updateBook("edition", edition, textbook.getId());
+    textbookDao.updateBook("edition", edition, book.getId());
   }
 
   @Override
-  public List<Author> setAuthors(Textbook textbook, List<Author> newValue) throws SQLException {
+  public List<Author> setAuthors(Book book, List<Author> newValue) throws SQLException {
     List<Author> authors = fixIds(newValue);
-    textbookDao.setAuthors(textbook.getId(), authors);
+    textbookDao.setAuthors(book.getId(), authors);
     return authors;
   }
 
   @Override
-  public void deleteTextbook(Textbook textbook) throws SQLException {
-    textbookDao.deleteTextbookById(textbook.getId());
+  public void deleteTextbook(Book book) throws SQLException {
+    textbookDao.deleteTextbookById(book.getId());
   }
 
   @Override
-  public void createReference(Algorithm algorithm, Textbook textbook)
-      throws SQLException, LogicException {
-    if (textbookDao.containsReference(algorithm.getId(), textbook.getId())) {
+  public void createReference(Algorithm algorithm, Book book) throws SQLException, LogicException {
+    if (referenceDao.containsReference(algorithm.getId(), book.getId())) {
       throw new LogicException("This reference already exists");
     } else {
-      textbookDao.createReference(algorithm.getId(), textbook.getId());
+      referenceDao.createReference(algorithm.getId(), book.getId());
     }
   }
 
   @Override
-  public List<Textbook> getReferences(Algorithm algorithm) throws SQLException {
+  public List<Book> getReferences(Algorithm algorithm) throws SQLException {
     return textbookDao.getTextbooksByAlgorithm(algorithm.getId());
   }
 
   @Override
-  public void deleteReference(Algorithm algorithm, Textbook textbook)
-      throws SQLException, LogicException {
-    if (!textbookDao.containsReference(algorithm.getId(), textbook.getId())) {
+  public void deleteReference(Algorithm algorithm, Book book) throws SQLException, LogicException {
+    if (!referenceDao.containsReference(algorithm.getId(), book.getId())) {
       throw new LogicException("This reference doesn't exist");
     } else {
-      textbookDao.deleteReference(algorithm.getId(), textbook.getId());
+      referenceDao.deleteReference(algorithm.getId(), book.getId());
     }
   }
 }

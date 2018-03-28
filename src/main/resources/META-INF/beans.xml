@@ -3,11 +3,13 @@
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
     <bean id="algorithmDao" class="app.dao.jdbc.AlgorithmDaoImpl"/>
     <bean id="paradigmDao" class="app.dao.jdbc.ParadigmDaoImpl"/>
     <bean id="fieldDao" class="app.dao.jdbc.FieldDaoImpl"/>
     <bean id="areaDao" class="app.dao.jdbc.AreaDaoImpl"/>
     <bean id="applicationDao" class="app.dao.jdbc.ApplicationDaoImpl"/>
+
     <bean id="algorithmService" class="app.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="algorithmDao"/>
         <constructor-arg name="paradigmDao" ref="paradigmDao"/>

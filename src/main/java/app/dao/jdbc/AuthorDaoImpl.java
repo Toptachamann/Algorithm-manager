@@ -57,25 +57,25 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
+  public boolean containsAuthor(String firstName, String lastName) throws SQLException {
+    return getAuthorId(firstName, lastName) != -1;
+  }
+
+  @Override
   public Author createAuthor(String firstName, String lastName) throws SQLException {
-    int id = getAuthorId(firstName, lastName);
-    if (id != -1) {
-      return new Author(id, firstName, lastName);
-    } else {
-      try {
-        insertAuthor.setString(1, firstName);
-        insertAuthor.setString(2, lastName);
-        logger.debug(() -> Util.format(insertAuthor));
-        insertAuthor.executeUpdate();
-        connection.commit();
-        return new Author(getLastId(connection), firstName, lastName);
-      } catch (SQLException e) {
-        logger.catching(Level.ERROR, e);
-        logger.error(
-            "Failed to create author with first name {} and last name {}", firstName, lastName);
-        rollBack(connection);
-        throw e;
-      }
+    try {
+      insertAuthor.setString(1, firstName);
+      insertAuthor.setString(2, lastName);
+      logger.debug(() -> Util.format(insertAuthor));
+      insertAuthor.executeUpdate();
+      connection.commit();
+      return new Author(getLastId(connection), firstName, lastName);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to create author with first name {} and last name {}", firstName, lastName);
+      rollBack(connection);
+      throw e;
     }
   }
 }

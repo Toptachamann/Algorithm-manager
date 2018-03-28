@@ -12,7 +12,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookServiceImpl implements BookService {
@@ -31,7 +30,8 @@ public class BookServiceImpl implements BookService {
   @Override
   public Book createBook(String title, Integer volume, Integer edition, List<Author> authors)
       throws Exception {
-    return bookDao.createBook(title, volume, edition, fixIds(authors));
+    fixIds(authors);
+    return bookDao.createBook(title, volume, edition, authors);
   }
 
   @Override
@@ -47,15 +47,17 @@ public class BookServiceImpl implements BookService {
   @Override
   public List<Book> searchBooks(String title, Integer edition, Integer volume, List<Author> authors)
       throws Exception {
-    return bookDao.searchBook(title, edition, volume, authors);
+    return bookDao.searchBooks(title, edition, volume, authors);
   }
 
-  private List<Author> fixIds(List<Author> authors) throws Exception {
-    List<Author> authorsList = new ArrayList<>();
+  private void fixIds(List<Author> authors) throws Exception {
     for (Author author : authors) {
-      authorsList.add(authorDao.createAuthor(author.getFirstName(), author.getLastName()));
+      if (authorDao.containsAuthor(author.getFirstName(), author.getLastName())) {
+        author.setId(authorDao.getAuthorId(author.getFirstName(), author.getLastName()));
+      } else {
+        author.setId(authorDao.createAuthor(author.getFirstName(), author.getLastName()).getId());
+      }
     }
-    return authorsList;
   }
 
   @Override
@@ -82,9 +84,9 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public List<Author> setAuthors(Book book, List<Author> newValue) throws Exception {
-    List<Author> authors = fixIds(newValue);
-    bookDao.setAuthors(book.getId(), authors);
-    return authors;
+    fixIds(newValue);
+    bookDao.setAuthors(book.getId(), newValue);
+    return newValue;
   }
 
   @Override

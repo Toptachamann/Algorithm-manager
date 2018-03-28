@@ -7,14 +7,14 @@
         <Property name="project_name">pure_jdbc_lab</Property>
     </Properties>
     <Appenders>
-        <Console name="STDOUT">
+        <Console name="console" target="SYSTEM_OUT">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
         </Console>
         <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="500 MB"/>
@@ -24,7 +24,7 @@
         <RollingFile name="ERROR" fileName="${baseDir}/${error_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] {%t} %c{1} --- %m%n}{FATAL=red, ERROR=red, WARN=yellow, INFO=blue, DEBUG=cyan, TRACE=black}"/>
+                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="5 MB"/>
@@ -33,8 +33,8 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="All">
-            <AppenderRef ref="STDOUT"/>
+        <Root level="all">
+            <AppenderRef ref="console"/>
         </Root>
         <Logger name="org.springframework" level="error" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
@@ -44,7 +44,7 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="app.dao.jdbc.AbstractDao">
+        <Logger name="app.dao.jdbc.AbstractDao" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
@@ -64,7 +64,7 @@
             <AppenderRef ref="ALL" level="all"/>
             <AppenderRef ref="ERROR" level="error"/>
         </Logger>
-        <Logger name="app.dao.jdbc.ApplicationDaoImpl" aditivity="true">
+        <Logger name="app.dao.jdbc.ApplicationDaoImpl" additivity="true">
             <AppenderRef ref="ALL" level="all"/>
             <AppenderRef ref="ERROR" level="error"/>
         </Logger>

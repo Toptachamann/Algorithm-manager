@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookDaoImpl extends AbstractDao implements BookDao {
-  private static final Logger logger = LogManager.getLogger(BookDaoImpl.class);
+  private static final Logger logger = LogManager.getLogger("app.dao.jdbc.BookDaoImpl");
 
   private PreparedStatement allBooks;
   private PreparedStatement createBook;
@@ -95,7 +94,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public List<Book> searchBook(String title, Integer volume, Integer edition, List<Author> authors)
+  public List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors)
       throws SQLException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtils.isBlank(title)) {
@@ -146,7 +145,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       Statement statement = connection.createStatement();
       String query = builder.toString();
       logger.debug(() -> Util.format(query));
-      return booksFromSet(statement.executeQuery(query));
+      return logger.traceExit(booksFromSet(statement.executeQuery(query)));
     }
   }
 
@@ -188,27 +187,20 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  private void resetAuthors(int bookId) throws SQLException {
-    try {
-      resetAuthors.setInt(1, bookId);
-      logger.debug(() -> Util.format(resetAuthors));
-      resetAuthors.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to reset book's authors:  book_id = {}", bookId);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
   private void addAuthorsToBook(int bookId, List<Author> authors) throws SQLException {
     if (authors.size() > 0) {
       StringBuilder builder =
-          new StringBuilder("INSERT INTO book (txtbk_book_id, txtbk_author_id) VALUES ");
+          new StringBuilder("INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUES ");
       for (Author author : authors) {
-        builder.append("(").append(bookId).append(", ").append(author.getId()).append(")");
+        builder
+            .append("(")
+            .append(bookId)
+            .append(", ")
+            .append(author.getId())
+            .append(")")
+            .append(",");
       }
+      builder.deleteCharAt(builder.length() - 1);
       String query = builder.toString();
       logger.debug(() -> Util.format(query));
       connection.createStatement().executeUpdate(query);
@@ -230,8 +222,17 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
 
   @Override
   public void setAuthors(int bookId, List<Author> authors) throws SQLException {
-    resetAuthors(bookId);
-    addAuthors(bookId, authors);
+    try {
+      resetAuthors.setInt(1, bookId);
+      logger.debug(() -> Util.format(resetAuthors));
+      resetAuthors.executeUpdate();
+      addAuthors(bookId, authors);
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to set authors {} to book with id {}", authors, bookId);
+      rollBack(connection);
+      throw e;
+    }
   }
 
   private List<Book> booksFromSet(ResultSet set) throws SQLException {

@@ -17,7 +17,7 @@ public interface BookDao {
 
   List<Book> getBooks() throws Exception;
 
-  List<Book> searchBook(String title, Integer volume, Integer edition, List<Author> authors)
+  List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors)
       throws Exception;
 
   <T> void updateBook(String column, T value, int id) throws Exception;

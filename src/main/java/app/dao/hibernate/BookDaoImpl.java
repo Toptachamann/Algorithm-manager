@@ -20,7 +20,7 @@ public class BookDaoImpl  extends AbstractDao implements BookDao {
   }
 
   @Override
-  public List<Book> searchBook(String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
+  public List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors) throws SQLException {
     return null;
   }
 

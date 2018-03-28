@@ -10,5 +10,7 @@ public interface AuthorDao {
 
   int getAuthorId(String firstName, String lastName) throws Exception;
 
+  boolean containsAuthor(String firstName, String lastName) throws SQLException;
+
   Author createAuthor(String firstName, String lastName) throws Exception;
 }

@@ -292,6 +292,7 @@ public class TextbookController extends AbstractController {
             if (e.getCode().equals(KeyCode.ENTER)) {
               try {
                 List<Author> authorsFromInput = authorsFromStr(textField.getText());
+                logger.debug(()->"Entered authors: " + authorsFromInput.toString());
                 commitEdit(authorsFromInput);
               } catch (InputException e1) {
                 logger.error(e1);

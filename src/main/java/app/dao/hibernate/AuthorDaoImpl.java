@@ -18,6 +18,11 @@ public class AuthorDaoImpl  extends AbstractDao implements AuthorDao {
   }
 
   @Override
+  public boolean containsAuthor(String firstName, String lastName) throws SQLException {
+    return false;
+  }
+
+  @Override
   public Author createAuthor(String firstName, String lastName) throws SQLException {
     return null;
   }

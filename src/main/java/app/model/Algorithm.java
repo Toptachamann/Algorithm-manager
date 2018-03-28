@@ -23,7 +23,8 @@ public class Algorithm {
   @ManyToOne(
     cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
     optional = false,
-    targetEntity = DesignParadigm.class
+    targetEntity = DesignParadigm.class,
+    fetch = FetchType.LAZY
   )
   @JoinColumn(
     name = "algo_paradigm_id",
@@ -32,6 +33,7 @@ public class Algorithm {
     foreignKey = @ForeignKey(name = "fk_paradigm_algorithm")
   )
   private DesignParadigm designParadigm;
+
   @ManyToOne(
     cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
     optional = false,
@@ -67,17 +69,6 @@ public class Algorithm {
   }
 
   public Algorithm() {}
-
-  @Override
-  public String toString() {
-    return new ToStringBuilder(this)
-        .append("id", id)
-        .append("name", name)
-        .append("complexity", complexity)
-        .append("designParadigm", designParadigm)
-        .append("fieldOfStudy", fieldOfStudy)
-        .toString();
-  }
 
   public int getId() {
     return id;
@@ -117,6 +108,17 @@ public class Algorithm {
 
   public void setFieldOfStudy(FieldOfStudy fieldOfStudy) {
     this.fieldOfStudy = fieldOfStudy;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this)
+        .append("id", id)
+        .append("name", name)
+        .append("complexity", complexity)
+        .append("designParadigm", designParadigm)
+        .append("fieldOfStudy", fieldOfStudy)
+        .toString();
   }
 
   @Override

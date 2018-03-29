@@ -1,11 +1,10 @@
-package app.dao.hibernate
+package app.dao.interf
 
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class FieldDaoImplTest extends Specification {
-  @Shared
-  def fieldDao = new FieldDaoImpl()
   @Shared
   def name = "Test field of study"
   @Shared
@@ -13,7 +12,8 @@ class FieldDaoImplTest extends Specification {
   @Shared
   def description = "Test field description"
 
-  def "test field creation by name"(){
+  @Unroll
+  def "test field creation by name"() {
     when:
     def created = fieldDao.createFieldOfStudy(name)
     then:
@@ -27,9 +27,12 @@ class FieldDaoImplTest extends Specification {
     field == created
     cleanup:
     fieldDao.deleteFieldOfStudy(created.getId())
+    where:
+    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
 
-  def "test field creation by name and description"(){
+  @Unroll
+  def "test field creation by name and description"() {
     when:
     def created = fieldDao.createFieldOfStudy(name, description)
     then:
@@ -45,26 +48,34 @@ class FieldDaoImplTest extends Specification {
     field.getId() == created.getId()
     cleanup:
     fieldDao.deleteFieldOfStudy(field.getId())
+    where:
+    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
 
-  def "test field deletion"(){
+  @Unroll
+  def "test field deletion"() {
     setup:
     def created = fieldDao.createFieldOfStudy(name)
     when:
     fieldDao.deleteFieldOfStudy(created.getId())
     then:
     !fieldDao.containsFieldOfStudy(name)
+    where:
+    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
 
-  def "test field update"(){
+  @Unroll
+  def "test field update"() {
     setup:
     def created = fieldDao.createFieldOfStudy(name)
     when:
-    fieldDao.updateFieldOfStudy( updated, created.getId())
+    fieldDao.updateFieldOfStudy(updated, created.getId())
     then:
     !fieldDao.containsFieldOfStudy(name)
     fieldDao.containsFieldOfStudy(updated)
     cleanup:
     fieldDao.deleteFieldOfStudy(created.getId())
+    where:
+    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
 }

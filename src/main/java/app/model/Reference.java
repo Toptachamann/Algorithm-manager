@@ -36,19 +36,19 @@ public class Reference {
     nullable = false,
     foreignKey = @ForeignKey(name = "fk_book_reference")
   )
-  private Book bookId;
+  private Book book;
 
   public Reference() {}
 
-  public Reference(int referenceId, Algorithm algorithm, Book bookId) {
+  public Reference(int referenceId, Algorithm algorithm, Book book) {
     this.referenceId = referenceId;
     this.algorithm = algorithm;
-    this.bookId = bookId;
+    this.book = book;
   }
 
-  public Reference(Algorithm algorithm, Book bookId) {
+  public Reference(Algorithm algorithm, Book book) {
     this.algorithm = algorithm;
-    this.bookId = bookId;
+    this.book = book;
   }
 
   @Override
@@ -56,7 +56,7 @@ public class Reference {
     return new ToStringBuilder(this)
         .append("referenceId", referenceId)
         .append("algorithm", algorithm)
-        .append("bookId", bookId)
+        .append("bookId", book)
         .toString();
   }
 
@@ -93,11 +93,11 @@ public class Reference {
     this.algorithm = algorithm;
   }
 
-  public Book getBookId() {
-    return bookId;
+  public Book getBook() {
+    return book;
   }
 
-  public void setBookId(Book bookId) {
-    this.bookId = bookId;
+  public void setBook(Book book) {
+    this.book = book;
   }
 }

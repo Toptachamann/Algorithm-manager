@@ -6,6 +6,7 @@ import app.model.FieldOfStudy_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
@@ -81,6 +82,19 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
             criteria
                 .set(FieldOfStudy_.field, newName)
                 .where(builder.equal(root.get(FieldOfStudy_.id), id)))
+        .executeUpdate();
+    entityManager.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteFieldOfStudy(int id) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<FieldOfStudy> delete = builder.createCriteriaDelete(FieldOfStudy.class);
+    Root<FieldOfStudy> root = delete.from(FieldOfStudy.class);
+    entityManager
+        .createQuery(delete.where(builder.equal(root.get(FieldOfStudy_.id), id)))
         .executeUpdate();
     entityManager.getTransaction().commit();
   }

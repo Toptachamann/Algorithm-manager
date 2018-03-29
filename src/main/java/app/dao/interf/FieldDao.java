@@ -2,7 +2,6 @@ package app.dao.interf;
 
 import app.model.FieldOfStudy;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,5 +16,15 @@ public interface FieldDao {
 
   Optional<FieldOfStudy> getFieldById(int id) throws Exception;
 
+  default boolean containsFieldOfStudy(int id) throws Exception {
+    return getFieldById(id).isPresent();
+  }
+
+  default boolean containsFieldOfStudy(String name) throws Exception {
+    return getFieldByName(name).isPresent();
+  }
+
   void updateFieldOfStudy(String newName, int id) throws Exception;
+
+  void deleteFieldOfStudy(int id) throws Exception;
 }

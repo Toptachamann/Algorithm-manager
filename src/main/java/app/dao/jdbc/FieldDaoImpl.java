@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,13 +17,13 @@ import java.util.Optional;
 public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private static final Logger logger = LogManager.getLogger(FieldDaoImpl.class);
 
-
   private PreparedStatement createFieldByName;
   private PreparedStatement createField;
   private PreparedStatement allFieldsOfStudy;
   private PreparedStatement getFieldById;
   private PreparedStatement getFieldByName;
   private PreparedStatement updateFieldOfStudy;
+  private PreparedStatement deleteFieldById;
 
   public FieldDaoImpl() throws SQLException {
     allFieldsOfStudy = connection.prepareStatement("SELECT * FROM field_of_study");
@@ -37,6 +36,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         connection.prepareStatement(
             "UPDATE algorithms.field_of_study "
                 + "SET algorithms.field_of_study.field = ? WHERE algorithms.field_of_study.field_id = ?");
+    deleteFieldById = connection.prepareStatement("DELETE FROM field_of_study WHERE field_id = ?");
   }
 
   @Override
@@ -122,6 +122,21 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error("Failed to update field of study name to {} where id = {}", newValue, id);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteFieldOfStudy(int id) throws Exception {
+    try {
+      deleteFieldById.setInt(1, id);
+      logger.debug(() -> Util.format(deleteFieldById));
+      deleteFieldById.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete field of study with id {}", id);
       rollBack(connection);
       throw e;
     }

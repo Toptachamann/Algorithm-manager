@@ -17,16 +17,14 @@ class FieldDaoImplTest extends Specification {
     when:
     def created = fieldDao.createFieldOfStudy(name)
     then:
-    created.getField() == name
-    created.getDescription() == null
     fieldDao.containsFieldOfStudy(created.getId())
     fieldDao.containsFieldOfStudy(name)
+    created.getField() == name
+    created.getDescription() == null
     def optField = fieldDao.getFieldByName(name)
     optField.isPresent()
     def field = optField.get()
-    field.getField() == name
-    field.getDescription() == null
-    field.getId() == created.getId()
+    field == created
     cleanup:
     fieldDao.deleteFieldOfStudy(created.getId())
   }

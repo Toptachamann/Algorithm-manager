@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,13 +17,13 @@ import java.util.Optional;
 public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private static final Logger logger = LogManager.getLogger(ParadigmDaoImpl.class);
 
-
   private PreparedStatement createParadigmByName;
   private PreparedStatement createParadigm;
   private PreparedStatement allParadigms;
   private PreparedStatement getParadigmById;
   private PreparedStatement getParadigmByName;
   private PreparedStatement updateParadigm;
+  private PreparedStatement deleteParadigm;
 
   public ParadigmDaoImpl() throws SQLException {
     createParadigm =
@@ -40,6 +39,8 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     updateParadigm =
         connection.prepareStatement(
             "UPDATE design_paradigm SET paradigm = ? WHERE paradigm_id = ?");
+    deleteParadigm =
+        connection.prepareStatement("DELETE FROM design_paradigm WHERE paradigm_id = ?");
   }
 
   @Override
@@ -98,6 +99,21 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
       return Optional.of(new DesignParadigm(set.getInt(1), set.getString(2), set.getString(3)));
     } else {
       return Optional.empty();
+    }
+  }
+
+  @Override
+  public void deleteParadigm(int id) throws Exception {
+    try {
+      deleteParadigm.setInt(1, id);
+      logger.debug(() -> Util.format(deleteParadigm));
+      deleteParadigm.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete design paradigm with id {}", id);
+      rollBack(connection);
+      throw e;
     }
   }
 

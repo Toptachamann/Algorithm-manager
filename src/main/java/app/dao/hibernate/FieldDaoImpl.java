@@ -84,10 +84,11 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
                 .where(builder.equal(root.get(FieldOfStudy_.id), id)))
         .executeUpdate();
     entityManager.getTransaction().commit();
+    entityManager.close();
   }
 
   @Override
-  public void deleteFieldOfStudy(int id) throws Exception {
+  public void deleteFieldOfStudy(int id) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -97,5 +98,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         .createQuery(delete.where(builder.equal(root.get(FieldOfStudy_.id), id)))
         .executeUpdate();
     entityManager.getTransaction().commit();
+    entityManager.close();
   }
 }

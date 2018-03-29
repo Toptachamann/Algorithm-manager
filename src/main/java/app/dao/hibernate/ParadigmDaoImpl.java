@@ -6,6 +6,7 @@ import app.model.DesignParadigm_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
@@ -75,6 +76,20 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
             .getResultList();
     entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
+  }
+
+  @Override
+  public void deleteParadigm(int id) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
+    Root<DesignParadigm> root = delete.from(DesignParadigm.class);
+    entityManager
+        .createQuery(delete.where(builder.equal(root.get(DesignParadigm_.id), id)))
+        .executeUpdate();
+    entityManager.getTransaction().commit();
+    entityManager.close();
   }
 
   @Override

@@ -8,9 +8,9 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Reference.class)
 public abstract class Reference_ {
 
+	public static volatile SingularAttribute<Reference, Book> book;
 	public static volatile SingularAttribute<Reference, Integer> referenceId;
 	public static volatile SingularAttribute<Reference, Algorithm> algorithm;
-	public static volatile SingularAttribute<Reference, Book> bookId;
 
 }
 

@@ -1,6 +1,7 @@
 package app.service;
 
 import app.model.Algorithm;
+import app.model.Application;
 import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
@@ -61,9 +62,9 @@ public interface AlgorithmService {
 
   void createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws Exception;
+  List<Application> getApplicationsAlgorithm(Algorithm algorithm) throws Exception;
 
-  List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws Exception;
+  List<Application> getApplicationsByArea(AreaOfUse areaOfUse) throws Exception;
 
   void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 }

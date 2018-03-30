@@ -2,6 +2,7 @@ package app.dao.hibernate;
 
 import app.dao.interf.AreaDao;
 import app.model.AreaOfUse;
+import app.model.AreaOfUse_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -61,7 +62,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     Root<AreaOfUse> root = query.from(AreaOfUse.class);
     List<AreaOfUse> result =
         entityManager
-            .createQuery(builder.equal(root.get(AreaOfUse_.areaOfUse), name))
+            .createQuery(query.where(builder.equal(root.get(AreaOfUse_.areaOfUse), name)))
             .getResultList();
     entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));

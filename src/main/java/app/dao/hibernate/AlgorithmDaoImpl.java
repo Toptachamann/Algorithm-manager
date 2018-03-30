@@ -3,10 +3,11 @@ package app.dao.hibernate;
 import app.auxiliary.Util;
 import app.dao.interf.AlgorithmDao;
 import app.model.Algorithm;
-import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
+import app.model.Algorithm_;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -51,8 +52,8 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     Root<Algorithm> root = query.from(Algorithm.class);
     List<Algorithm> result =
         entityManager
-            .createQuery(query.where(builder.equal(root.get(Algorithm_.algorithm), name)))
-            .executeUpdate();
+            .createQuery(query.where(builder.equal(root.get(Algorithm_.name), name)))
+            .getResultList();
     entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
@@ -69,7 +70,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     Root<Algorithm> root = query.from(Algorithm.class);
     List<Predicate> predicates = new ArrayList<>();
     if (!StringUtils.isBlank(algorithm)) {
-      predicates.add(builder.like(root.get(Algorithm_.algorithm), Util.fixForLike(algorithm)));
+      predicates.add(builder.like(root.get(Algorithm_.name), Util.fixForLike(algorithm)));
     }
     if (!StringUtils.isBlank(complexity)) {
       predicates.add(builder.like(root.get(Algorithm_.complexity), Util.fixForLike(complexity)));
@@ -119,7 +120,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
     Root<Algorithm> root = update.from(Algorithm.class);
-    update.set(root.get(Algorithm_.algorithm), name);
+    update.set(root.get(Algorithm_.name), name);
     entityManager.createQuery(update).executeUpdate();
     entityManager.getTransaction().commit();
     entityManager.close();
@@ -144,7 +145,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     entityManager.getTransaction().begin();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaDelete<Algorithm> delete = builder.createCriteriaDelete(Algorithm.class);
-    Root<Algorithm> root = update.from(Algorithm.class);
+    Root<Algorithm> root = delete.from(Algorithm.class);
     delete.where(builder.equal(root.get(Algorithm_.id), id));
     entityManager.createQuery(delete).executeUpdate();
     entityManager.getTransaction().commit();

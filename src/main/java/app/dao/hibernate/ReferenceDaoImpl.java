@@ -4,6 +4,8 @@ import app.dao.interf.ReferenceDao;
 import app.model.Algorithm;
 import app.model.Book;
 import app.model.Reference;
+import app.model.Reference_;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -53,7 +55,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
         .createQuery(
             delete.where(
                 builder.and(
-                    builder.equal(root.get(Reference.algorithm), algorithm),
+                    builder.equal(root.get(Reference_.algorithm), algorithm),
                     builder.equal(root.get(Reference_.book), book))))
         .executeUpdate();
     entityManager.getTransaction().commit();

@@ -4,6 +4,8 @@ import app.dao.interf.ApplicationDao;
 import app.model.Algorithm;
 import app.model.Application;
 import app.model.AreaOfUse;
+import app.model.Application_;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;

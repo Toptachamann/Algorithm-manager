@@ -2,6 +2,7 @@ package app.controller;
 
 import app.auxiliary.LogicException;
 import app.model.Algorithm;
+import app.model.Application;
 import app.model.AreaOfUse;
 import app.model.Book;
 import app.service.AlgorithmService;
@@ -87,7 +88,7 @@ public class ReferenceController extends AbstractController {
               info.setContentText("Select an algorithm to find its practical application");
               info.showAndWait();
             } else {
-              displayApplications(algorithm, algorithmService.getAreasByAlgorithm(algorithm));
+              displayApplications(algorithm, algorithmService.getApplicationsAlgorithm(algorithm));
             }
           } catch (Exception e1) {
             logger.error(e1);
@@ -156,7 +157,7 @@ public class ReferenceController extends AbstractController {
                   "To find algorithms for an area of use you have to select it first");
               info.showAndWait();
             } else {
-              displayAlgorithms(areaOfUse, algorithmService.getAlgorithmsByArea(areaOfUse));
+              displayAlgorithms(areaOfUse, algorithmService.getApplicationsByArea(areaOfUse));
             }
           } catch (Exception e1) {
             logger.error(e1);
@@ -342,7 +343,7 @@ public class ReferenceController extends AbstractController {
         });
   }
 
-  private void displayApplications(Algorithm algorithm, List<AreaOfUse> areas) {
+  private void displayApplications(Algorithm algorithm, List<Application> areas) {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
         algorithm.getName()
@@ -357,13 +358,13 @@ public class ReferenceController extends AbstractController {
             values.add(
                 "\t"
                     + a.getAreaOfUse()
-                    + (StringUtils.isBlank(a.getDescription())
+                    + (StringUtils.isBlank(a.getAreaOfUse().getDescription())
                         ? ""
-                        : "\n\t\t(" + a.getDescription() + ")")));
+                        : "\n\t\t(" + a.getAreaOfUse().getDescription() + ")")));
     areaListView.setItems(values);
   }
 
-  private void displayAlgorithms(AreaOfUse area, List<Algorithm> algorithms) {
+  private void displayAlgorithms(AreaOfUse area, List<Application> algorithms) {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
         area.getAreaOfUse()
@@ -375,8 +376,8 @@ public class ReferenceController extends AbstractController {
         a ->
             values.add(
                 "\t"
-                    + a.getName()
-                    + (StringUtils.containsIgnoreCase(a.getName(), "algorithm")
+                    + a.getAlgorithm().getName()
+                    + (StringUtils.containsIgnoreCase(a.getAlgorithm().getName(), "algorithm")
                         ? " "
                         : " algorithm ")));
     areaListView.setItems(values);

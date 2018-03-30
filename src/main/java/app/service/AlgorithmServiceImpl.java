@@ -7,6 +7,7 @@ import app.dao.interf.AreaDao;
 import app.dao.interf.FieldDao;
 import app.dao.interf.ParadigmDao;
 import app.model.Algorithm;
+import app.model.Application;
 import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
@@ -71,8 +72,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public List<Algorithm> getAlgorithmsByArea(AreaOfUse areaOfUse) throws Exception {
-    return algorithmDao.getAlgorithmsByArea(areaOfUse.getId());
+  public List<Application> getApplicationsByArea(AreaOfUse areaOfUse) throws Exception {
+    return applicationDao.getApplicationsByArea(areaOfUse);
   }
 
   @Override
@@ -225,8 +226,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public List<AreaOfUse> getAreasByAlgorithm(Algorithm algorithm) throws Exception {
-    return areaDao.getAreasOfUse(algorithm.getId());
+  public List<Application> getApplicationsAlgorithm(Algorithm algorithm) throws Exception {
+    return applicationDao.getApplicationsByAlgorithm(algorithm);
   }
 
   @Override

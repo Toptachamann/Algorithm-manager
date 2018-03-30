@@ -3,6 +3,7 @@ package app.dao.jdbc;
 import app.auxiliary.Util;
 import app.dao.interf.AlgorithmDao;
 import app.model.Algorithm;
+import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
@@ -10,7 +11,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,6 +26,8 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private PreparedStatement allAlgorithms;
   private PreparedStatement getAlgorithmByName;
   private PreparedStatement getAlgorithmsByArea;
+  private PreparedStatement setName;
+  private PreparedStatement setComplexity;
   private PreparedStatement setParadigm;
   private PreparedStatement setField;
   private PreparedStatement deleteById;
@@ -77,6 +79,14 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
         connection.prepareStatement(
             "UPDATE algorithms.algorithm "
                 + "SET algorithms.algorithm.algo_field_id = ? WHERE algorithms.algorithm.algorithm_id = ?");
+    setName =
+        connection.prepareStatement(
+            "UPDATE  algorithms.algorithm SET algorithms.algorithm.algorithm = ? "
+                + "WHERE algorithms.algorithm.algorithm_id = ?");
+    setComplexity =
+        connection.prepareStatement(
+            "UPDATE  algorithms.algorithm SET algorithms.algorithm.complexity = ? "
+                + "WHERE algorithms.algorithm.algorithm_id = ?");
   }
 
   @Override
@@ -143,10 +153,10 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       whereClause += " AND complexity LIKE " + complexity.trim();
     }
     if (designParadigm != null) {
-      whereClause += " AND paradigm_id LIKE " + designParadigm.getParadigm();
+      whereClause += " AND paradigm_id = " + designParadigm.getParadigm();
     }
     if (fieldOfStudy != null) {
-      whereClause += " AND field_id LIKE " + fieldOfStudy.getField();
+      whereClause += " AND field_id = " + fieldOfStudy.getField();
     }
     if (whereClause.length() == 0) {
       return getAllAlgorithms();
@@ -175,63 +185,67 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public void setDesignParadigm(int paradigmId, int algorithmId) throws SQLException {
+  public void setName(Algorithm algorithm, String name) throws SQLException {
     try {
-      setParadigm.setInt(1, paradigmId);
-      setParadigm.setInt( 2, algorithmId);
+      setName.setString(1, name);
+      setName.setInt(2, algorithm.getId());
+      logger.debug(() -> Util.format(setName));
+      setName.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to update name of the algorithm {} to {}", algorithm, name);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void setComplexity(Algorithm algorithm, String complexity) throws SQLException {
+    try {
+      setComplexity.setString(1, complexity);
+      setComplexity.setInt(2, algorithm.getId());
+      logger.debug(() -> Util.format(setComplexity));
+      setComplexity.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to update complexity of the algorithm {} to {}", algorithm, complexity);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException {
+    try {
+      setParadigm.setInt(1, paradigm.getId());
+      setParadigm.setInt(2, algorithm.getId());
       logger.debug(() -> Util.format(setParadigm));
       setParadigm.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to set paradigm id {} to algorithm with id {}", paradigmId, algorithmId);
+      logger.error("Failed to set design paradigm {} to algorithm {}", paradigm, algorithm);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public void setFieldOfStudy(int fieldId, int algorithmId) throws SQLException {
-    try{
-      setField.setInt(2, algorithmId);
-      setField.setInt(1, fieldId);
+  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) throws SQLException {
+    try {
+      setField.setInt(2, algorithm.getId());
+      setField.setInt(1, fieldOfStudy.getId());
       logger.debug(() -> Util.format(setField));
       setField.executeUpdate();
       connection.commit();
-    } catch (SQLException e){
+    } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to set field of study id {} to algorithm with id {}", fieldId, algorithmId);
+      logger.error("Failed to set field of study {} to algorithm {}", fieldOfStudy, algorithm);
       rollBack(connection);
       throw e;
     }
-  }
-
-  @Override
-  public void updateEntry(String column, String value, int id) throws SQLException {
-    try{
-      String query =
-          "UPDATE algorithm SET "
-              + column
-              + " = "
-              + Util.fixForString(value)
-              + " WHERE algorithm_id = "
-              + id;
-      logger.debug(() -> Util.format(query));
-      Statement statement = connection.createStatement();
-      statement.executeUpdate(query);
-    } catch (SQLException e){
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to update value {} of column {} where id = {}", value, column, id);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public List<Algorithm> getAlgorithmsByArea(int areaId) throws SQLException {
-    getAlgorithmsByArea.setInt(1, areaId);
-    logger.debug(() -> Util.format(getAlgorithmsByArea));
-    return algorithmFromResultSet(getAlgorithmsByArea.executeQuery());
   }
 
   private List<Algorithm> algorithmFromResultSet(ResultSet set) throws SQLException {

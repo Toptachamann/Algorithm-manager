@@ -76,29 +76,28 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void updateAlgorithmName(Algorithm algorithm, String newName) throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(newName));
-    if (algorithmDao.getAlgorithmByName(newName).isPresent()) {
+  public void updateAlgorithmName(Algorithm algorithm, String name) throws Exception {
+    Validate.isTrue(!StringUtils.isBlank(name));
+    if (algorithmDao.getAlgorithmByName(name).isPresent()) {
       throw new LogicException("Algorithm with this name already exists");
     }
-    algorithmDao.updateEntry("algorithm", newName.trim(), algorithm.getId());
+    algorithmDao.setName(algorithm, name);
   }
 
   @Override
-  public void updateAlgorithmComplexity(Algorithm algorithm, String newComplexity)
-      throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(newComplexity));
-    algorithmDao.updateEntry("complexity", newComplexity.trim(), algorithm.getId());
+  public void updateAlgorithmComplexity(Algorithm algorithm, String complexity) throws Exception {
+    Validate.isTrue(!StringUtils.isBlank(complexity));
+    algorithmDao.setComplexity(algorithm, complexity);
   }
 
   @Override
   public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception {
-    algorithmDao.setDesignParadigm(paradigm.getId(), algorithm.getId());
+    algorithmDao.setDesignParadigm(algorithm, paradigm);
   }
 
   @Override
   public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws Exception {
-    algorithmDao.setFieldOfStudy(field.getId(), algorithm.getId());
+    algorithmDao.setFieldOfStudy(algorithm, field);
   }
 
   @Override

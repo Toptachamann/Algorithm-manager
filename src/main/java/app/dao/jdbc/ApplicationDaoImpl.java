@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   private static final Logger logger = LogManager.getLogger(ApplicationDaoImpl.class);
@@ -78,5 +79,10 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
       rollBack(connection);
       throw e;
     }
+  }
+
+  @Override
+  public List<Application> getApplicationsByArea(AreaOfUse area) throws Exception {
+    return null;
   }
 }

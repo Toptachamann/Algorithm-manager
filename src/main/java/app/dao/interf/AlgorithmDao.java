@@ -1,6 +1,7 @@
 package app.dao.interf;
 
 import app.model.Algorithm;
+import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 
@@ -21,13 +22,13 @@ public interface AlgorithmDao {
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception;
 
-  void setDesignParadigm(int paradigmId, int algorithmId) throws Exception;
+  void setName(Algorithm algorithm, String name) throws Exception;
 
-  void setFieldOfStudy(int fieldId, int algorithmId) throws Exception;
+  void setComplexity(Algorithm algorithm, String complexity) throws Exception;
 
-  void updateEntry(String column, String value, int id) throws Exception;
+  void setDesignParadigm(Algorithm algorithm, DesignParadigm designParadigm) throws Exception;
+
+  void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) throws Exception;
 
   void deleteById(int id) throws Exception;
-
-  List<Algorithm> getAlgorithmsByArea(int areaId) throws Exception;
 }

@@ -6,6 +6,7 @@ import app.model.Author_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
@@ -24,7 +25,20 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public Optional<Author> getAuthorByName(String firstName, String lastName) {
+  public void deleteAuthor(Author author) {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<Author> delete = builder.createCriteriaDelete(Author.class);
+    Root<Author> root = delete.from(Author.class);
+    delete.where(builder.equal(root.get(Author_.id), author.getId()));
+    entityManager.createQuery(delete).executeUpdate();
+    entityManager.getTransaction().commit();
+    entityManager.close();
+  }
+
+  @Override
+  public Optional<Author> getAuthor(String firstName, String lastName) {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Author> query = builder.createQuery(Author.class);

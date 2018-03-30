@@ -19,16 +19,18 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
 
   private PreparedStatement getAuthorByName;
   private PreparedStatement insertAuthor;
+  private PreparedStatement deleteAuthor;
 
   public AuthorDaoImpl() throws SQLException {
     insertAuthor =
         connection.prepareStatement("INSERT INTO author (first_name, last_name) VALUE (?, ?)");
     getAuthorByName =
         connection.prepareStatement("SELECT * FROM author WHERE first_name = ? && last_name = ?");
+    deleteAuthor = connection.prepareStatement("DELETE FROM author WHERE author_id = ?");
   }
 
   @Override
-  public Optional<Author> getAuthorByName(String firstName, String lastName) throws SQLException {
+  public Optional<Author> getAuthor(String firstName, String lastName) throws SQLException {
     List<Author> authors = new ArrayList<>();
     getAuthorByName.setString(1, firstName);
     getAuthorByName.setString(2, lastName);
@@ -52,6 +54,21 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
       logger.catching(Level.ERROR, e);
       logger.error(
           "Failed to create author with first name {} and last name {}", firstName, lastName);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteAuthor(Author author) throws Exception {
+    try {
+      deleteAuthor.setInt(1, author.getId());
+      logger.debug(() -> Util.format(deleteAuthor));
+      deleteAuthor.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete author {}", author);
       rollBack(connection);
       throw e;
     }

@@ -55,7 +55,7 @@ public class BookServiceImpl implements BookService {
   private void fixIds(List<Author> authors) throws Exception {
     for (Author author : authors) {
       Optional<Author> optionalAuthor =
-          authorDao.getAuthorByName(author.getFirstName(), author.getLastName());
+          authorDao.getAuthor(author.getFirstName(), author.getLastName());
       if (optionalAuthor.isPresent()) {
         author.setId(optionalAuthor.get().getId());
       } else {

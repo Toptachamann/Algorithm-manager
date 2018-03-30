@@ -18,6 +18,4 @@ public interface AreaDao {
   Optional<AreaOfUse> getAreaByName(String name) throws Exception;
 
   void deleteAreaOfUse(int id) throws Exception;
-
-  List<AreaOfUse> getAreasOfUse(int algorithmId) throws Exception;
 }

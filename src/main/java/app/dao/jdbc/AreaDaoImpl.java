@@ -22,7 +22,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   private PreparedStatement getAllAreas;
   private PreparedStatement getAreaById;
   private PreparedStatement getAreaByName;
-  private PreparedStatement getAreasByAlgo;
   private PreparedStatement deleteAreaById;
 
   public AreaDaoImpl() throws SQLException {
@@ -36,11 +35,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     getAreaByName =
         connection.prepareStatement(
             "SELECT area_id, area, description FROM area_of_use WHERE area = ?");
-    getAreasByAlgo =
-        connection.prepareStatement(
-            "SELECT area_id, area, description "
-                + "FROM (SELECT app_area_id FROM algorithm_application WHERE app_algorithm_id = ?) AS areas "
-                + "INNER JOIN area_of_use ON areas.app_area_id = area_id");
     deleteAreaById =
         connection.prepareStatement("DELETE FROM algorithms.area_of_use WHERE area_id = ?");
   }
@@ -113,18 +107,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     } else {
       return Optional.empty();
     }
-  }
-
-  @Override
-  public List<AreaOfUse> getAreasOfUse(int algorithmId) throws SQLException {
-    getAreasByAlgo.setInt(1, algorithmId);
-    logger.debug(() -> Util.format(getAreasByAlgo));
-    List<AreaOfUse> areas = new ArrayList<>();
-    ResultSet set = getAreasByAlgo.executeQuery();
-    while (set.next()) {
-      areas.add(new AreaOfUse(set.getInt(1), set.getString(2), set.getString(3)));
-    }
-    return areas;
   }
 
   @Override

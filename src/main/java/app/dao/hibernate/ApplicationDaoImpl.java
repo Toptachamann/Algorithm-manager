@@ -66,4 +66,16 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     entityManager.close();
     return result;
   }
+
+  @Override
+  public List<Application> getApplicationsByAlgorithm(Algorithm algorithm) {
+    EntityManager entityManager = getEntityManager();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Application> query = builder.createQuery(Application.class);
+    Root<Application> root = query.from(Application.class);
+    query.where(builder.equal(root.get(Application_.algorithm), algorithm));
+    List<Application> applications = entityManager.createQuery(query).getResultList();
+    entityManager.close();
+    return applications;
+  }
 }

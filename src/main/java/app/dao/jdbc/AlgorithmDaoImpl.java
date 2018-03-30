@@ -45,31 +45,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgorithmByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
     getAlgorithmsByArea =
-        connection.prepareStatement(
-            "SELECT \n"
-                + "    algorithm_id,\n"
-                + "    algorithm,\n"
-                + "    complexity,\n"
-                + "    paradigm_id,\n"
-                + "    paradigm,\n"
-                + "    dp.description,\n"
-                + "    field_id,\n"
-                + "    field,\n"
-                + "    f.description\n"
-                + "FROM\n"
-                + "    (SELECT \n"
-                + "        app_algorithm_id\n"
-                + "    FROM\n"
-                + "        algorithm_application\n"
-                + "    WHERE\n"
-                + "        app_area_id = ?) AS algos\n"
-                + "        INNER JOIN\n"
-                + "    algorithm ON algos.app_algorithm_id = algorithm_id\n"
-                + "        INNER JOIN\n"
-                + "    design_paradigm AS dp ON algo_paradigm_id = paradigm_id\n"
-                + "        INNER JOIN\n"
-                + "    field_of_study AS f ON algo_field_id = field_id\n"
-                + "ORDER BY algorithm_id");
+
     deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
     setParadigm =
         connection.prepareStatement(

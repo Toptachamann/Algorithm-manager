@@ -4,14 +4,18 @@ import app.model.Algorithm;
 import app.model.Application;
 import app.model.AreaOfUse;
 
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationDao {
 
   Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
+  default boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
+    return getApplication(algorithm, areaOfUse).isPresent();
+  }
+
+  Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
   void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 

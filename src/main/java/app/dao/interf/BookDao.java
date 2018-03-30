@@ -20,13 +20,15 @@ public interface BookDao {
   List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors)
       throws Exception;
 
-  <T> void updateBook(String column, T value, int id) throws Exception;
+  void setTitle(Book book, String title) throws Exception;
 
-  void deleteBookById(int id) throws Exception;
+  void setVolume(Book book, Integer volume) throws Exception;
 
-  void addAuthors(int bookId, List<Author> authors) throws Exception;
+  void setEdition(Book book, int edition) throws Exception;
 
-  void setAuthors(int bookId, List<Author> authors) throws Exception;
+  void deleteBook(Book book) throws Exception;
 
-  List<Book> getBooksByAlgorithm(int algorithmId) throws Exception;
+  void addAuthors(Book book, List<Author> authors) throws Exception;
+
+  void setAuthors(Book book, List<Author> authors) throws Exception;
 }

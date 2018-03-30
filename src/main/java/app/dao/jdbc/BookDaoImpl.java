@@ -23,8 +23,9 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
 
   private PreparedStatement allBooks;
   private PreparedStatement createBook;
-  private PreparedStatement connectAlgorithm;
-  private PreparedStatement getBooksByAlgorithm;
+  private PreparedStatement setTitle;
+  private PreparedStatement setVolume;
+  private PreparedStatement setEdition;
   private PreparedStatement deleteBook;
   private PreparedStatement resetAuthors;
 
@@ -40,18 +41,10 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
                 + "ORDER BY book_id, author_id");
     createBook =
         connection.prepareStatement("INSERT INTO book (title, volume, edition) VALUE (?, ?, ?)");
-    connectAlgorithm =
-        connection.prepareStatement(
-            "INSERT INTO algorithm_reference (ref_textbook_id, ref_algorithm_id) "
-                + "VALUE (?, ?)");
-    getBooksByAlgorithm =
-        connection.prepareStatement(
-            "SELECT book_id, title, volume, edition, author_id, first_name, last_name\n"
-                + "FROM (SELECT ref_book_id FROM algorithm_reference WHERE ref_algorithm_id = ?) AS algos\n"
-                + "INNER JOIN book ON algos.ref_book_id = book_id INNER JOIN textbook ON book_id = txtbk_book_id \n"
-                + "INNER JOIN author ON txtbk_author_id = author_id\n"
-                + "ORDER BY book_id, author_id");
     deleteBook = connection.prepareStatement("DELETE FROM book WHERE book_id = ?");
+    setTitle = connection.prepareStatement("UPDATE book SET title = ? WHERE book_id = ?");
+    setVolume = connection.prepareStatement("UPDATE book SET volume = ? WHERE book_id = ?");
+    setEdition = connection.prepareStatement("UPDATE book SET edition = ? WHERE book_id = ?");
     resetAuthors =
         connection.prepareStatement(
             "DELETE FROM algorithms.textbook WHERE algorithms.textbook.txtbk_book_id = ?");
@@ -150,38 +143,67 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public <T> void updateBook(String column, T newValue, int id) throws SQLException {
+  public void setTitle(Book book, String title) throws SQLException {
     try {
-      String query = "UPDATE book SET " + column + " = ";
-      if (newValue instanceof Integer) {
-        query += newValue;
-      } else {
-        query += Util.fixForString(newValue.toString());
-      }
-      query += " WHERE book_id = " + id;
-      String query1 = query;
-      logger.debug(() -> Util.format(query1));
-      connection.createStatement().executeUpdate(query);
+      setTitle.setString(1, title);
+      setTitle.setInt(2, book.getId());
+      logger.debug(() -> Util.format(setTitle));
+      setTitle.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to set value {} in column {} in table book where id = {}", newValue, column, id);
+      logger.error("Failed to set title {} to book {}", title, book);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public void deleteBookById(int bookId) throws SQLException {
+  public void setVolume(Book book, Integer volume) throws SQLException {
     try {
-      deleteBook.setInt(1, bookId);
+      if (volume == null) {
+        setVolume.setNull(1, Types.INTEGER);
+      } else {
+        setVolume.setInt(1, volume);
+      }
+      setVolume.setInt(2, book.getId());
+      logger.debug(() -> Util.format(setVolume));
+      setVolume.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to set volume {} to book {}", volume, book);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void setEdition(Book book, int edition) throws SQLException {
+    try {
+      setEdition.setInt(1, edition);
+      setEdition.setInt(2, book.getId());
+      logger.debug(() -> Util.format(setEdition));
+      setEdition.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to set edition {} to book {}", edition, book);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteBook(Book book) throws SQLException {
+    try {
+      deleteBook.setInt(1, book.getId());
       logger.debug(() -> Util.format(deleteBook));
       deleteBook.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete book with id = {}", bookId);
+      logger.error("Failed to delete book ", book);
       rollBack(connection);
       throw e;
     }
@@ -208,28 +230,28 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public void addAuthors(int bookId, List<Author> authors) throws SQLException {
+  public void addAuthors(Book book, List<Author> authors) throws SQLException {
     try {
-      addAuthorsToBook(bookId, authors);
+      addAuthorsToBook(book.getId(), authors);
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to add authors {} to book with id {}", authors.toString(), bookId);
+      logger.error("Failed to add authors {} to book {}", authors.toString(), book);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public void setAuthors(int bookId, List<Author> authors) throws SQLException {
+  public void setAuthors(Book book, List<Author> authors) throws SQLException {
     try {
-      resetAuthors.setInt(1, bookId);
+      resetAuthors.setInt(1, book.getId());
       logger.debug(() -> Util.format(resetAuthors));
       resetAuthors.executeUpdate();
-      addAuthors(bookId, authors);
+      addAuthors(book, authors);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to set authors {} to book with id {}", authors, bookId);
+      logger.error("Failed to set authors {} to book {}", authors, book);
       rollBack(connection);
       throw e;
     }
@@ -254,12 +276,5 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       }
     }
     return books;
-  }
-
-  @Override
-  public List<Book> getBooksByAlgorithm(int algorithmId) throws SQLException {
-    getBooksByAlgorithm.setInt(1, algorithmId);
-    logger.debug(() -> Util.format(getBooksByAlgorithm));
-    return booksFromSet(getBooksByAlgorithm.executeQuery());
   }
 }

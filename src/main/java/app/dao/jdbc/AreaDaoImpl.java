@@ -59,19 +59,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
 
   @Override
   public AreaOfUse createAreaOfUse(String area) throws SQLException {
-    try {
-      createAreaByName.setString(1, area);
-      logger.debug(() -> Util.format(createAreaByName));
-      createAreaByName.executeUpdate();
-      int id = getLastId(connection);
-      connection.commit();
-      return new AreaOfUse(id, area);
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to create area {}", area);
-      rollBack(connection);
-      throw e;
-    }
+    return createAreaOfUse(area, null);
   }
 
   @Override

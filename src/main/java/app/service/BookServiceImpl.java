@@ -91,7 +91,7 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public void deleteBook(Book book) throws Exception {
-    bookDao.deleteBookById(book.getId());
+    bookDao.deleteBook(book.getId());
   }
 
   @Override

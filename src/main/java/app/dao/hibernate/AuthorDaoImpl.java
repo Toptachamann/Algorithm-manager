@@ -3,27 +3,36 @@ package app.dao.hibernate;
 import app.dao.interf.AuthorDao;
 import app.model.Author;
 
-import java.sql.SQLException;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
-public class AuthorDaoImpl  extends AbstractDao implements AuthorDao {
+public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   @Override
-  public List<Author> getAuthorByName(String firstName, String lastName) throws SQLException {
-    return null;
+  public Author createAuthor(String firstName, String lastName) {
+    Author author = new Author(firstName, lastName);
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    entityManager.persist(author);
+    entityManager.getTransaction().commit();
+    entityManager.close();
+    return author;
   }
 
   @Override
-  public int getAuthorId(String firstName, String lastName) throws SQLException {
-    return 0;
-  }
-
-  @Override
-  public boolean containsAuthor(String firstName, String lastName) throws SQLException {
-    return false;
-  }
-
-  @Override
-  public Author createAuthor(String firstName, String lastName) throws SQLException {
-    return null;
+  public List<Author> getAuthorByName(String firstName, String lastName) {
+    EntityManager entityManager = getEntityManager();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Author> query = builder.createQuery(Author.class);
+    Root<Author> root = query.from(Author.class);
+    query.where(
+        builder.and(
+            builder.equal(root.get(Author_.firstName), firstName),
+            builder.equal(root.get(Author_.lastName), lastName)));
+    List<Author> result = entityManager.createQuery(query).getResultList();
+    entityManager.close();
+    return result;
   }
 }

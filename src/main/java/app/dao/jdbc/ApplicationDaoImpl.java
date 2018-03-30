@@ -16,23 +16,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   private static final Logger logger = LogManager.getLogger(ApplicationDaoImpl.class);
 
   private PreparedStatement createApp;
-  private PreparedStatement containsApp;
   private PreparedStatement deleteApplication;
   private PreparedStatement getApplicationsByArea;
   private PreparedStatement getApplicationsByAlgorithm;
+  private PreparedStatement getApplication;
 
   public ApplicationDaoImpl() throws SQLException {
     createApp =
         connection.prepareStatement(
             "INSERT INTO algorithm_application (app_algorithm_id, app_area_id) VALUE (?, ?)");
-    containsApp =
+    getApplication =
         connection.prepareStatement(
-            "SELECT COUNT(*) FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
+            "SELECT application_id FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
     deleteApplication =
         connection.prepareStatement(
             "DELETE FROM algorithm_application WHERE app_algorithm_id = ? AND app_area_id = ?");
@@ -91,13 +92,22 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException {
-    containsApp.setInt(1, algorithm.getId());
-    containsApp.setInt(2, areaOfUse.getId());
-    logger.debug(() -> Util.format(containsApp));
-    ResultSet set = containsApp.executeQuery();
-    set.next();
-    return set.getInt(1) == 1;
+  public Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws SQLException {
+    try {
+      getApplication.setInt(1, algorithm.getId());
+      getApplication.setInt(2, areaOfUse.getId());
+      logger.debug(() -> Util.format(getApplication));
+      ResultSet set = getApplication.executeQuery();
+      return set.next()
+          ? Optional.of(new Application(set.getInt(1), algorithm, areaOfUse))
+          : Optional.empty();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error(
+          "Failed to get application of algorithm {} and area of use {}", algorithm, areaOfUse);
+      throw e;
+    }
   }
 
   @Override
@@ -140,7 +150,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error("Failed to obtain algorithms by area {}", area);
-      rollBack(connection);
       throw e;
     }
   }
@@ -160,7 +169,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error("Failed to get applications by algorithm {}", algorithm);
-      rollBack(connection);
       throw e;
     }
   }

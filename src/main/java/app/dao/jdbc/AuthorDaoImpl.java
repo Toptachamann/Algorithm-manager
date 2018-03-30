@@ -17,7 +17,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
 
   private PreparedStatement getAuthorByName;
-  private PreparedStatement getAuthorId;
   private PreparedStatement insertAuthor;
 
   public AuthorDaoImpl() throws SQLException {
@@ -25,9 +24,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
         connection.prepareStatement("INSERT INTO author (first_name, last_name) VALUE (?, ?)");
     getAuthorByName =
         connection.prepareStatement("SELECT * FROM author WHERE first_name = ? && last_name = ?");
-    getAuthorId =
-        connection.prepareStatement(
-            "SELECT author_id from author WHERE first_name = ? AND last_name = ? LIMIT 1");
   }
 
   @Override
@@ -41,24 +37,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
       authors.add(new Author(set.getInt(1), set.getString(2), set.getString(3)));
     }
     return authors;
-  }
-
-  @Override
-  public int getAuthorId(String firstName, String lastName) throws SQLException {
-    getAuthorId.setString(1, firstName);
-    getAuthorId.setString(2, lastName);
-    logger.debug(() -> Util.format(getAuthorId));
-    ResultSet set = getAuthorId.executeQuery();
-    if (set.next()) {
-      return set.getInt(1);
-    } else {
-      return -1;
-    }
-  }
-
-  @Override
-  public boolean containsAuthor(String firstName, String lastName) throws SQLException {
-    return getAuthorId(firstName, lastName) != -1;
   }
 
   @Override

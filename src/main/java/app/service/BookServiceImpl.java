@@ -7,12 +7,14 @@ import app.dao.interf.ReferenceDao;
 import app.model.Algorithm;
 import app.model.Author;
 import app.model.Book;
+import app.model.Reference;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BookServiceImpl implements BookService {
   private static final Logger logger = LogManager.getLogger(BookServiceImpl.class);
@@ -52,10 +54,13 @@ public class BookServiceImpl implements BookService {
 
   private void fixIds(List<Author> authors) throws Exception {
     for (Author author : authors) {
-      if (authorDao.containsAuthor(author.getFirstName(), author.getLastName())) {
-        author.setId(authorDao.getAuthorId(author.getFirstName(), author.getLastName()));
+      Optional<Author> optionalAuthor =
+          authorDao.getAuthorByName(author.getFirstName(), author.getLastName());
+      if (optionalAuthor.isPresent()) {
+        author.setId(optionalAuthor.get().getId());
       } else {
-        author.setId(authorDao.createAuthor(author.getFirstName(), author.getLastName()).getId());
+        Author created = authorDao.createAuthor(author.getFirstName(), author.getLastName());
+        author.setId(created.getId());
       }
     }
   }
@@ -63,35 +68,33 @@ public class BookServiceImpl implements BookService {
   @Override
   public void updateTitle(Book book, String newValue) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(newValue));
-    bookDao.updateBook("title", newValue, book.getId());
+    bookDao.setTitle(book, newValue);
   }
 
   @Override
   public void updateVolume(Book book, Integer volume) throws Exception {
-    if (volume == null) {
-      bookDao.updateBook("volume", null, book.getId());
-    } else {
+    if (volume != null) {
       Validate.isTrue(volume > 0);
-      bookDao.updateBook("volume", volume, book.getId());
     }
+    bookDao.setVolume(book, volume);
   }
 
   @Override
   public void updateEdition(Book book, Integer edition) throws Exception {
     Validate.isTrue(edition > 0);
-    bookDao.updateBook("edition", edition, book.getId());
+    bookDao.setEdition(book, edition);
   }
 
   @Override
   public List<Author> setAuthors(Book book, List<Author> newValue) throws Exception {
     fixIds(newValue);
-    bookDao.setAuthors(book.getId(), newValue);
+    bookDao.setAuthors(book, newValue);
     return newValue;
   }
 
   @Override
   public void deleteBook(Book book) throws Exception {
-    bookDao.deleteBook(book.getId());
+    bookDao.deleteBook(book);
   }
 
   @Override
@@ -104,8 +107,8 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
-  public List<Book> getReferences(Algorithm algorithm) throws Exception {
-    return bookDao.getBooksByAlgorithm(algorithm.getId());
+  public List<Reference> getReferences(Algorithm algorithm) throws Exception {
+    return referenceDao.getAlgorithmReferences(algorithm);
   }
 
   @Override

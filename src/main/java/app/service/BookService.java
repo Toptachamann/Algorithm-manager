@@ -3,6 +3,7 @@ package app.service;
 import app.model.Algorithm;
 import app.model.Author;
 import app.model.Book;
+import app.model.Reference;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface BookService {
 
   void createReference(Algorithm algorithm, Book book) throws Exception;
 
-  List<Book> getReferences(Algorithm algorithm) throws Exception;
+  List<Reference> getReferences(Algorithm algorithm) throws Exception;
 
   void deleteReference(Algorithm algorithm, Book book) throws Exception;
 }

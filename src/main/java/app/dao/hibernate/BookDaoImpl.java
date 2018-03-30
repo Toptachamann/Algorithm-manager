@@ -3,6 +3,7 @@ package app.dao.hibernate;
 import app.dao.interf.BookDao;
 import app.model.Author;
 import app.model.Book;
+import app.model.Book_;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,25 +125,20 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   public void addAuthors(Book book, List<Author> authors) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Book> update = builder.createCriteriaUpdate(Book.class);
-    Root<Book> root = update.from(Book.class);
-    update.set(root.get(Book_.book), book.getAuthors().addAll(authors))
-    update.where(builder.equal(root.get(Book_.id), book.getId()));
-    entityManager.createQuery(update).executeUpdate();
+    book.getAuthors().addAll(authors);
+    entityManager.merge(book);
     entityManager.getTransaction().commit();
+    entityManager.close();
   }
 
   @Override
   public void setAuthors(Book book, List<Author> authors) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Book> update = builder.createCriteriaUpdate(Book.class);
-    Root<Book> root = update.from(Book.class);
-    update.set(root.get(Book_.authors), authors);
-    update.where(builder.equal(root.get(Book_.id), book.getId()));
-    entityManager.createQuery(update).executeUpdate();
+    book.setAuthors(authors);
+    entityManager.merge(book);
     entityManager.getTransaction().commit();
+    entityManager.close();
+
   }
 }

@@ -5,6 +5,7 @@ import app.model.Algorithm;
 import app.model.Application;
 import app.model.AreaOfUse;
 import app.model.Book;
+import app.model.Reference;
 import app.service.AlgorithmService;
 import app.service.BookService;
 import javafx.collections.FXCollections;
@@ -383,7 +384,7 @@ public class ReferenceController extends AbstractController {
     areaListView.setItems(values);
   }
 
-  private void displayReferences(Algorithm algorithm, List<Book> books) {
+  private void displayReferences(Algorithm algorithm, List<Reference> books) {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
         algorithm.getName()
@@ -397,9 +398,9 @@ public class ReferenceController extends AbstractController {
         t ->
             values.add(
                 "\t"
-                    + t.getTitle()
-                    + (t.getVolume() == null ? " " : " Vol. " + t.getVolume() + " ")
-                    + t.getEdition()
+                    + t.getBook().getTitle()
+                    + (t.getBook().getVolume() == null ? " " : " Vol. " + t.getBook().getVolume() + " ")
+                    + t.getBook().getEdition()
                     + " edition"));
     referenceListView.setItems(values);
   }

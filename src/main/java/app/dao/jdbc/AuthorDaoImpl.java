@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
@@ -27,16 +28,15 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public List<Author> getAuthorByName(String firstName, String lastName) throws SQLException {
+  public Optional<Author> getAuthorByName(String firstName, String lastName) throws SQLException {
     List<Author> authors = new ArrayList<>();
     getAuthorByName.setString(1, firstName);
     getAuthorByName.setString(2, lastName);
     logger.debug(() -> Util.format(getAuthorByName));
     ResultSet set = getAuthorByName.executeQuery();
-    while (set.next()) {
-      authors.add(new Author(set.getInt(1), set.getString(2), set.getString(3)));
-    }
-    return authors;
+    return set.next()
+        ? Optional.of(new Author(set.getInt(1), set.getString(2), set.getString(3)))
+        : Optional.empty();
   }
 
   @Override

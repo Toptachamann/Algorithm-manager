@@ -13,6 +13,7 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import java.util.Optional;
 
 public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   @Override
@@ -26,8 +27,10 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     return application;
   }
 
+
+
   @Override
-  public boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) {
+  public Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
@@ -38,7 +41,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
             builder.equal(root.get(Application_.areaOfUse), areaOfUse)));
     List<Application> result = entityManager.createQuery(query).getResultList();
     entityManager.close();
-    return !result.isEmpty();
+    return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
   @Override

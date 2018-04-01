@@ -27,15 +27,20 @@ jar {
   }
 }
 
-task deleteJar(type: Delete) {
-  delete project.projectDir.getAbsolutePath() + File.separator + jar.getArchiveName()
+task deleteJar(dependsOn: jar) {
+  doLast {
+    delete "C:\\Java_Projects\\JARs\\MyJar\\Algorithm_manager\\" + File.separator + jar.getArchiveName()
+  }
 }
 
-task copyJar(type: Copy) {
+task copyJar(dependsOn: deleteJar) {
+  doLast {
     copy {
       from jar.getArchivePath()
-      into "C:\\Java_Projects\\Algorithm manager"
+      into "C:\\Java_Projects\\JARs\\MyJar\\Algorithm_manager"
     }
+  }
+
 }
 
 

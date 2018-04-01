@@ -1,5 +1,6 @@
 package app.dao.interf
 
+import app.model.DesignParadigm
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -15,18 +16,19 @@ class ParadigmDaoImplTest extends Specification {
   @Unroll
   def "test paradigm creation"() {
     setup:
-    def created = paradigmDao.createParadigm(name)
+    def paradigm = new DesignParadigm(name)
+    paradigmDao.create(paradigm)
+    def optCreated = paradigmDao.findById(paradigm.getId())
     expect:
+    optCreated.isPresent()
+    def created = optCreated.get()
     created.getParadigm() == name
     created.getDescription() == null
     paradigmDao.containsParadigm(created.getId())
     paradigmDao.containsParadigm(created.getParadigm())
-    def optParadigm = paradigmDao.getParadigmByName(name)
-    optParadigm.isPresent()
-    def paradigm = optParadigm.get()
     paradigm == created
     cleanup:
-    paradigmDao.deleteParadigm(created.getId())
+    paradigmDao.deleteDesignParadigmById(created.getId())
     where:
     paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
   }
@@ -34,18 +36,19 @@ class ParadigmDaoImplTest extends Specification {
   @Unroll
   def "test paradigm creation with description"() {
     setup:
-    def created = paradigmDao.createParadigm(name, description)
+    def paradigm = new DesignParadigm(name, description)
+    paradigmDao.create(paradigm)
+    def optCreated = paradigmDao.findById(paradigm.getId())
     expect:
+    optCreated.isPresent()
+    def created = optCreated.get()
     created.getParadigm() == name
     created.getDescription() == description
     paradigmDao.containsParadigm(created.getId())
     paradigmDao.containsParadigm(created.getParadigm())
-    def optParadigm = paradigmDao.getParadigmByName(name)
-    optParadigm.isPresent()
-    def paradigm = optParadigm.get()
     paradigm == created
     cleanup:
-    paradigmDao.deleteParadigm(created.getId())
+    paradigmDao.deleteDesignParadigmById(created.getId())
     where:
     paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
   }
@@ -53,10 +56,11 @@ class ParadigmDaoImplTest extends Specification {
   @Unroll
   def "test paradigm deletion"() {
     setup:
-    def created = paradigmDao.createParadigm(name)
-    paradigmDao.deleteParadigm(created.getId())
+    def paradigm = new DesignParadigm(name)
+    paradigmDao.create(paradigm)
+    paradigmDao.deleteDesignParadigmById(paradigm.getId())
     expect:
-    !paradigmDao.containsParadigm(created.getId())
+    !paradigmDao.containsParadigm(paradigm.getId())
     where:
     paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
   }
@@ -64,13 +68,14 @@ class ParadigmDaoImplTest extends Specification {
   @Unroll
   def "test update design paradigm"() {
     setup:
-    def created = paradigmDao.createParadigm(name)
-    paradigmDao.updateDesignParadigm(updatedName, created.getId())
+    def paradigm = new DesignParadigm(name)
+    paradigmDao.create(paradigm)
+    paradigmDao.updateDesignParadigm(updatedName, paradigm.getId())
     expect:
     !paradigmDao.containsParadigm(name)
     paradigmDao.containsParadigm(updatedName)
     cleanup:
-    paradigmDao.deleteParadigm(created.getId())
+    paradigmDao.deleteDesignParadigmById(paradigm.getId())
     where:
     paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
   }

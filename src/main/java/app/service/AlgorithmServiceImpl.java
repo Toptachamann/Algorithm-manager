@@ -46,7 +46,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
-    Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
+    Optional<DesignParadigm> paradigm = paradigmDao.findById(designParadigm.getId());
     Optional<FieldOfStudy> field = fieldDao.getFieldById(fieldOfStudy.getId());
     Optional<Algorithm> algorithm = algorithmDao.getAlgorithmByName(name.trim());
     if (!paradigm.isPresent()) {
@@ -108,37 +108,30 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public DesignParadigm createDesignParadigm(String paradigmName) throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(paradigmName));
-    if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
-      throw new LogicException("This design paradigm already exists");
-    } else {
-      return paradigmDao.createParadigm(paradigmName);
-    }
+    return createDesignParadigm(paradigmName, null);
   }
 
   @Override
   public DesignParadigm createDesignParadigm(String paradigmName, String description)
       throws Exception {
-    if (StringUtils.isBlank(description)) {
-      return this.createDesignParadigm(paradigmName);
+    Validate.isTrue(!StringUtils.isBlank(paradigmName));
+    if (paradigmDao.findByParadigm(paradigmName).isPresent()) {
+      throw new SQLException("This design paradigm already exists");
     } else {
-      Validate.isTrue(!StringUtils.isBlank(paradigmName));
-      if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
-        throw new SQLException("This design paradigm already exists");
-      } else {
-        return paradigmDao.createParadigm(paradigmName, description);
-      }
+      DesignParadigm paradigm = new DesignParadigm(paradigmName, description);
+      paradigmDao.create(paradigm);
+      return paradigm;
     }
   }
 
   @Override
   public List<DesignParadigm> getDesignParadigms() throws Exception {
-    return paradigmDao.getAllDesignParadigms();
+    return paradigmDao.getAll();
   }
 
   @Override
   public Optional<DesignParadigm> getParadigmByName(String name) throws Exception {
-    return paradigmDao.getParadigmByName(name);
+    return paradigmDao.findByParadigm(name);
   }
 
   @Override

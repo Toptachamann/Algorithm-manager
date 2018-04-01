@@ -6,25 +6,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParadigmDao {
-  DesignParadigm createParadigm(String paradigm) throws Exception;
+  void create(DesignParadigm paradigm) throws Exception;
 
-  DesignParadigm createParadigm(String paradigm, String description) throws Exception;
+  List<DesignParadigm> getAll() throws Exception;
 
-  List<DesignParadigm> getAllDesignParadigms() throws Exception;
+  Optional<DesignParadigm> findById(int id) throws Exception;
 
-  Optional<DesignParadigm> getParadigmById(int id) throws Exception;
-
-  Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
+  Optional<DesignParadigm> findByParadigm(String paradigm) throws Exception;
 
   default boolean containsParadigm(String name) throws Exception {
-    return getParadigmByName(name).isPresent();
+    return findByParadigm(name).isPresent();
   }
 
   default boolean containsParadigm(int id) throws Exception {
-    return getParadigmById(id).isPresent();
+    return findById(id).isPresent();
   }
 
-  void deleteParadigm(int id) throws Exception;
+  void deleteDesignParadigmById(int id) throws Exception;
 
   void updateDesignParadigm(String newName, int id) throws Exception;
 }

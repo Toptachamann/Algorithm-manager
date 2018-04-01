@@ -36,10 +36,10 @@
         <Root level="all">
             <AppenderRef ref="console"/>
         </Root>
-        <Logger name="org.springframework" level="error" additivity="true">
+        <!--<Logger name="org.springframework" level="error" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
-        </Logger>
+        </Logger>-->
         <Logger name="org.hibernate" level="error" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>

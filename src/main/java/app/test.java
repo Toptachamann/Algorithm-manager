@@ -12,7 +12,7 @@ public class test {
     System.out.println(HibernatePersistenceProvider.class);
     Class.forName("org.hibernate.jpa.HibernatePersistenceProvider");
     ParadigmDaoImpl dao = new ParadigmDaoImpl();
-    List<DesignParadigm> paradigms = dao.getAllDesignParadigms();
+    List<DesignParadigm> paradigms = dao.getAll();
     System.out.println(
         paradigms.stream().map(DesignParadigm::getParadigm).collect(Collectors.joining(", ")));
   }

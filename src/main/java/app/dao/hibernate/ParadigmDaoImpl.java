@@ -18,23 +18,16 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   public ParadigmDaoImpl() {}
 
   @Override
-  public DesignParadigm createParadigm(String paradigm) {
-    return createParadigm(paradigm, null);
-  }
-
-  @Override
-  public DesignParadigm createParadigm(String paradigm, String description) {
-    DesignParadigm designParadigm = new DesignParadigm(paradigm, description);
+  public void create(DesignParadigm paradigm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    entityManager.persist(designParadigm);
+    entityManager.persist(paradigm);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return designParadigm;
   }
 
   @Override
-  public List<DesignParadigm> getAllDesignParadigms() {
+  public List<DesignParadigm> getAll() {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
@@ -47,7 +40,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmById(int id) {
+  public Optional<DesignParadigm> findById(int id) {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
@@ -62,7 +55,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmByName(String name) {
+  public Optional<DesignParadigm> findByParadigm(String paradigm) {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
@@ -72,14 +65,14 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
             .createQuery(
                 criteria
                     .select(root)
-                    .where(builder.equal(root.get(DesignParadigm_.paradigm), name)))
+                    .where(builder.equal(root.get(DesignParadigm_.paradigm), paradigm)))
             .getResultList();
     entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
   @Override
-  public void deleteParadigm(int id) throws Exception {
+  public void deleteDesignParadigmById(int id) throws Exception {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,6 @@ import java.util.Optional;
 public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private static final Logger logger = LogManager.getLogger(ParadigmDaoImpl.class);
 
-  private PreparedStatement createParadigmByName;
   private PreparedStatement createParadigm;
   private PreparedStatement allParadigms;
   private PreparedStatement getParadigmById;
@@ -29,8 +29,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     createParadigm =
         connection.prepareStatement(
             "INSERT INTO design_paradigm (paradigm, description) VALUE (?, ?)");
-    createParadigmByName =
-        connection.prepareStatement("INSERT INTO design_paradigm (paradigm) VALUE (?)");
     allParadigms = connection.prepareStatement("SELECT * FROM design_paradigm");
     getParadigmById =
         connection.prepareStatement("SELECT * FROM design_paradigm WHERE paradigm_id = ?");
@@ -44,43 +42,29 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public DesignParadigm createParadigm(String paradigm) throws SQLException {
+  public void create(DesignParadigm paradigm) throws SQLException {
     try {
-      createParadigmByName.setString(1, paradigm);
-      logger.debug(() -> Util.format(createParadigmByName));
-      createParadigmByName.executeUpdate();
-      int id = getLastId(connection);
-      connection.commit();
-      return new DesignParadigm(id, paradigm);
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to create design paradigm {}", paradigm);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public DesignParadigm createParadigm(String paradigm, String description) throws SQLException {
-    try {
-      createParadigm.setString(1, paradigm);
-      createParadigm.setString(2, description);
+      createParadigm.setString(1, paradigm.getParadigm());
+      if(paradigm.getDescription() == null){
+        createParadigm.setNull(2, Types.VARCHAR);
+      }else{
+        createParadigm.setString(2, paradigm.getDescription());
+      }
       logger.debug(() -> Util.format(createParadigm));
       createParadigm.executeUpdate();
-      int id = getLastId(connection);
+      paradigm.setId(getLastId(connection));
       connection.commit();
-      return new DesignParadigm(id, paradigm, description);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
-          "Failed to create design paradigm {} with description {}", paradigm, description);
+          "Failed to create design paradigm {}", paradigm);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public List<DesignParadigm> getAllDesignParadigms() throws SQLException {
+  public List<DesignParadigm> getAll() throws SQLException {
     logger.debug(() -> Util.format(allParadigms));
     ResultSet result = allParadigms.executeQuery();
     List<DesignParadigm> paradigms = new ArrayList<>();
@@ -91,8 +75,8 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmByName(String name) throws SQLException {
-    getParadigmByName.setString(1, name);
+  public Optional<DesignParadigm> findByParadigm(String paradigm) throws SQLException {
+    getParadigmByName.setString(1, paradigm);
     logger.debug(() -> Util.format(getParadigmByName));
     ResultSet set = getParadigmByName.executeQuery();
     if (set.next()) {
@@ -103,7 +87,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void deleteParadigm(int id) throws Exception {
+  public void deleteDesignParadigmById(int id) throws Exception {
     try {
       deleteParadigm.setInt(1, id);
       logger.debug(() -> Util.format(deleteParadigm));
@@ -118,7 +102,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmById(int id) throws SQLException {
+  public Optional<DesignParadigm> findById(int id) throws SQLException {
     getParadigmById.setInt(1, id);
     logger.debug(() -> Util.format(getParadigmById));
     ResultSet set = getParadigmById.executeQuery();

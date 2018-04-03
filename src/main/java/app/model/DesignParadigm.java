@@ -56,12 +56,20 @@ public class DesignParadigm {
 
     DesignParadigm that = (DesignParadigm) o;
 
-    return new EqualsBuilder().append(id, that.id).isEquals();
+    return new EqualsBuilder()
+        .append(id, that.id)
+        .append(paradigm, that.paradigm)
+        .append(description, that.description)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(paradigm)
+        .append(description)
+        .toHashCode();
   }
 
   public int getId() {

@@ -24,10 +24,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private PreparedStatement createAlgorithm;
   private PreparedStatement allAlgorithms;
   private PreparedStatement getAlgorithmByName;
-  private PreparedStatement setName;
-  private PreparedStatement setComplexity;
-  private PreparedStatement setParadigm;
-  private PreparedStatement setField;
+  private PreparedStatement merge;
   private PreparedStatement deleteById;
 
   public AlgorithmDaoImpl() throws SQLException {
@@ -43,21 +40,10 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgorithmByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
     deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
-    setParadigm =
+    merge =
         connection.prepareStatement(
-            "UPDATE algorithms.algorithm "
-                + "SET algorithms.algorithm.algo_paradigm_id = ? WHERE algorithms.algorithm.algorithm_id = ?");
-    setField =
-        connection.prepareStatement(
-            "UPDATE algorithms.algorithm "
-                + "SET algorithms.algorithm.algo_field_id = ? WHERE algorithms.algorithm.algorithm_id = ?");
-    setName =
-        connection.prepareStatement(
-            "UPDATE  algorithms.algorithm SET algorithms.algorithm.algorithm = ? "
-                + "WHERE algorithms.algorithm.algorithm_id = ?");
-    setComplexity =
-        connection.prepareStatement(
-            "UPDATE  algorithms.algorithm SET algorithms.algorithm.complexity = ? "
+            "UPDATE algorithm "
+                + "SET algorithm = ?, complexity = ?, algo_paradigm_id = ?, algo_field_id = ? "
                 + "WHERE algorithms.algorithm.algorithm_id = ?");
   }
 
@@ -139,6 +125,25 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
+  public void merge(Algorithm algorithm) throws SQLException {
+    try {
+      merge.setString(1, algorithm.getName());
+      merge.setString(2, algorithm.getComplexity());
+      merge.setInt(3, algorithm.getDesignParadigm().getId());
+      merge.setInt(4, algorithm.getFieldOfStudy().getId());
+      merge.setInt(5, algorithm.getId());
+      logger.debug(() -> Util.format(merge));
+      merge.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to merge {}", algorithm);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
   public void delete(Algorithm algorithm) throws SQLException {
     try {
       deleteById.setInt(1, algorithm.getId());
@@ -149,70 +154,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       logger.catching(Level.ERROR, e);
       logger.error("Failed to delete an algorithm {}", algorithm);
       connection.rollback();
-      throw e;
-    }
-  }
-
-  @Override
-  public void setName(Algorithm algorithm, String name) throws SQLException {
-    try {
-      setName.setString(1, name);
-      setName.setInt(2, algorithm.getId());
-      logger.debug(() -> Util.format(setName));
-      setName.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to update name of the algorithm {} to {}", algorithm, name);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void setComplexity(Algorithm algorithm, String complexity) throws SQLException {
-    try {
-      setComplexity.setString(1, complexity);
-      setComplexity.setInt(2, algorithm.getId());
-      logger.debug(() -> Util.format(setComplexity));
-      setComplexity.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to update complexity of the algorithm {} to {}", algorithm, complexity);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws SQLException {
-    try {
-      setParadigm.setInt(1, paradigm.getId());
-      setParadigm.setInt(2, algorithm.getId());
-      logger.debug(() -> Util.format(setParadigm));
-      setParadigm.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set design paradigm {} to algorithm {}", paradigm, algorithm);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) throws SQLException {
-    try {
-      setField.setInt(2, algorithm.getId());
-      setField.setInt(1, fieldOfStudy.getId());
-      logger.debug(() -> Util.format(setField));
-      setField.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set field of study {} to algorithm {}", fieldOfStudy, algorithm);
-      rollBack(connection);
       throw e;
     }
   }

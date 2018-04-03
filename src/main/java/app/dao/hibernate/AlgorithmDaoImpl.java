@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -83,54 +82,10 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
-    Root<Algorithm> root = update.from(Algorithm.class);
-    update.set(root.get(Algorithm_.designParadigm), paradigm);
-    entityManager.createQuery(update).executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.close();
-  }
-
-  @Override
-  public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
-    Root<Algorithm> root = update.from(Algorithm.class);
-    update.set(root.get(Algorithm_.fieldOfStudy), fieldOfStudy);
-    entityManager.createQuery(update).executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.close();
-  }
-
-  @Override
-  public void setName(Algorithm algorithm, String name) {
+  public void merge(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.merge(algorithm);
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
-    Root<Algorithm> root = update.from(Algorithm.class);
-    update.set(root.get(Algorithm_.name), name);
-    entityManager.createQuery(update).executeUpdate();
-    entityManager.getTransaction().commit();
-    entityManager.close();
-  }
-
-  @Override
-  public void setComplexity(Algorithm algorithm, String complexity) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
-    Root<Algorithm> root = update.from(Algorithm.class);
-    update.set(root.get(Algorithm_.complexity), complexity);
-    entityManager.createQuery(update).executeUpdate();
     entityManager.getTransaction().commit();
     entityManager.close();
   }
@@ -139,9 +94,9 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   public void delete(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    if(entityManager.contains(algorithm)){
+    if (entityManager.contains(algorithm)) {
       entityManager.remove(algorithm);
-    }else{
+    } else {
       entityManager.remove(entityManager.merge(algorithm));
     }
     entityManager.getTransaction().commit();

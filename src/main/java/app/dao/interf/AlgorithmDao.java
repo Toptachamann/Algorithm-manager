@@ -23,13 +23,7 @@ public interface AlgorithmDao {
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception;
 
-  void setName(Algorithm algorithm, String name) throws Exception;
-
-  void setComplexity(Algorithm algorithm, String complexity) throws Exception;
-
-  void setDesignParadigm(Algorithm algorithm, DesignParadigm designParadigm) throws Exception;
-
-  void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) throws Exception;
+  void merge(Algorithm algorithm) throws Exception;
 
   void delete(Algorithm algorithm) throws Exception;
 }

@@ -129,11 +129,23 @@ public class Algorithm {
 
     Algorithm algorithm = (Algorithm) o;
 
-    return new EqualsBuilder().append(id, algorithm.id).isEquals();
+    return new EqualsBuilder()
+        .append(id, algorithm.id)
+        .append(name, algorithm.name)
+        .append(complexity, algorithm.complexity)
+        .append(designParadigm, algorithm.designParadigm)
+        .append(fieldOfStudy, algorithm.fieldOfStudy)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(name)
+        .append(complexity)
+        .append(designParadigm)
+        .append(fieldOfStudy)
+        .toHashCode();
   }
 }

@@ -57,12 +57,20 @@ public class FieldOfStudy {
 
     FieldOfStudy that = (FieldOfStudy) o;
 
-    return new EqualsBuilder().append(id, that.id).isEquals();
+    return new EqualsBuilder()
+        .append(id, that.id)
+        .append(field, that.field)
+        .append(description, that.description)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(field)
+        .append(description)
+        .toHashCode();
   }
 
   public int getId() {

@@ -48,12 +48,20 @@ public class Author {
 
     Author author = (Author) o;
 
-    return new EqualsBuilder().append(id, author.id).isEquals();
+    return new EqualsBuilder()
+        .append(id, author.id)
+        .append(firstName, author.firstName)
+        .append(lastName, author.lastName)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(firstName)
+        .append(lastName)
+        .toHashCode();
   }
 
   public int getId() {

@@ -58,6 +58,8 @@ public class Application {
 
     return new EqualsBuilder()
         .append(applicationId, that.applicationId)
+        .append(algorithm, that.algorithm)
+        .append(areaOfUse, that.areaOfUse)
         .isEquals();
   }
 
@@ -65,6 +67,8 @@ public class Application {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(applicationId)
+        .append(algorithm)
+        .append(areaOfUse)
         .toHashCode();
   }
 

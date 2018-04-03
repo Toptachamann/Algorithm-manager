@@ -66,14 +66,22 @@ public class Reference {
 
     if (o == null || getClass() != o.getClass()) return false;
 
-    Reference that = (Reference) o;
+    Reference reference = (Reference) o;
 
-    return new EqualsBuilder().append(referenceId, that.referenceId).isEquals();
+    return new EqualsBuilder()
+        .append(referenceId, reference.referenceId)
+        .append(algorithm, reference.algorithm)
+        .append(book, reference.book)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(referenceId).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(referenceId)
+        .append(algorithm)
+        .append(book)
+        .toHashCode();
   }
 
   public int getReferenceId() {

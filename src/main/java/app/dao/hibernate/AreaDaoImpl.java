@@ -62,7 +62,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void deleteAreaOfUse(AreaOfUse areaOfUse) {
+  public void delete(AreaOfUse areaOfUse) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));

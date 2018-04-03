@@ -85,12 +85,24 @@ public class Book {
 
     Book book = (Book) o;
 
-    return new EqualsBuilder().append(id, book.id).isEquals();
+    return new EqualsBuilder()
+        .append(id, book.id)
+        .append(edition, book.edition)
+        .append(title, book.title)
+        .append(volume, book.volume)
+        .append(authors, book.authors)
+        .isEquals();
   }
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(id).toHashCode();
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(title)
+        .append(volume)
+        .append(edition)
+        .append(authors)
+        .toHashCode();
   }
 
   public Integer getId() {

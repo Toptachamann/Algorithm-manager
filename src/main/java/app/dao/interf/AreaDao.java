@@ -10,13 +10,13 @@ public interface AreaDao {
 
   void persist(AreaOfUse areaOfUse) throws Exception;
 
-  default boolean containsAreaOfUse(AreaOfUse areaOfUse) throws Exception {
-    return getAreaById(areaOfUse.getId()).isPresent();
+  default boolean containsAreaOfUse(String name) throws Exception {
+    return getAreaByName(name).isPresent();
   }
 
   Optional<AreaOfUse> getAreaById(int id) throws Exception;
 
   Optional<AreaOfUse> getAreaByName(String name) throws Exception;
 
-  void deleteAreaOfUse(AreaOfUse areaOfUse) throws Exception;
+  void delete(AreaOfUse areaOfUse) throws Exception;
 }

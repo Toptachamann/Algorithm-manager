@@ -97,7 +97,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException {
+  public void delete(AreaOfUse areaOfUse) throws SQLException {
     try {
       deleteAreaById.setInt(1, areaOfUse.getId());
       logger.debug(() -> Util.format(deleteAreaById));

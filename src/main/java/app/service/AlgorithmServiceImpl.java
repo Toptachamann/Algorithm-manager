@@ -84,23 +84,27 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     if (algorithmDao.getAlgorithmByName(name).isPresent()) {
       throw new LogicException("Algorithm with this name already exists");
     }
-    algorithmDao.setName(algorithm, name);
+    algorithm.setName(name);
+    algorithmDao.merge(algorithm);
   }
 
   @Override
   public void updateAlgorithmComplexity(Algorithm algorithm, String complexity) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(complexity));
-    algorithmDao.setComplexity(algorithm, complexity);
+    algorithm.setComplexity(complexity);
+    algorithmDao.merge(algorithm);
   }
 
   @Override
   public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception {
-    algorithmDao.setDesignParadigm(algorithm, paradigm);
+    algorithm.setDesignParadigm(paradigm);
+    algorithmDao.merge(algorithm);
   }
 
   @Override
   public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws Exception {
-    algorithmDao.setFieldOfStudy(algorithm, field);
+    algorithm.setFieldOfStudy(field);
+    algorithmDao.merge(algorithm);
   }
 
   @Override
@@ -218,7 +222,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void deleteAreaOfUse(AreaOfUse areaOfUse) throws Exception {
-    areaDao.deleteAreaOfUse(areaOfUse);
+    areaDao.delete(areaOfUse);
   }
 
   @Override

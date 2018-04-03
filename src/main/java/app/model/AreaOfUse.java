@@ -1,5 +1,7 @@
 package app.model;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
@@ -39,6 +41,30 @@ public class AreaOfUse {
     this.id = id;
     this.areaOfUse = areaOfUse;
     this.description = description;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+
+    if (o == null || getClass() != o.getClass()) return false;
+
+    AreaOfUse areaOfUse1 = (AreaOfUse) o;
+
+    return new EqualsBuilder()
+        .append(id, areaOfUse1.id)
+        .append(areaOfUse, areaOfUse1.areaOfUse)
+        .append(description, areaOfUse1.description)
+        .isEquals();
+  }
+
+  @Override
+  public int hashCode() {
+    return new HashCodeBuilder(17, 37)
+        .append(id)
+        .append(areaOfUse)
+        .append(description)
+        .toHashCode();
   }
 
   public AreaOfUse(String areaOfUse) {

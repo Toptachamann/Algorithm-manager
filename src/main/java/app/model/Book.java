@@ -26,7 +26,7 @@ public class Book {
   @Column(name = "edition")
   private int edition;
   @ManyToMany(
-    cascade = {CascadeType.PERSIST},
+    cascade = {CascadeType.REFRESH},
     targetEntity = Author.class
   )
   @JoinTable(

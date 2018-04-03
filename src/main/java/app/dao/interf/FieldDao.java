@@ -24,5 +24,5 @@ public interface FieldDao {
 
   void setField(FieldOfStudy fieldOfStudy, String newName) throws Exception;
 
-  void deleteFieldOfStudy(FieldOfStudy fieldOfStudy) throws Exception;
+  void delete(FieldOfStudy fieldOfStudy) throws Exception;
 }

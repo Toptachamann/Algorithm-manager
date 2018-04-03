@@ -12,6 +12,10 @@ class ParadigmDaoImplTest extends Specification {
   def updatedName = "test updated paradigm"
   @Shared
   def description = "test description"
+  @Shared
+  def jdbcDao = new app.dao.hibernate.ParadigmDaoImpl()
+  @Shared
+  def hibernateDao = new app.dao.jdbc.ParadigmDaoImpl()
 
   @Unroll
   def "test paradigm creation"() {
@@ -28,9 +32,9 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.containsParadigm(created.getParadigm())
     paradigm == created
     cleanup:
-    paradigmDao.deleteDesignParadigm(created)
+    paradigmDao.delete(created)
     where:
-    paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
+    paradigmDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -48,9 +52,9 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.containsParadigm(created.getParadigm())
     paradigm == created
     cleanup:
-    paradigmDao.deleteDesignParadigm(created)
+    paradigmDao.delete(created)
     where:
-    paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
+    paradigmDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -58,11 +62,11 @@ class ParadigmDaoImplTest extends Specification {
     setup:
     def paradigm = new DesignParadigm(name)
     paradigmDao.persist(paradigm)
-    paradigmDao.deleteDesignParadigm(paradigm)
+    paradigmDao.delete(paradigm)
     expect:
     !paradigmDao.containsParadigm(paradigm)
     where:
-    paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
+    paradigmDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -75,9 +79,9 @@ class ParadigmDaoImplTest extends Specification {
     !paradigmDao.containsParadigm(name)
     paradigmDao.containsParadigm(updatedName)
     cleanup:
-    paradigmDao.deleteDesignParadigm(paradigm)
+    paradigmDao.delete(paradigm)
     where:
-    paradigmDao << [new app.dao.hibernate.ParadigmDaoImpl(), new app.dao.jdbc.ParadigmDaoImpl()]
+    paradigmDao << [jdbcDao, hibernateDao]
   }
 
 }

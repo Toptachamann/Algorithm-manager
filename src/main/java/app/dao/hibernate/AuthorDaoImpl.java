@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
+
   @Override
   public void persist(Author author) {
     EntityManager entityManager = getEntityManager();

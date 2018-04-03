@@ -72,7 +72,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void deleteDesignParadigm(DesignParadigm paradigm) {
+  public void delete(DesignParadigm paradigm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(paradigm) ? paradigm : entityManager.merge(paradigm));

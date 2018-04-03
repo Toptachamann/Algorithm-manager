@@ -12,6 +12,10 @@ class FieldDaoImplTest extends Specification {
   def updated = "Updated test field of study"
   @Shared
   def description = "Test field description"
+  @Shared
+  def jdbcDao = new app.dao.jdbc.FieldDaoImpl()
+  @Shared
+  def hibernateDao = new app.dao.jdbc.FieldDaoImpl()
 
   @Unroll
   def "test field creation by name"() {
@@ -28,9 +32,9 @@ class FieldDaoImplTest extends Specification {
     def field = optField.get()
     field == fieldOfStudy
     cleanup:
-    fieldDao.deleteFieldOfStudy(fieldOfStudy)
+    fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
+    fieldDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -50,9 +54,9 @@ class FieldDaoImplTest extends Specification {
     field.getDescription() == description
     field.getId() == fieldOfStudy.getId()
     cleanup:
-    fieldDao.deleteFieldOfStudy(fieldOfStudy)
+    fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
+    fieldDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -61,11 +65,11 @@ class FieldDaoImplTest extends Specification {
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
     when:
-    fieldDao.deleteFieldOfStudy(fieldOfStudy)
+    fieldDao.delete(fieldOfStudy)
     then:
     !fieldDao.containsFieldOfStudy(name)
     where:
-    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
+    fieldDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
@@ -79,8 +83,8 @@ class FieldDaoImplTest extends Specification {
     !fieldDao.containsFieldOfStudy(name)
     fieldDao.containsFieldOfStudy(updated)
     cleanup:
-    fieldDao.deleteFieldOfStudy(fieldOfStudy)
+    fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
+    fieldDao << [jdbcDao, hibernateDao]
   }
 }

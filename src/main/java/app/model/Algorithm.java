@@ -21,7 +21,7 @@ public class Algorithm {
   private String complexity;
 
   @ManyToOne(
-    cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
+    cascade = {CascadeType.REFRESH},
     optional = false,
     targetEntity = DesignParadigm.class,
     fetch = FetchType.LAZY
@@ -35,7 +35,7 @@ public class Algorithm {
   private DesignParadigm designParadigm;
 
   @ManyToOne(
-    cascade = {CascadeType.PERSIST, CascadeType.REFRESH},
+    cascade = {CascadeType.REFRESH},
     optional = false,
     targetEntity = FieldOfStudy.class
   )

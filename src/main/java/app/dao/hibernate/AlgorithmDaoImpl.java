@@ -112,6 +112,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   public void setName(Algorithm algorithm, String name) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
+    entityManager.merge(algorithm);
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
     Root<Algorithm> root = update.from(Algorithm.class);
@@ -138,8 +139,11 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   public void delete(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    entityManager.remove(
-        entityManager.contains(algorithm) ? algorithm : entityManager.merge(algorithm));
+    if(entityManager.contains(algorithm)){
+      entityManager.remove(algorithm);
+    }else{
+      entityManager.remove(entityManager.merge(algorithm));
+    }
     entityManager.getTransaction().commit();
     entityManager.close();
   }

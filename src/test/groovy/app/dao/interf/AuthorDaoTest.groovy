@@ -9,6 +9,10 @@ class AuthorDaoTest extends Specification {
   def firstName = "Test first name"
   @Shared
   def lastName = "Test last name"
+  @Shared
+  def jdbcDao = new app.dao.jdbc.AuthorDaoImpl()
+  @Shared
+  def hibernateDao = new app.dao.hibernate.AuthorDaoImpl()
 
 
   def "test author creation"() {
@@ -23,7 +27,7 @@ class AuthorDaoTest extends Specification {
     cleanup:
     authorDao.deleteAuthor(author)
     where:
-    authorDao << [new app.dao.jdbc.AuthorDaoImpl(), new app.dao.hibernate.AuthorDaoImpl()]
+    authorDao << [jdbcDao, hibernateDao]
   }
 
   def "test author deletion"(){
@@ -36,6 +40,6 @@ class AuthorDaoTest extends Specification {
     !authorDao.containsAuthor(firstName, lastName)
     !authorDao.getAuthor(firstName, lastName).isPresent()
     where:
-    authorDao << [new app.dao.jdbc.AuthorDaoImpl(), new app.dao.hibernate.AuthorDaoImpl()]
+    authorDao << [jdbcDao, hibernateDao]
   }
 }

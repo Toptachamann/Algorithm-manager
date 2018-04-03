@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.List;
 
 @Entity
 @Table(name = "area_of_use")
@@ -18,8 +17,10 @@ public class AreaOfUse {
   @Column(name = "area_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
   @Column(name = "area", length = 50, nullable = false, unique = true)
   private String areaOfUse;
+
   @Column(name = "description")
   private String description;
 
@@ -40,11 +41,8 @@ public class AreaOfUse {
     this.description = description;
   }
 
-  public AreaOfUse(int id, String areaOfUse, String description, List<Algorithm> algorithms) {
-
-    this.id = id;
+  public AreaOfUse(String areaOfUse) {
     this.areaOfUse = areaOfUse;
-    this.description = description;
   }
 
   public AreaOfUse() {}

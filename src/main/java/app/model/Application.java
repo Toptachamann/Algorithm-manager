@@ -15,11 +15,11 @@ public class Application {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int applicationId;
 
-  @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
+  @ManyToOne(cascade = {CascadeType.REFRESH}, optional = false)
   @JoinColumn(name = "app_algorithm_id", referencedColumnName = "algorithm_id",
       nullable = false, foreignKey = @ForeignKey(name = "fk_algorithm_application"))
   private Algorithm algorithm;
-  @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
+  @ManyToOne(cascade = {CascadeType.REFRESH}, optional = false)
   @JoinColumn(name = "app_area_id", referencedColumnName = "area_id",
       nullable = false, foreignKey = @ForeignKey(name = "fk_area_application"))
   private AreaOfUse areaOfUse;

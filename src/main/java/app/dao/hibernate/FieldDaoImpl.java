@@ -82,7 +82,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void deleteFieldOfStudy(FieldOfStudy fieldOfStudy) {
+  public void delete(FieldOfStudy fieldOfStudy) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(fieldOfStudy) ? fieldOfStudy : entityManager.merge(fieldOfStudy));

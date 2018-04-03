@@ -111,7 +111,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void deleteFieldOfStudy(FieldOfStudy fieldOfStudy) throws Exception {
+  public void delete(FieldOfStudy fieldOfStudy) throws Exception {
     try {
       deleteFieldById.setInt(1, fieldOfStudy.getId());
       logger.debug(() -> Util.format(deleteFieldById));

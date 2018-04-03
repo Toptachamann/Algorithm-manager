@@ -22,7 +22,7 @@ public interface ParadigmDao {
     return getParadigmById(paradigm.getId()).isPresent();
   }
 
-  void deleteDesignParadigm(DesignParadigm paradigm) throws Exception;
+  void delete(DesignParadigm paradigm) throws Exception;
 
   void setParadigm(DesignParadigm paradigm, String newName) throws Exception;
 }

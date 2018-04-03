@@ -86,7 +86,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void deleteDesignParadigm(DesignParadigm paradigm) throws Exception {
+  public void delete(DesignParadigm paradigm) throws Exception {
     try {
       deleteParadigm.setInt(1, paradigm.getId());
       logger.debug(() -> Util.format(deleteParadigm));

@@ -15,6 +15,10 @@ public interface AlgorithmDao {
 
   Optional<Algorithm> getAlgorithmByName(String name) throws Exception;
 
+  default boolean containsAlgorithm(String name) throws Exception {
+    return getAlgorithmByName(name).isPresent();
+  }
+
   List<Algorithm> searchAlgorithm(
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception;

@@ -15,7 +15,7 @@ public class Reference {
   private int referenceId;
 
   @ManyToOne(
-    cascade = {CascadeType.PERSIST},
+    cascade = {CascadeType.REFRESH},
     optional = false
   )
   @JoinColumn(
@@ -27,7 +27,7 @@ public class Reference {
   private Algorithm algorithm;
 
   @ManyToOne(
-    cascade = {CascadeType.PERSIST},
+    cascade = {CascadeType.REFRESH},
     optional = false
   )
   @JoinColumn(

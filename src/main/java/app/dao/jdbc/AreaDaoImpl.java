@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,26 +41,24 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public AreaOfUse createAreaOfUse(String area, String description) throws SQLException {
+  public void persist(AreaOfUse areaOfUse) throws SQLException {
     try {
-      createArea.setString(1, area);
-      createArea.setString(2, description);
+      createArea.setString(1, areaOfUse.getAreaOfUse());
+      if (areaOfUse.getDescription() == null) {
+        createArea.setNull(2, Types.VARCHAR);
+      } else {
+        createArea.setString(2, areaOfUse.getDescription());
+      }
       logger.debug(() -> Util.format(createArea));
       createArea.executeUpdate();
-      int id = getLastId(connection);
+      areaOfUse.setId(getLastId(connection));
       connection.commit();
-      return new AreaOfUse(id, area, description);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to create area of use {} with description {}", area, description);
+      logger.error("Failed to persist area of use {}", areaOfUse);
       rollBack(connection);
       throw e;
     }
-  }
-
-  @Override
-  public AreaOfUse createAreaOfUse(String area) throws SQLException {
-    return createAreaOfUse(area, null);
   }
 
   @Override
@@ -98,15 +97,15 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void deleteAreaOfUse(int id) throws SQLException {
+  public void deleteAreaOfUse(AreaOfUse areaOfUse) throws SQLException {
     try {
-      deleteAreaById.setInt(1, id);
+      deleteAreaById.setInt(1, areaOfUse.getId());
       logger.debug(() -> Util.format(deleteAreaById));
       deleteAreaById.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete area of use with id {}", id);
+      logger.error("Failed to delete area of use", areaOfUse);
       rollBack(connection);
       throw e;
     }

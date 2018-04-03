@@ -3,9 +3,8 @@ package app.dao.hibernate;
 import app.dao.interf.ApplicationDao;
 import app.model.Algorithm;
 import app.model.Application;
-import app.model.AreaOfUse;
 import app.model.Application_;
-
+import app.model.AreaOfUse;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -17,20 +16,17 @@ import java.util.Optional;
 
 public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   @Override
-  public Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse) {
-    Application application = new Application(algorithm, areaOfUse);
+  public void persist(Application application) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(application);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return application;
   }
 
-
-
   @Override
-  public Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
+  public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse)
+      throws Exception {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
@@ -45,17 +41,10 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) {
+  public void deleteApplication(Application application) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<Application> delete = builder.createCriteriaDelete(Application.class);
-    Root<Application> root = delete.from(Application.class);
-    delete.where(
-        builder.and(
-            builder.equal(root.get(Application_.algorithm), algorithm),
-            builder.equal(root.get(Application_.areaOfUse), areaOfUse)));
-    entityManager.createQuery(delete).executeUpdate();
+    entityManager.remove(entityManager.contains(application) ? application : entityManager.merge(application));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

@@ -46,7 +46,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public Algorithm createAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
-    Optional<DesignParadigm> paradigm = paradigmDao.findById(designParadigm.getId());
+    Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
     Optional<FieldOfStudy> field = fieldDao.getFieldById(fieldOfStudy.getId());
     Optional<Algorithm> algorithm = algorithmDao.getAlgorithmByName(name.trim());
     if (!paradigm.isPresent()) {
@@ -56,7 +56,9 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     } else if (algorithm.isPresent()) {
       throw new LogicException("Algorithm with this name is already present");
     }
-    return algorithmDao.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
+    Algorithm algorithm1 = new Algorithm(name, complexity, designParadigm, fieldOfStudy);
+    algorithmDao.persist(algorithm1);
+    return algorithm1;
   }
 
   @Override
@@ -103,7 +105,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void deleteAlgorithm(Algorithm algorithm) throws Exception {
-    algorithmDao.deleteById(algorithm.getId());
+    algorithmDao.delete(algorithm);
   }
 
   @Override
@@ -115,46 +117,40 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public DesignParadigm createDesignParadigm(String paradigmName, String description)
       throws Exception {
     Validate.isTrue(!StringUtils.isBlank(paradigmName));
-    if (paradigmDao.findByParadigm(paradigmName).isPresent()) {
+    if (paradigmDao.getParadigmByParadigm(paradigmName).isPresent()) {
       throw new SQLException("This design paradigm already exists");
     } else {
       DesignParadigm paradigm = new DesignParadigm(paradigmName, description);
-      paradigmDao.create(paradigm);
+      paradigmDao.persist(paradigm);
       return paradigm;
     }
   }
 
   @Override
   public List<DesignParadigm> getDesignParadigms() throws Exception {
-    return paradigmDao.getAll();
+    return paradigmDao.getAllParadigms();
   }
 
   @Override
   public Optional<DesignParadigm> getParadigmByName(String name) throws Exception {
-    return paradigmDao.findByParadigm(name);
+    return paradigmDao.getParadigmByParadigm(name);
+  }
+
+  @Override
+  public FieldOfStudy createFieldOfStudy(String fieldName) throws Exception {
+    return createFieldOfStudy(fieldName, null);
   }
 
   @Override
   public FieldOfStudy createFieldOfStudy(String fieldName, String fieldDescription)
       throws Exception {
-    if (StringUtils.isBlank(fieldDescription)) {
-      createFieldOfStudy(fieldName);
-    }
     Validate.isTrue(!StringUtils.isBlank(fieldName));
     if (fieldDao.getFieldByName(fieldName).isPresent()) {
       throw new LogicException("This field of study already exists");
     } else {
-      return fieldDao.createFieldOfStudy(fieldDescription, fieldDescription);
-    }
-  }
-
-  @Override
-  public FieldOfStudy createFieldOfStudy(String fieldName) throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(fieldName));
-    if (fieldDao.getFieldByName(fieldName).isPresent()) {
-      throw new LogicException("This field of study already exists");
-    } else {
-      return fieldDao.createFieldOfStudy(fieldName);
+      FieldOfStudy fieldOfStudy = new FieldOfStudy(fieldName, fieldDescription);
+      fieldDao.persist(fieldOfStudy);
+      return fieldOfStudy;
     }
   }
 
@@ -169,29 +165,19 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String newParadigm)
+  public DesignParadigm setParadigmName(DesignParadigm paradigm, String newParadigm)
       throws Exception {
-    logger.trace("Updating design paradigm {}, new name is {}", oldValue, newParadigm);
+    logger.trace("Updating design paradigm {}, new name is {}", paradigm, newParadigm);
     Validate.isTrue(!StringUtils.isBlank(newParadigm));
-    paradigmDao.updateDesignParadigm(newParadigm, oldValue.getId());
-    return new DesignParadigm(oldValue.getId(), newParadigm, oldValue.getDescription());
+    paradigmDao.setParadigm(paradigm, newParadigm);
+    return new DesignParadigm(paradigm.getId(), newParadigm, paradigm.getDescription());
   }
 
   @Override
-  public FieldOfStudy updateFieldName(FieldOfStudy field, String newField) throws Exception {
+  public FieldOfStudy setFieldName(FieldOfStudy field, String newField) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(newField));
-    fieldDao.updateFieldOfStudy(newField, field.getId());
+    fieldDao.setField(field, newField);
     return new FieldOfStudy(field.getId(), newField, field.getDescription());
-  }
-
-  @Override
-  public AreaOfUse createAreaOfUse(String area) throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(area));
-    if (areaDao.getAreaByName(area).isPresent()) {
-      throw new LogicException("There already exists an area of use with this name");
-    } else {
-      return areaDao.createAreaOfUse(area);
-    }
   }
 
   @Override
@@ -203,7 +189,9 @@ public class AlgorithmServiceImpl implements AlgorithmService {
       if (areaDao.getAreaByName(area).isPresent()) {
         throw new LogicException("There already exists an area of use with this name");
       } else {
-        return areaDao.createAreaOfUse(area, description);
+        AreaOfUse areaOfUse = new AreaOfUse(area, description);
+        areaDao.persist(areaOfUse);
+        return areaOfUse;
       }
     }
   }
@@ -211,6 +199,11 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   @Override
   public List<AreaOfUse> getAllAreas() throws Exception {
     return areaDao.getAllAreas();
+  }
+
+  @Override
+  public AreaOfUse createAreaOfUse(String area) throws Exception {
+    return createAreaOfUse(area, null);
   }
 
   @Override
@@ -225,24 +218,26 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void deleteAreaOfUse(AreaOfUse areaOfUse) throws Exception {
-    areaDao.deleteAreaOfUse(areaOfUse.getId());
+    areaDao.deleteAreaOfUse(areaOfUse);
   }
 
   @Override
   public void createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
-    if (applicationDao.containsApplication(algorithm, areaOfUse)) {
+    Application application = new Application(algorithm, areaOfUse);
+    if (applicationDao.containsApplication(application)) {
       throw new LogicException("This algorithm application does already exist");
     } else {
-      applicationDao.createApplication(algorithm, areaOfUse);
+      applicationDao.persist(application);
     }
   }
 
   @Override
   public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
-    if (!applicationDao.containsApplication(algorithm, areaOfUse)) {
+    Application application = new Application(algorithm, areaOfUse);
+    if (!applicationDao.containsApplication(application)) {
       throw new LogicException("This application didn't exist");
     } else {
-      applicationDao.deleteApplication(algorithm, areaOfUse);
+      applicationDao.deleteApplication(application);
     }
   }
 }

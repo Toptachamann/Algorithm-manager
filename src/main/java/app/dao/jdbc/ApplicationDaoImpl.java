@@ -73,26 +73,24 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse)
-      throws SQLException {
+  public void persist(Application application) throws SQLException {
     try {
-      createApp.setInt(1, algorithm.getId());
-      createApp.setInt(2, areaOfUse.getId());
+      createApp.setInt(1, application.getAlgorithm().getId());
+      createApp.setInt(2, application.getAreaOfUse().getId());
       logger.debug(() -> Util.format(createApp));
       createApp.executeUpdate();
-      int id = getLastId(connection);
+      application.setApplicationId(getLastId(connection));
       connection.commit();
-      return new Application(id, algorithm, areaOfUse);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to create application. Algorithm = {}, area = {}", algorithm, areaOfUse);
+      logger.error("Failed to persist application {}", application);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse)
+  public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException {
     try {
       getApplication.setInt(1, algorithm.getId());
@@ -111,19 +109,17 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws SQLException {
+  public void deleteApplication(Application application) throws SQLException {
     try {
-      deleteApplication.setInt(1, algorithm.getId());
-      deleteApplication.setInt(2, areaOfUse.getId());
+      deleteApplication.setInt(1, application.getAlgorithm().getId());
+      deleteApplication.setInt(2, application.getAreaOfUse().getId());
       logger.debug(() -> Util.format(deleteApplication));
       deleteApplication.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
-          "Failed to delete algorithm application, algorithm id = {}, areaId = {}",
-          algorithm,
-          areaOfUse);
+          "Failed to delete algorithm application {}", application);
       rollBack(connection);
       throw e;
     }

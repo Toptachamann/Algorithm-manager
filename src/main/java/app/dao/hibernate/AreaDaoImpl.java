@@ -25,19 +25,12 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public AreaOfUse createAreaOfUse(String area, String description) {
-    AreaOfUse areaOfUse = new AreaOfUse(area, description);
+  public void persist(AreaOfUse areaOfUse) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(areaOfUse);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return areaOfUse;
-  }
-
-  @Override
-  public AreaOfUse createAreaOfUse(String area) {
-    return createAreaOfUse(area, null);
   }
 
   @Override
@@ -69,15 +62,10 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void deleteAreaOfUse(int id) {
+  public void deleteAreaOfUse(AreaOfUse areaOfUse) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<AreaOfUse> delete = builder.createCriteriaDelete(AreaOfUse.class);
-    Root<AreaOfUse> root = delete.from(AreaOfUse.class);
-    entityManager
-        .createQuery(delete.where(builder.equal(root.get(AreaOfUse_.id), id)))
-        .executeUpdate();
+    entityManager.remove(entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

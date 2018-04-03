@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ReferenceDao {
 
-  Reference createReference(Algorithm algorithm, Book book) throws Exception;
+  void persist(Reference reference) throws Exception;
 
   Optional<Reference> getReference(Algorithm algorithm, Book book) throws Exception;
 
@@ -19,5 +19,5 @@ public interface ReferenceDao {
 
   List<Reference> getAlgorithmReferences(Algorithm algorithm) throws Exception;
 
-  void deleteReference(Algorithm algorithm, Book book) throws Exception;
+  void deleteReference(Reference reference) throws Exception;
 }

@@ -40,9 +40,9 @@ public interface AlgorithmService {
 
   void updateAlgorithmComplexity(Algorithm rowValue, String newComplexity) throws Exception;
 
-  DesignParadigm updateDesignParadigm(DesignParadigm oldValue, String paradigm) throws Exception;
+  DesignParadigm setParadigmName(DesignParadigm oldValue, String paradigm) throws Exception;
 
-  FieldOfStudy updateFieldName(FieldOfStudy newValue, String field) throws Exception;
+  FieldOfStudy setFieldName(FieldOfStudy newValue, String field) throws Exception;
 
   void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception;
 

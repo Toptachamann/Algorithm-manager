@@ -14,20 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class FieldDaoImpl extends AbstractDao implements FieldDao {
-  @Override
-  public FieldOfStudy createFieldOfStudy(String field) {
-    return createFieldOfStudy(field, null);
-  }
 
   @Override
-  public FieldOfStudy createFieldOfStudy(String field, String description) {
-    FieldOfStudy fieldOfStudy = new FieldOfStudy(field, description);
+  public void persist(FieldOfStudy fieldOfStudy) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(fieldOfStudy);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return fieldOfStudy;
   }
 
   @Override
@@ -71,7 +65,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void updateFieldOfStudy(String newName, int id) {
+  public void setField(FieldOfStudy fieldOfStudy, String newName) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -81,22 +75,17 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         .createQuery(
             criteria
                 .set(FieldOfStudy_.field, newName)
-                .where(builder.equal(root.get(FieldOfStudy_.id), id)))
+                .where(builder.equal(root.get(FieldOfStudy_.id), fieldOfStudy.getId())))
         .executeUpdate();
     entityManager.getTransaction().commit();
     entityManager.close();
   }
 
   @Override
-  public void deleteFieldOfStudy(int id) {
+  public void deleteFieldOfStudy(FieldOfStudy fieldOfStudy) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<FieldOfStudy> delete = builder.createCriteriaDelete(FieldOfStudy.class);
-    Root<FieldOfStudy> root = delete.from(FieldOfStudy.class);
-    entityManager
-        .createQuery(delete.where(builder.equal(root.get(FieldOfStudy_.id), id)))
-        .executeUpdate();
+    entityManager.remove(entityManager.contains(fieldOfStudy) ? fieldOfStudy : entityManager.merge(fieldOfStudy));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

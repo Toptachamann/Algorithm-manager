@@ -8,7 +8,6 @@ import app.model.Reference_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
@@ -16,18 +15,16 @@ import java.util.Optional;
 
 public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   @Override
-  public Reference createReference(Algorithm algorithm, Book book) {
-    Reference reference = new Reference(algorithm, book);
+  public void persist(Reference reference) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(reference);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return reference;
   }
 
   @Override
-  public Optional<Reference> getReference(Algorithm algorithm, Book book) throws Exception {
+  public Optional<Reference> getReference(Algorithm algorithm, Book book) {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Reference> query = builder.createQuery(Reference.class);
@@ -72,19 +69,11 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   }
 
   @Override
-  public void deleteReference(Algorithm algorithm, Book book) {
+  public void deleteReference(Reference reference) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<Reference> delete = builder.createCriteriaDelete(Reference.class);
-    Root<Reference> root = delete.from(Reference.class);
-    entityManager
-        .createQuery(
-            delete.where(
-                builder.and(
-                    builder.equal(root.get(Reference_.algorithm), algorithm),
-                    builder.equal(root.get(Reference_.book), book))))
-        .executeUpdate();
+    entityManager.remove(
+        entityManager.contains(reference) ? reference : entityManager.merge(reference));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

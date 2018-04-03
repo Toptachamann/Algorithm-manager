@@ -1,7 +1,6 @@
 package app.dao.interf;
 
 import app.model.Algorithm;
-import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 
@@ -10,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AlgorithmDao {
-  Algorithm createAlgorithm(
-      String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
-      throws SQLException;
+  void persist(Algorithm algorithm) throws SQLException;
 
   List<Algorithm> getAllAlgorithms() throws Exception;
 
@@ -30,5 +27,5 @@ public interface AlgorithmDao {
 
   void setFieldOfStudy(Algorithm algorithm, FieldOfStudy fieldOfStudy) throws Exception;
 
-  void deleteById(int id) throws Exception;
+  void delete(Algorithm algorithm) throws Exception;
 }

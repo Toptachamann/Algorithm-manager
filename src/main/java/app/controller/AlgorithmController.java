@@ -539,7 +539,7 @@ public class AlgorithmController extends AbstractController {
             algorithmService.setFieldOfStudy(rowAlgorithm, field.get());
             rowAlgorithm.setFieldOfStudy(field.get());
           } else {
-            FieldOfStudy fieldOfStudy = algorithmService.updateFieldName(oldValue, newFieldOfStudy);
+            FieldOfStudy fieldOfStudy = algorithmService.setFieldName(oldValue, newFieldOfStudy);
             AlgorithmController.this.updateTableView(
                 Algorithm.class,
                 algorithmTableView.getItems(),
@@ -649,7 +649,7 @@ public class AlgorithmController extends AbstractController {
             rowAlgorithm.setDesignParadigm(paradigm.get());
           } else {
             DesignParadigm designParadigm =
-                algorithmService.updateDesignParadigm(oldValue, newValue.getParadigm());
+                algorithmService.setParadigmName(oldValue, newValue.getParadigm());
             AlgorithmController.this.updateTableView(
                 Algorithm.class,
                 algorithmTableView.getItems(),

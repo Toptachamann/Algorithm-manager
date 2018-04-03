@@ -197,10 +197,10 @@ public class ReferenceController extends AbstractController {
             Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
             Book book = bookCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
-              info.setContentText("To create a reference to an algorithm select it first");
+              info.setContentText("To persist a reference to an algorithm select it first");
               info.showAndWait();
             } else if (book == null) {
-              info.setContentText("To create a reference you have to select a book");
+              info.setContentText("To persist a reference you have to select a book");
               info.showAndWait();
             } else {
               bookService.createReference(algorithm, book);

@@ -3,7 +3,6 @@ package app.dao.jdbc;
 import app.auxiliary.Util;
 import app.dao.interf.AlgorithmDao;
 import app.model.Algorithm;
-import app.model.AreaOfUse;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +24,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private PreparedStatement createAlgorithm;
   private PreparedStatement allAlgorithms;
   private PreparedStatement getAlgorithmByName;
-  private PreparedStatement getAlgorithmsByArea;
   private PreparedStatement setName;
   private PreparedStatement setComplexity;
   private PreparedStatement setParadigm;
@@ -44,8 +42,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
             + "    INNER JOIN field_of_study as fos ON algo_field_id = field_id)";
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgorithmByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
-    getAlgorithmsByArea =
-
     deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
     setParadigm =
         connection.prepareStatement(
@@ -66,22 +62,19 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public Algorithm createAlgorithm(
-      String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
-      throws SQLException {
+  public void persist(Algorithm algorithm) throws SQLException {
     try {
-      createAlgorithm.setString(1, name);
-      createAlgorithm.setString(2, complexity);
-      createAlgorithm.setInt(3, designParadigm.getId());
-      createAlgorithm.setInt(4, fieldOfStudy.getId());
+      createAlgorithm.setString(1, algorithm.getName());
+      createAlgorithm.setString(2, algorithm.getComplexity());
+      createAlgorithm.setInt(3, algorithm.getDesignParadigm().getId());
+      createAlgorithm.setInt(4, algorithm.getFieldOfStudy().getId());
       logger.debug(() -> Util.format(createAlgorithm));
       createAlgorithm.executeUpdate();
-      int id = getLastId(connection);
+      algorithm.setId(getLastId(connection));
       connection.commit();
-      return new Algorithm(id, name, complexity, designParadigm, fieldOfStudy);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to insert an algorithm {}", name);
+      logger.error("Failed to persist an algorithm {}", algorithm);
       super.rollBack(connection);
       throw e;
     }
@@ -146,15 +139,15 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public void deleteById(int id) throws SQLException {
+  public void delete(Algorithm algorithm) throws SQLException {
     try {
-      deleteById.setInt(1, id);
+      deleteById.setInt(1, algorithm.getId());
       logger.debug(() -> Util.format(deleteById));
       deleteById.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete an algorithm by id {}", id);
+      logger.error("Failed to delete an algorithm {}", algorithm);
       connection.rollback();
       throw e;
     }

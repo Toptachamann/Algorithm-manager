@@ -10,8 +10,6 @@ import org.apache.logging.log4j.Logger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
@@ -31,7 +29,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
 
   @Override
   public Optional<Author> getAuthor(String firstName, String lastName) throws SQLException {
-    List<Author> authors = new ArrayList<>();
     getAuthorByName.setString(1, firstName);
     getAuthorByName.setString(2, lastName);
     logger.debug(() -> Util.format(getAuthorByName));
@@ -42,18 +39,17 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public Author createAuthor(String firstName, String lastName) throws SQLException {
+  public void persist(Author author) throws SQLException {
     try {
-      insertAuthor.setString(1, firstName);
-      insertAuthor.setString(2, lastName);
+      insertAuthor.setString(1, author.getFirstName());
+      insertAuthor.setString(2, author.getLastName());
       logger.debug(() -> Util.format(insertAuthor));
       insertAuthor.executeUpdate();
       connection.commit();
-      return new Author(getLastId(connection), firstName, lastName);
+      author.setId(getLastId(connection));
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create author with first name {} and last name {}", firstName, lastName);
+      logger.error("Failed to persist author {}", author);
       rollBack(connection);
       throw e;
     }

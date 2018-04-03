@@ -9,15 +9,15 @@ import java.util.Optional;
 
 public interface ApplicationDao {
 
-  Application createApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
+  void persist(Application application) throws Exception;
 
-  default boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
-    return getApplication(algorithm, areaOfUse).isPresent();
+  default boolean containsApplication(Application application) throws Exception {
+    return getApplicationOf(application.getAlgorithm(), application.getAreaOfUse()).isPresent();
   }
 
-  Optional<Application> getApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
+  Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  void deleteApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
+  void deleteApplication(Application application) throws Exception;
 
   List<Application> getApplicationsByArea(AreaOfUse area) throws Exception;
 

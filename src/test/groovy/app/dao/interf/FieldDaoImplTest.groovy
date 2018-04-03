@@ -1,5 +1,6 @@
 package app.dao.interf
 
+import app.model.FieldOfStudy
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -15,18 +16,19 @@ class FieldDaoImplTest extends Specification {
   @Unroll
   def "test field creation by name"() {
     when:
-    def created = fieldDao.createFieldOfStudy(name)
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
     then:
-    fieldDao.containsFieldOfStudy(created.getId())
+    fieldDao.containsFieldOfStudy(fieldOfStudy.getId())
     fieldDao.containsFieldOfStudy(name)
-    created.getField() == name
-    created.getDescription() == null
+    fieldOfStudy.getField() == name
+    fieldOfStudy.getDescription() == null
     def optField = fieldDao.getFieldByName(name)
     optField.isPresent()
     def field = optField.get()
-    field == created
+    field == fieldOfStudy
     cleanup:
-    fieldDao.deleteFieldOfStudy(created.getId())
+    fieldDao.deleteFieldOfStudy(fieldOfStudy)
     where:
     fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
@@ -34,20 +36,21 @@ class FieldDaoImplTest extends Specification {
   @Unroll
   def "test field creation by name and description"() {
     when:
-    def created = fieldDao.createFieldOfStudy(name, description)
+    def fieldOfStudy = new FieldOfStudy(name, description);
+    fieldDao.persist(fieldOfStudy)
     then:
-    created.getField() == name
-    created.getDescription() == description
+    fieldOfStudy.getField() == name
+    fieldOfStudy.getDescription() == description
     fieldDao.containsFieldOfStudy(name)
-    fieldDao.containsFieldOfStudy(created.getId())
+    fieldDao.containsFieldOfStudy(fieldOfStudy.getId())
     def optField = fieldDao.getFieldByName(name)
     optField.isPresent()
     def field = optField.get()
     field.getField() == name
     field.getDescription() == description
-    field.getId() == created.getId()
+    field.getId() == fieldOfStudy.getId()
     cleanup:
-    fieldDao.deleteFieldOfStudy(field.getId())
+    fieldDao.deleteFieldOfStudy(fieldOfStudy)
     where:
     fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }
@@ -55,9 +58,10 @@ class FieldDaoImplTest extends Specification {
   @Unroll
   def "test field deletion"() {
     setup:
-    def created = fieldDao.createFieldOfStudy(name)
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
     when:
-    fieldDao.deleteFieldOfStudy(created.getId())
+    fieldDao.deleteFieldOfStudy(fieldOfStudy)
     then:
     !fieldDao.containsFieldOfStudy(name)
     where:
@@ -67,14 +71,15 @@ class FieldDaoImplTest extends Specification {
   @Unroll
   def "test field update"() {
     setup:
-    def created = fieldDao.createFieldOfStudy(name)
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
     when:
-    fieldDao.updateFieldOfStudy(updated, created.getId())
+    fieldDao.setField(fieldOfStudy, updated)
     then:
     !fieldDao.containsFieldOfStudy(name)
     fieldDao.containsFieldOfStudy(updated)
     cleanup:
-    fieldDao.deleteFieldOfStudy(created.getId())
+    fieldDao.deleteFieldOfStudy(fieldOfStudy)
     where:
     fieldDao << [new app.dao.jdbc.FieldDaoImpl(), new app.dao.jdbc.FieldDaoImpl()]
   }

@@ -33,12 +33,16 @@ public class BookServiceImpl implements BookService {
   public Book createBook(String title, Integer volume, Integer edition, List<Author> authors)
       throws Exception {
     fixIds(authors);
-    return bookDao.createBook(title, volume, edition, authors);
+    Book book = new Book(title, volume, edition, authors);
+    bookDao.persist(book);
+    return book;
   }
 
   @Override
   public Author createAuthor(String firstName, String lastName) throws Exception {
-    return authorDao.createAuthor(firstName, lastName);
+    Author author = new Author(firstName, lastName);
+    authorDao.persist(author);
+    return author;
   }
 
   @Override
@@ -59,8 +63,7 @@ public class BookServiceImpl implements BookService {
       if (optionalAuthor.isPresent()) {
         author.setId(optionalAuthor.get().getId());
       } else {
-        Author created = authorDao.createAuthor(author.getFirstName(), author.getLastName());
-        author.setId(created.getId());
+        authorDao.persist(author);
       }
     }
   }
@@ -98,11 +101,13 @@ public class BookServiceImpl implements BookService {
   }
 
   @Override
-  public void createReference(Algorithm algorithm, Book book) throws Exception {
+  public Reference createReference(Algorithm algorithm, Book book) throws Exception {
     if (referenceDao.containsReference(algorithm, book)) {
       throw new LogicException("This reference already exists");
     } else {
-      referenceDao.createReference(algorithm, book);
+      Reference reference = new Reference(algorithm, book);
+      referenceDao.persist(reference);
+      return reference;
     }
   }
 
@@ -116,7 +121,7 @@ public class BookServiceImpl implements BookService {
     if (!referenceDao.containsReference(algorithm, book)) {
       throw new LogicException("This reference doesn't exist");
     } else {
-      referenceDao.deleteReference(algorithm, book);
+      referenceDao.deleteReference(new Reference(algorithm, book));
     }
   }
 }

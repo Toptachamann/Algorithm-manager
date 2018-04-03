@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,11 +16,13 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BookDaoImpl extends AbstractDao implements BookDao {
   private static final Logger logger = LogManager.getLogger("app.dao.jdbc.BookDaoImpl");
 
   private PreparedStatement allBooks;
+  private PreparedStatement bookById;
   private PreparedStatement createBook;
   private PreparedStatement setTitle;
   private PreparedStatement setVolume;
@@ -39,6 +40,14 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
                 + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
                 + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
                 + "ORDER BY book_id, author_id");
+    bookById = connection.prepareStatement("SELECT \n"
+        + "    book_id, title, volume, edition, author_id, first_name, last_name\n"
+        + "FROM\n"
+        + "    ((book\n"
+        + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
+        + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
+        + "WHERE book_id = ?"
+        + "ORDER BY book_id, author_id");
     createBook =
         connection.prepareStatement("INSERT INTO book (title, volume, edition) VALUE (?, ?, ?)");
     deleteBook = connection.prepareStatement("DELETE FROM book WHERE book_id = ?");
@@ -51,30 +60,23 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public Book createBook(
-      String title, @Nullable Integer volume, Integer edition, List<Author> authors)
-      throws SQLException {
+  public void persist(Book book) throws SQLException {
     try {
-      createBook.setString(1, title.trim());
-      if (volume == null) {
+      createBook.setString(1,book.getTitle());
+      if (book.getVolume() == null) {
         createBook.setNull(2, Types.INTEGER);
       } else {
-        createBook.setInt(2, volume);
+        createBook.setInt(2, book.getVolume());
       }
-      createBook.setInt(3, edition);
+      createBook.setInt(3, book.getEdition());
       createBook.executeUpdate();
-      int bookId = getLastId(connection);
-      addAuthorsToBook(bookId, authors);
+      book.setId(getLastId(connection));
+      addAuthorsToBook(book.getId(), book.getAuthors());
       connection.commit();
-      return new Book(bookId, title, volume, edition, authors);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
-          "Failed to create a book: title = {}, volume = {}, edition = {}, authors = {}",
-          title,
-          String.valueOf(volume),
-          edition,
-          authors.toString());
+          "Failed to persist a book {}", book);
       rollBack(connection);
       throw e;
     }
@@ -139,6 +141,18 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       String query = builder.toString();
       logger.debug(() -> Util.format(query));
       return logger.traceExit(booksFromSet(statement.executeQuery(query)));
+    }
+  }
+
+  @Override
+  public Optional<Book> getBookById(int id) throws SQLException {
+    bookById.setInt(1, id);
+    logger.debug(()->Util.format(bookById));
+    ResultSet set = bookById.executeQuery();
+    if(set.next()){
+      return Optional.of(booksFromSet(set).get(0));
+    }else{
+      return Optional.empty();
     }
   }
 

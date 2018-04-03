@@ -29,7 +29,7 @@ public interface BookService {
 
   List<Author> setAuthors(Book book, List<Author> authors) throws Exception;
 
-  void createReference(Algorithm algorithm, Book book) throws Exception;
+  Reference createReference(Algorithm algorithm, Book book) throws Exception;
 
   List<Reference> getReferences(Algorithm algorithm) throws Exception;
 

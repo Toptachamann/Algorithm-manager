@@ -1,5 +1,6 @@
 package app.dao.interf
 
+import app.model.Author
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -12,24 +13,26 @@ class AuthorDaoTest extends Specification {
 
   def "test author creation"() {
     given:
-    def created = authorDao.createAuthor(firstName, lastName)
+    def author = new Author(firstName, lastName)
+    authorDao.persist(author)
     expect:
     authorDao.containsAuthor(firstName, lastName)
     def optAuthor = authorDao.getAuthor(firstName, lastName)
     optAuthor.isPresent()
-    optAuthor.get() == created
+    optAuthor.get() == author
     cleanup:
-    authorDao.deleteAuthor(created)
+    authorDao.deleteAuthor(author)
     where:
     authorDao << [new app.dao.jdbc.AuthorDaoImpl(), new app.dao.hibernate.AuthorDaoImpl()]
   }
 
   def "test author deletion"(){
     given:
-    def created = authorDao.createAuthor(firstName, lastName)
+    def author = new Author(firstName, lastName)
+    authorDao.persist(author)
     expect:
     authorDao.containsAuthor(firstName, lastName)
-    authorDao.deleteAuthor(created)
+    authorDao.deleteAuthor(author)
     !authorDao.containsAuthor(firstName, lastName)
     !authorDao.getAuthor(firstName, lastName).isPresent()
     where:

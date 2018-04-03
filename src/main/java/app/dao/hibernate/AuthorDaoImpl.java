@@ -14,25 +14,19 @@ import java.util.Optional;
 
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   @Override
-  public Author createAuthor(String firstName, String lastName) {
-    Author author = new Author(firstName, lastName);
+  public void persist(Author author) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(author);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return author;
   }
 
   @Override
   public void deleteAuthor(Author author) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<Author> delete = builder.createCriteriaDelete(Author.class);
-    Root<Author> root = delete.from(Author.class);
-    delete.where(builder.equal(root.get(Author_.id), author.getId()));
-    entityManager.createQuery(delete).executeUpdate();
+    entityManager.remove(entityManager.contains(author) ? author : entityManager.merge(author));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

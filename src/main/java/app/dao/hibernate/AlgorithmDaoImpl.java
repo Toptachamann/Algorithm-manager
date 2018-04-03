@@ -3,15 +3,13 @@ package app.dao.hibernate;
 import app.auxiliary.Util;
 import app.dao.interf.AlgorithmDao;
 import app.model.Algorithm;
+import app.model.Algorithm_;
 import app.model.DesignParadigm;
 import app.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
-import app.model.Algorithm_;
-
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
@@ -22,15 +20,12 @@ import java.util.Optional;
 
 public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   @Override
-  public Algorithm createAlgorithm(
-      String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy) {
-    Algorithm algorithm = new Algorithm(name, complexity, designParadigm, fieldOfStudy);
+  public void persist(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.persist(algorithm);
     entityManager.getTransaction().commit();
     entityManager.close();
-    return algorithm;
   }
 
   @Override
@@ -140,14 +135,11 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public void deleteById(int id) {
+  public void delete(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaDelete<Algorithm> delete = builder.createCriteriaDelete(Algorithm.class);
-    Root<Algorithm> root = delete.from(Algorithm.class);
-    delete.where(builder.equal(root.get(Algorithm_.id), id));
-    entityManager.createQuery(delete).executeUpdate();
+    entityManager.remove(
+        entityManager.contains(algorithm) ? algorithm : entityManager.merge(algorithm));
     entityManager.getTransaction().commit();
     entityManager.close();
   }

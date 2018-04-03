@@ -49,19 +49,17 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   }
 
   @Override
-  public Reference createReference(Algorithm algorithm, Book book) throws SQLException {
+  public void persist(Reference reference) throws SQLException {
     try {
-      createReference.setInt(1, algorithm.getId());
-      createReference.setInt(2, book.getId());
+      createReference.setInt(1, reference.getAlgorithm().getId());
+      createReference.setInt(2, reference.getBook().getId());
       logger.debug(() -> Util.format(createReference));
       createReference.executeUpdate();
-      int id = getLastId(connection);
+      reference.setReferenceId(getLastId(connection));
       connection.commit();
-      return new Reference(id, algorithm, book);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to create reference with algorithm_id = {} and book_id = {}", algorithm, book);
+      logger.error("Failed to persist reference {}", reference);
       rollBack(connection);
       throw e;
     }
@@ -97,17 +95,16 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   }
 
   @Override
-  public void deleteReference(Algorithm algorithm, Book book) throws SQLException {
+  public void deleteReference(Reference reference) throws SQLException {
     try {
-      deleteReference.setInt(1, algorithm.getId());
-      deleteReference.setInt(2, book.getId());
+      deleteReference.setInt(1, reference.getAlgorithm().getId());
+      deleteReference.setInt(2, reference.getBook().getId());
       logger.debug(() -> Util.format(deleteReference));
       deleteReference.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to delete reference with algorithm_id = {} and book_id = {}", algorithm, book);
+      logger.error("Failed to delete reference {}", reference);
       rollBack(connection);
       throw e;
     }

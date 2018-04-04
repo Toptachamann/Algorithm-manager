@@ -24,7 +24,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     entityManager.getTransaction().begin();
     entityManager.persist(algorithm);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -34,7 +33,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     CriteriaQuery<Algorithm> query = builder.createQuery(Algorithm.class);
     query.from(Algorithm.class);
     List<Algorithm> result = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return result;
   }
 
@@ -48,7 +46,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
         entityManager
             .createQuery(query.where(builder.equal(root.get(Algorithm_.name), name)))
             .getResultList();
-    entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
@@ -77,7 +74,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
     query.where(predicates.toArray(new Predicate[] {}));
     List<Algorithm> result = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return result;
   }
 
@@ -87,7 +83,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     entityManager.getTransaction().begin();
     entityManager.merge(algorithm);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -100,6 +95,5 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       entityManager.remove(entityManager.merge(algorithm));
     }
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 }

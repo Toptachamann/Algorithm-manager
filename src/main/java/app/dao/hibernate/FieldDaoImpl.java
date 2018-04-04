@@ -21,7 +21,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     entityManager.getTransaction().begin();
     entityManager.persist(fieldOfStudy);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -29,7 +28,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<FieldOfStudy> criteriaQuery = builder.createQuery(FieldOfStudy.class);
-    entityManager.close();
     return entityManager
         .createQuery(criteriaQuery.select(criteriaQuery.from(FieldOfStudy.class)))
         .getResultList();
@@ -46,7 +44,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
             .createQuery(
                 criteria.select(root).where(builder.equal(root.get(FieldOfStudy_.field), name)))
             .getResultList();
-    entityManager.close();
     return fields.size() == 1 ? Optional.of(fields.get(0)) : Optional.empty();
   }
 
@@ -60,7 +57,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         entityManager
             .createQuery(criteria.select(root).where(builder.equal(root.get(FieldOfStudy_.id), id)))
             .getResultList();
-    entityManager.close();
     return fields.size() == 1 ? Optional.of(fields.get(0)) : Optional.empty();
   }
 
@@ -78,7 +74,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
                 .where(builder.equal(root.get(FieldOfStudy_.id), fieldOfStudy.getId())))
         .executeUpdate();
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -87,6 +82,5 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(fieldOfStudy) ? fieldOfStudy : entityManager.merge(fieldOfStudy));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 }

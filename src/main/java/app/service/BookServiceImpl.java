@@ -71,7 +71,8 @@ public class BookServiceImpl implements BookService {
   @Override
   public void updateTitle(Book book, String newValue) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(newValue));
-    bookDao.setTitle(book, newValue);
+    book.setTitle(newValue);
+    bookDao.merge(book);
   }
 
   @Override
@@ -79,19 +80,22 @@ public class BookServiceImpl implements BookService {
     if (volume != null) {
       Validate.isTrue(volume > 0);
     }
-    bookDao.setVolume(book, volume);
+    book.setVolume(volume);
+    bookDao.merge(book);
   }
 
   @Override
   public void updateEdition(Book book, Integer edition) throws Exception {
     Validate.isTrue(edition > 0);
-    bookDao.setEdition(book, edition);
+    book.setEdition(edition);
+    bookDao.merge(book);
   }
 
   @Override
   public List<Author> setAuthors(Book book, List<Author> newValue) throws Exception {
     fixIds(newValue);
-    bookDao.setAuthors(book, newValue);
+    book.setAuthors(newValue);
+    bookDao.merge(book);
     return newValue;
   }
 

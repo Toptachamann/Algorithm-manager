@@ -21,12 +21,10 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     entityManager.getTransaction().begin();
     entityManager.persist(application);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
-  public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse)
-      throws Exception {
+  public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse) {
     EntityManager entityManager = getEntityManager();
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
@@ -36,7 +34,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
             builder.equal(root.get(Application_.algorithm), algorithm),
             builder.equal(root.get(Application_.areaOfUse), areaOfUse)));
     List<Application> result = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
@@ -46,7 +43,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(application) ? application : entityManager.merge(application));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -57,7 +53,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     Root<Application> root = query.from(Application.class);
     query.where(builder.equal(root.get(Application_.areaOfUse), area));
     List<Application> result = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return result;
   }
 
@@ -69,7 +64,6 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     Root<Application> root = query.from(Application.class);
     query.where(builder.equal(root.get(Application_.algorithm), algorithm));
     List<Application> applications = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return applications;
   }
 }

@@ -20,7 +20,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     CriteriaQuery<AreaOfUse> query = builder.createQuery(AreaOfUse.class);
     query.from(AreaOfUse.class);
     List<AreaOfUse> areas = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return areas;
   }
 
@@ -30,7 +29,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     entityManager.getTransaction().begin();
     entityManager.persist(areaOfUse);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -43,7 +41,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
         entityManager
             .createQuery(query.where(builder.equal(root.get(AreaOfUse_.id), id)))
             .getResultList();
-    entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
@@ -57,7 +54,6 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
         entityManager
             .createQuery(query.where(builder.equal(root.get(AreaOfUse_.areaOfUse), name)))
             .getResultList();
-    entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
@@ -67,6 +63,5 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 }

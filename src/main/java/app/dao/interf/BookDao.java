@@ -20,15 +20,7 @@ public interface BookDao {
     return getBookById(book.getId()).isPresent();
   }
 
-  void setTitle(Book book, String title) throws Exception;
-
-  void setVolume(Book book, Integer volume) throws Exception;
-
-  void setEdition(Book book, int edition) throws Exception;
+  void merge(Book book) throws Exception;
 
   void deleteBook(Book book) throws Exception;
-
-  void addAuthors(Book book, List<Author> authors) throws Exception;
-
-  void setAuthors(Book book, List<Author> authors) throws Exception;
 }

@@ -21,14 +21,13 @@ import java.util.Optional;
 public class BookDaoImpl extends AbstractDao implements BookDao {
   private static final Logger logger = LogManager.getLogger("app.dao.jdbc.BookDaoImpl");
 
+  private PreparedStatement createBook;
   private PreparedStatement allBooks;
   private PreparedStatement bookById;
-  private PreparedStatement createBook;
-  private PreparedStatement setTitle;
-  private PreparedStatement setVolume;
-  private PreparedStatement setEdition;
-  private PreparedStatement deleteBook;
+  private PreparedStatement bookAuthors;
+  private PreparedStatement mergeBook;
   private PreparedStatement resetAuthors;
+  private PreparedStatement deleteBook;
 
   public BookDaoImpl() throws SQLException {
     allBooks =
@@ -40,20 +39,19 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
                 + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
                 + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
                 + "ORDER BY book_id, author_id");
-    bookById = connection.prepareStatement("SELECT \n"
-        + "    book_id, title, volume, edition, author_id, first_name, last_name\n"
-        + "FROM\n"
-        + "    ((book\n"
-        + "    INNER JOIN textbook ON book_id = txtbk_book_id)\n"
-        + "    INNER JOIN author ON txtbk_author_id = author_id)\n"
-        + "WHERE book_id = ?"
-        + "ORDER BY book_id, author_id");
+    bookById =
+        connection.prepareStatement(
+            "SELECT book_id, title, volume, edition FROM book WHERE book_id = ?");
+    bookAuthors =
+        connection.prepareStatement(
+            "SELECT author_id, first_name, last_name FROM author "
+                + "inner join textbook on author.author_id = textbook.txtbk_author_id WHERE textbook.txtbk_author_id = ?");
+    mergeBook =
+        connection.prepareStatement(
+            "UPDATE book SET title = ?, volume = ?, edition = ? WHERE author_id = ?");
     createBook =
         connection.prepareStatement("INSERT INTO book (title, volume, edition) VALUE (?, ?, ?)");
     deleteBook = connection.prepareStatement("DELETE FROM book WHERE book_id = ?");
-    setTitle = connection.prepareStatement("UPDATE book SET title = ? WHERE book_id = ?");
-    setVolume = connection.prepareStatement("UPDATE book SET volume = ? WHERE book_id = ?");
-    setEdition = connection.prepareStatement("UPDATE book SET edition = ? WHERE book_id = ?");
     resetAuthors =
         connection.prepareStatement(
             "DELETE FROM algorithms.textbook WHERE algorithms.textbook.txtbk_book_id = ?");
@@ -62,7 +60,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   @Override
   public void persist(Book book) throws SQLException {
     try {
-      createBook.setString(1,book.getTitle());
+      createBook.setString(1, book.getTitle());
       if (book.getVolume() == null) {
         createBook.setNull(2, Types.INTEGER);
       } else {
@@ -71,12 +69,11 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       createBook.setInt(3, book.getEdition());
       createBook.executeUpdate();
       book.setId(getLastId(connection));
-      addAuthorsToBook(book.getId(), book.getAuthors());
+      addAuthorsToBook(book, book.getAuthors());
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error(
-          "Failed to persist a book {}", book);
+      logger.error("Failed to persist a book {}", book);
       rollBack(connection);
       throw e;
     }
@@ -147,62 +144,39 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   @Override
   public Optional<Book> getBookById(int id) throws SQLException {
     bookById.setInt(1, id);
-    logger.debug(()->Util.format(bookById));
+    logger.debug(() -> Util.format(bookById));
     ResultSet set = bookById.executeQuery();
-    if(set.next()){
-      return Optional.of(booksFromSet(set).get(0));
-    }else{
+    if (set.next()) {
+      Integer volume = set.getInt(3);
+      if (set.wasNull()) {
+        volume = null;
+      }
+      Book book = new Book(set.getInt(1), set.getString(2), volume, set.getInt(4));
+      book.setAuthors(getBookAuthors(book));
+      return Optional.of(book);
+    } else {
       return Optional.empty();
     }
   }
 
   @Override
-  public void setTitle(Book book, String title) throws SQLException {
+  public void merge(Book book) throws SQLException {
     try {
-      setTitle.setString(1, title);
-      setTitle.setInt(2, book.getId());
-      logger.debug(() -> Util.format(setTitle));
-      setTitle.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set title {} to book {}", title, book);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void setVolume(Book book, Integer volume) throws SQLException {
-    try {
-      if (volume == null) {
-        setVolume.setNull(1, Types.INTEGER);
+      mergeBook.setString(1, book.getTitle());
+      if (book.getVolume() == null) {
+        mergeBook.setNull(2, Types.INTEGER);
       } else {
-        setVolume.setInt(1, volume);
+        mergeBook.setInt(2, book.getVolume());
       }
-      setVolume.setInt(2, book.getId());
-      logger.debug(() -> Util.format(setVolume));
-      setVolume.executeUpdate();
+      mergeBook.setInt(1, book.getEdition());
+      mergeBook.setInt(4, book.getId());
+      mergeBook.executeUpdate();
+      resetAuthors(book);
+      addAuthorsToBook(book, book.getAuthors());
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to set volume {} to book {}", volume, book);
-      rollBack(connection);
-      throw e;
-    }
-  }
-
-  @Override
-  public void setEdition(Book book, int edition) throws SQLException {
-    try {
-      setEdition.setInt(1, edition);
-      setEdition.setInt(2, book.getId());
-      logger.debug(() -> Util.format(setEdition));
-      setEdition.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set edition {} to book {}", edition, book);
+      logger.error("Failed to merge book {}", book);
       rollBack(connection);
       throw e;
     }
@@ -223,14 +197,14 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  private void addAuthorsToBook(int bookId, List<Author> authors) throws SQLException {
+  private void addAuthorsToBook(Book book, List<Author> authors) throws SQLException {
     if (authors.size() > 0) {
       StringBuilder builder =
           new StringBuilder("INSERT INTO textbook (txtbk_book_id, txtbk_author_id) VALUES ");
       for (Author author : authors) {
         builder
             .append("(")
-            .append(bookId)
+            .append(book.getId())
             .append(", ")
             .append(author.getId())
             .append(")")
@@ -243,29 +217,25 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
-  public void addAuthors(Book book, List<Author> authors) throws SQLException {
-    try {
-      addAuthorsToBook(book.getId(), authors);
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to add authors {} to book {}", authors.toString(), book);
-      rollBack(connection);
-      throw e;
+  private List<Author> getBookAuthors(Book book) throws SQLException {
+    bookAuthors.setInt(1, book.getId());
+    logger.debug(() -> Util.format(bookAuthors));
+    ResultSet set = bookAuthors.executeQuery();
+    List<Author> result = new ArrayList<>();
+    while (set.next()) {
+      result.add(new Author(set.getInt(1), set.getString(2), set.getString(3)));
     }
+    return result;
   }
 
-  @Override
-  public void setAuthors(Book book, List<Author> authors) throws SQLException {
+  private void resetAuthors(Book book) throws SQLException {
     try {
       resetAuthors.setInt(1, book.getId());
       logger.debug(() -> Util.format(resetAuthors));
       resetAuthors.executeUpdate();
-      addAuthors(book, authors);
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to set authors {} to book {}", authors, book);
+      logger.error("Failed to reset authors of the book", book);
       rollBack(connection);
       throw e;
     }

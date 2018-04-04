@@ -9,6 +9,7 @@ import app.model.DesignParadigm
 import app.model.FieldOfStudy
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class ReferenceDaoImplTest extends Specification {
   @Shared
@@ -24,7 +25,20 @@ class ReferenceDaoImplTest extends Specification {
   @Shared
   def field = new FieldOfStudy("test field of study")
   @Shared
-  def testAlgorithm = new Algorithm("test name", "test complexity", paradigm, field)
+  def testAlgorithm
 
+  def setup(){
+    testAlgorithm = new Algorithm("test name", "test complexity", paradigm, field)
+  }
+
+  @Unroll
+  def "test reference creation"(){
+
+  }
+
+  @Unroll
+  def "test reference deletion"(){
+
+  }
 
 }

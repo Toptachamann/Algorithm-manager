@@ -23,7 +23,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     entityManager.getTransaction().begin();
     entityManager.persist(paradigm);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -35,7 +34,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
         entityManager
             .createQuery(criteria.select(criteria.from(DesignParadigm.class)))
             .getResultList();
-    entityManager.close();
     return paradigms;
   }
 
@@ -50,7 +48,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
             .createQuery(
                 criteria.select(root).where(builder.equal(root.get(DesignParadigm_.id), id)))
             .getResultList();
-    entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
@@ -67,7 +64,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
                     .select(root)
                     .where(builder.equal(root.get(DesignParadigm_.paradigm), paradigm)))
             .getResultList();
-    entityManager.close();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
@@ -77,7 +73,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(paradigm) ? paradigm : entityManager.merge(paradigm));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -94,6 +89,5 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
                 .where(builder.equal(root.get(DesignParadigm_.id), paradigm.getId())))
         .executeUpdate();
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 }

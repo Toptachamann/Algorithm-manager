@@ -3,6 +3,7 @@ package app.dao.interf
 import app.model.Author
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class AuthorDaoTest extends Specification {
   @Shared
@@ -14,7 +15,7 @@ class AuthorDaoTest extends Specification {
   @Shared
   def hibernateDao = new app.dao.hibernate.AuthorDaoImpl()
 
-
+  @Unroll
   def "test author creation"() {
     given:
     def author = new Author(firstName, lastName)
@@ -30,6 +31,7 @@ class AuthorDaoTest extends Specification {
     authorDao << [jdbcDao, hibernateDao]
   }
 
+  @Unroll
   def "test author deletion"(){
     given:
     def author = new Author(firstName, lastName)

@@ -20,7 +20,6 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     entityManager.getTransaction().begin();
     entityManager.persist(reference);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -34,7 +33,6 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
             builder.equal(root.get(Reference_.algorithm), algorithm),
             builder.equal(root.get(Reference_.book), book)));
     List<Reference> references = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return references.isEmpty() ? Optional.empty() : Optional.of(references.get(0));
   }
 
@@ -52,7 +50,6 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
                         builder.equal(root.get(Reference_.algorithm), algorithm),
                         builder.equal(root.get(Reference_.book), book))))
             .getResultList();
-    entityManager.close();
     return result.size() == 1;
   }
 
@@ -64,7 +61,6 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     Root<Reference> root = query.from(Reference.class);
     query.where(builder.equal(root.get(Reference_.algorithm), algorithm));
     List<Reference> references = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return references;
   }
 
@@ -75,6 +71,5 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     entityManager.remove(
         entityManager.contains(reference) ? reference : entityManager.merge(reference));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 }

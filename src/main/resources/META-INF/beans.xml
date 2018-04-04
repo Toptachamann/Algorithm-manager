@@ -4,11 +4,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="algorithmDao" class="app.dao.jdbc.AlgorithmDaoImpl"/>
-    <bean id="paradigmDao" class="app.dao.jdbc.ParadigmDaoImpl"/>
-    <bean id="fieldDao" class="app.dao.jdbc.FieldDaoImpl"/>
-    <bean id="areaDao" class="app.dao.jdbc.AreaDaoImpl"/>
-    <bean id="applicationDao" class="app.dao.jdbc.ApplicationDaoImpl"/>
+    <bean id="abstractDao" class="app.dao.hibernate.AbstractDao" abstract="true" destroy-method="cleanUp"/>
+
+    <bean id="algorithmDao" class="app.dao.hibernate.AlgorithmDaoImpl" parent="abstractDao"/>
+    <bean id="paradigmDao" class="app.dao.hibernate.ParadigmDaoImpl" parent="abstractDao"/>
+    <bean id="fieldDao" class="app.dao.hibernate.FieldDaoImpl" parent="abstractDao"/>
+    <bean id="areaDao" class="app.dao.hibernate.AreaDaoImpl" parent="abstractDao"/>
+    <bean id="applicationDao" class="app.dao.hibernate.ApplicationDaoImpl" parent="abstractDao"/>
 
     <bean id="algorithmService" class="app.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="algorithmDao"/>
@@ -23,9 +25,9 @@
     </bean>
 
 
-    <bean id="bookDao" class="app.dao.jdbc.BookDaoImpl"/>
-    <bean id="authorDao" class="app.dao.jdbc.AuthorDaoImpl"/>
-    <bean id="referenceDao" class="app.dao.jdbc.ReferenceDaoImpl"/>
+    <bean id="bookDao" class="app.dao.hibernate.BookDaoImpl" parent="abstractDao"/>
+    <bean id="authorDao" class="app.dao.hibernate.AuthorDaoImpl" parent="abstractDao"/>
+    <bean id="referenceDao" class="app.dao.hibernate.ReferenceDaoImpl" parent="abstractDao"/>
     <bean id="bookService" class="app.service.BookServiceImpl">
         <constructor-arg name="bookDao" ref="bookDao"/>
         <constructor-arg name="authorDao" ref="authorDao"/>

@@ -20,7 +20,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
     entityManager.getTransaction().begin();
     entityManager.persist(author);
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -29,7 +28,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(author) ? author : entityManager.merge(author));
     entityManager.getTransaction().commit();
-    entityManager.close();
   }
 
   @Override
@@ -43,7 +41,6 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
             builder.equal(root.get(Author_.firstName), firstName),
             builder.equal(root.get(Author_.lastName), lastName)));
     List<Author> result = entityManager.createQuery(query).getResultList();
-    entityManager.close();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 }

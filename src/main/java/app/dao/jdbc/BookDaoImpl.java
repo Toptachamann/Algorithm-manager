@@ -45,7 +45,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     bookAuthors =
         connection.prepareStatement(
             "SELECT author_id, first_name, last_name FROM author "
-                + "inner join textbook on author.author_id = textbook.txtbk_author_id WHERE textbook.txtbk_author_id = ?");
+                + "inner join textbook on author.author_id = textbook.txtbk_author_id WHERE textbook.txtbk_book_id = ?");
     mergeBook =
         connection.prepareStatement(
             "UPDATE book SET title = ?, volume = ?, edition = ? WHERE author_id = ?");

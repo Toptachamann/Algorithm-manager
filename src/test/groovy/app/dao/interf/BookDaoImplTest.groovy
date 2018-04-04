@@ -21,13 +21,13 @@ class BookDaoImplTest extends Specification {
     def author2 = new Author("test first name 2", "test last name 2")
     authors = [author1, author2]
     for(Author author : authors){
-      authorDao.persist(author);
+      authorDao.persist(author)
     }
   }
 
   def cleanup() {
     for(Author author : authors){
-      authorDao.deleteAuthor(author);
+      authorDao.deleteAuthor(author)
     }
   }
 
@@ -46,10 +46,10 @@ class BookDaoImplTest extends Specification {
     bookDao.deleteBook(book)
     where:
     bookDao      | volume
-    hibernateDao | null
-    hibernateDao | 1
     jdbcDao      | null
     jdbcDao      | 1
+    hibernateDao | null
+    hibernateDao | 1
   }
 
   /*def "test book deletion"() {

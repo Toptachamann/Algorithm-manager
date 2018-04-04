@@ -89,11 +89,8 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   public void delete(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    if (entityManager.contains(algorithm)) {
-      entityManager.remove(algorithm);
-    } else {
-      entityManager.remove(entityManager.merge(algorithm));
-    }
+    entityManager.remove(
+        entityManager.contains(algorithm) ? algorithm : entityManager.merge(algorithm));
     entityManager.getTransaction().commit();
   }
 }

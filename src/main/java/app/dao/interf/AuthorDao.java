@@ -13,5 +13,5 @@ public interface AuthorDao {
 
   void persist(Author author) throws Exception;
 
-  void deleteAuthor(Author author) throws Exception;
+  void delete(Author author) throws Exception;
 }

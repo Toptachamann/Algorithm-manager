@@ -101,7 +101,7 @@ public class BookServiceImpl implements BookService {
 
   @Override
   public void deleteBook(Book book) throws Exception {
-    bookDao.deleteBook(book);
+    bookDao.delete(book);
   }
 
   @Override
@@ -125,7 +125,7 @@ public class BookServiceImpl implements BookService {
     if (!referenceDao.containsReference(algorithm, book)) {
       throw new LogicException("This reference doesn't exist");
     } else {
-      referenceDao.deleteReference(new Reference(algorithm, book));
+      referenceDao.delete(new Reference(algorithm, book));
     }
   }
 }

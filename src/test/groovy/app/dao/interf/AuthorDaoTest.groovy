@@ -26,19 +26,19 @@ class AuthorDaoTest extends Specification {
     optAuthor.isPresent()
     optAuthor.get() == author
     cleanup:
-    authorDao.deleteAuthor(author)
+    authorDao.delete(author)
     where:
     authorDao << [jdbcDao, hibernateDao]
   }
 
   @Unroll
-  def "test author deletion"(){
+  def "test author deletion"() {
     given:
     def author = new Author(firstName, lastName)
     authorDao.persist(author)
     expect:
     authorDao.containsAuthor(firstName, lastName)
-    authorDao.deleteAuthor(author)
+    authorDao.delete(author)
     !authorDao.containsAuthor(firstName, lastName)
     !authorDao.getAuthor(firstName, lastName).isPresent()
     where:

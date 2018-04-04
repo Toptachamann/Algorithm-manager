@@ -22,5 +22,5 @@ public interface BookDao {
 
   void merge(Book book) throws Exception;
 
-  void deleteBook(Book book) throws Exception;
+  void delete(Book book) throws Exception;
 }

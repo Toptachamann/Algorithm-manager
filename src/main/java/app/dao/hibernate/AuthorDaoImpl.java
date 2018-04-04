@@ -23,7 +23,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public void deleteAuthor(Author author) {
+  public void delete(Author author) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(author) ? author : entityManager.merge(author));

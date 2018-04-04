@@ -6,19 +6,24 @@ import javax.persistence.Persistence;
 
 public abstract class AbstractDao {
   private static EntityManagerFactory sessionFactory;
-  private static EntityManager entityManager;
+  private static ThreadLocal<EntityManager> threadLocal;
 
   static {
     sessionFactory = Persistence.createEntityManagerFactory("com.algorithm.manager");
-    entityManager = sessionFactory.createEntityManager();
+    threadLocal = new ThreadLocal<>();
   }
 
-  protected EntityManager getEntityManager() {
+   protected static EntityManager getEntityManager() {
+    EntityManager entityManager = threadLocal.get();
+    if(entityManager == null){
+      entityManager = sessionFactory.createEntityManager();
+      threadLocal.set(entityManager);
+    }
     return entityManager;
   }
 
   public void cleanUp() {
-    entityManager.close();
+    threadLocal.get().close();
     sessionFactory.close();
   }
 }

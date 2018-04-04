@@ -79,7 +79,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public void deleteBook(Book book) {
+  public void delete(Book book) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(book) ? book : entityManager.merge(book));

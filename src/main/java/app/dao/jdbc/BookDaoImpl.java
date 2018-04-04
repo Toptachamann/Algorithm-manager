@@ -183,7 +183,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   }
 
   @Override
-  public void deleteBook(Book book) throws SQLException {
+  public void delete(Book book) throws SQLException {
     try {
       deleteBook.setInt(1, book.getId());
       logger.debug(() -> Util.format(deleteBook));

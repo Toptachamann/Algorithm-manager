@@ -19,5 +19,5 @@ public interface ReferenceDao {
 
   List<Reference> getAlgorithmReferences(Algorithm algorithm) throws Exception;
 
-  void deleteReference(Reference reference) throws Exception;
+  void delete(Reference reference) throws Exception;
 }

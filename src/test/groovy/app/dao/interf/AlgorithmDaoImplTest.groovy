@@ -5,7 +5,6 @@ import app.dao.hibernate.ParadigmDaoImpl
 import app.model.Algorithm
 import app.model.DesignParadigm
 import app.model.FieldOfStudy
-import org.junit.Test
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

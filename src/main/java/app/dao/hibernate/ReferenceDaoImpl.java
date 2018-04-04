@@ -65,7 +65,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   }
 
   @Override
-  public void deleteReference(Reference reference) {
+  public void delete(Reference reference) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(

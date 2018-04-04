@@ -56,7 +56,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public void deleteAuthor(Author author) throws Exception {
+  public void delete(Author author) throws Exception {
     try {
       deleteAuthor.setInt(1, author.getId());
       logger.debug(() -> Util.format(deleteAuthor));

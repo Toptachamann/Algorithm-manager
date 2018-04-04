@@ -41,10 +41,10 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
             "SELECT reference_id FROM algorithm_reference WHERE ref_algorithm_id = ? AND ref_book_id = ?");
     getAlgorithmReferences =
         connection.prepareStatement(
-            "SELECT book_id, title, volume, edition, author_id, first_name, last_name,algos.ref_book_id\n"
+            "SELECT reference_id, book_id, title, volume, edition, author_id, first_name, last_name\n"
                 + "FROM (SELECT reference_id, ref_book_id FROM algorithm_reference WHERE ref_algorithm_id = ?) AS algos\n"
                 + "INNER JOIN book ON algos.ref_book_id = book_id INNER JOIN textbook ON book_id = txtbk_book_id \n"
-                + "INNER JOIN author ON txtbk_author_id = author_id\n"
+                + "INNER JOIN author ON txtbk_author_id = author_id \n"
                 + "ORDER BY book_id, author_id");
   }
 
@@ -95,7 +95,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
   }
 
   @Override
-  public void deleteReference(Reference reference) throws SQLException {
+  public void delete(Reference reference) throws SQLException {
     try {
       deleteReference.setInt(1, reference.getAlgorithm().getId());
       deleteReference.setInt(2, reference.getBook().getId());
@@ -115,18 +115,18 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     List<Reference> books = new ArrayList<>();
     if (set.next()) {
       for (; !set.isAfterLast(); ) {
-        int volume = set.getInt(3);
+        int referenceId = set.getInt(1);
+        Integer volume = set.getInt(4);
         Book book;
         if (set.wasNull()) {
-          book = new Book(set.getInt(1), set.getString(2), null, set.getInt(4));
-        } else {
-          book = new Book(set.getInt(1), set.getString(2), volume, set.getInt(4));
+          volume = null;
         }
-        int id = set.getInt(1);
+        book = new Book(set.getInt(2), set.getString(3), volume, set.getInt(5));
+        int id = set.getInt(2);
         do {
-          book.addAuthor(new Author(set.getInt(5), set.getString(6), set.getString(7)));
-        } while (set.next() && set.getInt(1) == id);
-        books.add(new Reference(algorithm, book));
+          book.addAuthor(new Author(set.getInt(6), set.getString(7), set.getString(8)));
+        } while (set.next() && set.getInt(2) == id);
+        books.add(new Reference(referenceId, algorithm, book));
       }
     }
     return books;

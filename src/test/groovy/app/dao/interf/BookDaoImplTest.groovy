@@ -20,14 +20,14 @@ class BookDaoImplTest extends Specification {
     def author1 = new Author("test first name 1", "test last name 1")
     def author2 = new Author("test first name 2", "test last name 2")
     authors = [author1, author2]
-    for(Author author : authors){
+    for (Author author : authors) {
       authorDao.persist(author)
     }
   }
 
   def cleanup() {
-    for(Author author : authors){
-      authorDao.deleteAuthor(author)
+    for (Author author : authors) {
+      authorDao.delete(author)
     }
   }
 
@@ -43,7 +43,7 @@ class BookDaoImplTest extends Specification {
     def created = optCreated.get()
     created == book
     cleanup:
-    bookDao.deleteBook(book)
+    bookDao.delete(book)
     where:
     bookDao      | volume
     jdbcDao      | null

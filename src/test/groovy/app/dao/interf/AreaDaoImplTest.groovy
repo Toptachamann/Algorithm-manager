@@ -14,12 +14,12 @@ class AreaDaoImplTest extends Specification {
   @Shared
   AreaOfUse area
 
-  def setup(){
+  def setup() {
     area = new AreaOfUse("Test area of use")
   }
 
   @Unroll
-  def "test area creation"(){
+  def "test area creation"() {
     when:
     areaDao.persist(area)
     then:
@@ -34,7 +34,7 @@ class AreaDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test area deletion"(){
+  def "test area deletion"() {
     setup:
     areaDao.persist(area)
     when:

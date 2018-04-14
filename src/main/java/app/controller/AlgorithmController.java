@@ -234,7 +234,7 @@ public class AlgorithmController extends AbstractController {
               info.showAndWait();
             } else {
               Algorithm algorithm =
-                  algorithmService.createAlgorithm(name, complexity, designParadigm, fieldOfStudy);
+                  algorithmService.persist(name, complexity, designParadigm, fieldOfStudy);
               algorithmTableView.getItems().add(algorithm);
               algorithmTableView.scrollTo(algorithmTableView.getItems().size() - 1);
             }
@@ -349,7 +349,7 @@ public class AlgorithmController extends AbstractController {
           } else {
             try {
               newValue = newValue.trim();
-              algorithmService.updateAlgorithmName(algorithm, newValue);
+              algorithmService.setAlgorithmName(algorithm, newValue);
               algorithm.setName(newValue);
             } catch (LogicException e1) {
               logger.warn(e1);
@@ -376,7 +376,7 @@ public class AlgorithmController extends AbstractController {
           }
           try {
             newValue = newValue.trim();
-            algorithmService.updateAlgorithmComplexity(e.getRowValue(), newValue);
+            algorithmService.setAlgorithmComplexity(e.getRowValue(), newValue);
             algorithm.setComplexity(newValue);
           } catch (Exception e1) {
             logger.error(e1);

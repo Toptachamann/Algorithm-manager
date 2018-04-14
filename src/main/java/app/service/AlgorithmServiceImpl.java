@@ -43,7 +43,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public Algorithm createAlgorithm(
+  public Algorithm persist(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
     Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
@@ -79,7 +79,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void updateAlgorithmName(Algorithm algorithm, String name) throws Exception {
+  public void setAlgorithmName(Algorithm algorithm, String name) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(name));
     if (algorithmDao.getAlgorithmByName(name).isPresent()) {
       throw new LogicException("Algorithm with this name already exists");
@@ -89,7 +89,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public void updateAlgorithmComplexity(Algorithm algorithm, String complexity) throws Exception {
+  public void setAlgorithmComplexity(Algorithm algorithm, String complexity) throws Exception {
     Validate.isTrue(!StringUtils.isBlank(complexity));
     algorithm.setComplexity(complexity);
     algorithmDao.merge(algorithm);

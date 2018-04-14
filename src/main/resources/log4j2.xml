@@ -9,12 +9,13 @@
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
+            pattern="[%highlight{%5p}] %d{HH:mm:ss.SSS} [%t] %logger{36} -  %msg%n"/>
+
         </Console>
         <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
+                    pattern="%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="500 MB"/>
@@ -24,7 +25,7 @@
         <RollingFile name="ERROR" fileName="${baseDir}/${error_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
             <PatternLayout
-                    pattern="%highlight{%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n}"/>
+                    pattern="%d{HH:mm:ss,SSS} [%level] %logger {%t} %c{1} --- %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="5 MB"/>
@@ -40,6 +41,10 @@
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>-->
+        <Logger name="org.hibernate.type" level="trace" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
         <Logger name="org.hibernate" level="error" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>

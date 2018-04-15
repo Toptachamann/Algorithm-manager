@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="hibernateAbstractDao" class="com.algorithm.manager.dao.hibernate.AbstractDao" abstract="true"
+          destroy-method="cleanUp"/>
+
+    <bean id="hibernateAlgorithmDao" class="com.algorithm.manager.dao.hibernate.AlgorithmDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="hibernateParadigmDao" class="com.algorithm.manager.dao.hibernate.ParadigmDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="hibernateFieldDao" class="com.algorithm.manager.dao.hibernate.FieldDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="hibernateAreaDao" class="com.algorithm.manager.dao.hibernate.AreaDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="hibernateApplicationDao" class="com.algorithm.manager.dao.hibernate.ApplicationDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="hibernateBookDao" class="com.algorithm.manager.dao.hibernate.BookDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="hibernateAuthorDao" class="com.algorithm.manager.dao.hibernate.AuthorDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="hibernateReferenceDao" class="com.algorithm.manager.dao.hibernate.ReferenceDaoImpl"
+          parent="hibernateAbstractDao"/>
+
+    <bean id="jdbcAbstractDao" class="com.algorithm.manager.dao.jdbc.AbstractDao" abstract="true"
+          destroy-method="cleanUp"/>
+
+    <bean id="jdbcAlgorithmDao" class="com.algorithm.manager.dao.jdbc.AlgorithmDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcParadigmDao" class="com.algorithm.manager.dao.jdbc.ParadigmDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcFieldDao" class="com.algorithm.manager.dao.jdbc.FieldDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcAreaDao" class="com.algorithm.manager.dao.jdbc.AreaDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcApplicationDao" class="com.algorithm.manager.dao.jdbc.ApplicationDaoImpl"
+          parent="hibernateAbstractDao"/>
+    <bean id="jdbcBookDao" class="com.algorithm.manager.dao.jdbc.BookDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcAuthorDao" class="com.algorithm.manager.dao.jdbc.AuthorDaoImpl" parent="hibernateAbstractDao"/>
+    <bean id="jdbcReferenceDao" class="com.algorithm.manager.dao.jdbc.ReferenceDaoImpl" parent="hibernateAbstractDao"/>
+
+    <bean id="algorithmService" class="com.algorithm.manager.app.service.AlgorithmServiceImpl">
+        <constructor-arg name="algorithmDao" ref="hibernateAlgorithmDao"/>
+        <constructor-arg name="paradigmDao" ref="hibernateParadigmDao"/>
+        <constructor-arg name="fieldDao" ref="hibernateFieldDao"/>
+        <constructor-arg name="areaDao" ref="hibernateAreaDao"/>
+        <constructor-arg name="applicationDao" ref="hibernateApplicationDao"/>
+    </bean>
+
+    <bean id="algorithmController" class="com.algorithm.manager.app.controller.AlgorithmController">
+        <constructor-arg name="algorithmService" ref="algorithmService"/>
+    </bean>
+
+
+    <bean id="bookService" class="com.algorithm.manager.app.service.BookServiceImpl">
+        <constructor-arg name="bookDao" ref="hibernateBookDao"/>
+        <constructor-arg name="authorDao" ref="hibernateAuthorDao"/>
+        <constructor-arg name="referenceDao" ref="hibernateReferenceDao"/>
+    </bean>
+    <bean id="textbookController" class="com.algorithm.manager.app.controller.TextbookController">
+        <constructor-arg name="bookService" ref="bookService"/>
+    </bean>
+
+    <bean id="referenceController" class="com.algorithm.manager.app.controller.ReferenceController">
+        <constructor-arg name="algorithmService" ref="algorithmService"/>
+        <constructor-arg name="bookService" ref="bookService"/>
+    </bean>
+</beans>

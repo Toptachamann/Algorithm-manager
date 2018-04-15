@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="warn" name="Algorithm manager" schema="">
+    <Properties>
+        <Property name="baseDir">logs</Property>
+        <Property name="trace_file_name">desktop.log</Property>
+        <Property name="error_file_name">desktop.err</Property>
+        <Property name="project_name">desktop</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout
+            pattern="%d{HH:mm:ss,SSS} [%highlight{%level}] %logger {%t} %c{1} --- %m%n"/>
+
+        </Console>
+        <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss,SSS} [%highlight{%level}] %logger {%t} %c{1} --- %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="500 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+        <RollingFile name="ERROR" fileName="${baseDir}/${error_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss,SSS} [%highlight{%level}] %logger {%t} %c{1} --- %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="all">
+            <AppenderRef ref="console"/>
+        </Root>
+        <!--<Logger name="org.springframework" level="error" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>-->
+
+        <Logger name="com.algorithm.manager.app.service.AlgorithmServiceImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="com.algorithm.manager.app.service.BookServiceImpl" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="com.algorithm.manager.app.controller.AlgorithmController" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="com.algorithm.manager.app.controller.TextbookController" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+    </Loggers>
+</Configuration>

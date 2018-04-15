@@ -14,8 +14,14 @@
       <module name="Algorithm_manager_main" target="1.8" />
       <module name="Algorithm_manager_test" target="1.8" />
       <module name="Algorithm_test" target="1.8" />
+      <module name="database_main" target="1.8" />
+      <module name="database_test" target="1.8" />
+      <module name="desktop_main" target="1.8" />
+      <module name="desktop_test" target="1.8" />
       <module name="Pure_JDBC_Lab_main" target="1.8" />
       <module name="Pure_JDBC_Lab_test" target="1.8" />
+      <module name="web_main" target="1.8" />
+      <module name="web_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

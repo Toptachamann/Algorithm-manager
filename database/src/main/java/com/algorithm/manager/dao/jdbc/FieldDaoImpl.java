@@ -22,7 +22,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private PreparedStatement allFieldsOfStudy;
   private PreparedStatement getFieldById;
   private PreparedStatement getFieldByName;
-  private PreparedStatement updateFieldOfStudy;
+  private PreparedStatement merge;
   private PreparedStatement deleteFieldById;
 
   public FieldDaoImpl() throws SQLException {
@@ -31,10 +31,10 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         connection.prepareStatement("INSERT INTO field_of_study (field, description) VALUE (?, ?)");
     getFieldById = connection.prepareStatement("SELECT * FROM field_of_study WHERE field_id = ?");
     getFieldByName = connection.prepareStatement("SELECT * FROM field_of_study WHERE field = ?");
-    updateFieldOfStudy =
+    merge =
         connection.prepareStatement(
             "UPDATE algorithms.field_of_study "
-                + "SET algorithms.field_of_study.field = ? WHERE algorithms.field_of_study.field_id = ?");
+                + "SET algorithms.field_of_study.field = ?, field_of_study.description = ? WHERE algorithms.field_of_study.field_id = ?");
     deleteFieldById = connection.prepareStatement("DELETE FROM field_of_study WHERE field_id = ?");
   }
 
@@ -95,19 +95,25 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void setField(FieldOfStudy fieldOfStudy, String newValue) throws SQLException {
-    try {
-      updateFieldOfStudy.setString(1, newValue);
-      updateFieldOfStudy.setInt(2, fieldOfStudy.getId());
-      logger.debug(() -> Util.format(updateFieldOfStudy));
-      updateFieldOfStudy.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set name of {} to {}", fieldOfStudy, newValue);
-      rollBack(connection);
-      throw e;
+  public void merge(FieldOfStudy fieldOfStudy) throws Exception {
+    if(!containsFieldOfStudy(fieldOfStudy)){
+      persist(fieldOfStudy);
+    }else{
+      try {
+        merge.setString(1, fieldOfStudy.getField());
+        merge.setString(2, fieldOfStudy.getDescription());
+        merge.setInt(3, fieldOfStudy.getId());
+        logger.debug(() -> Util.format(merge));
+        merge.executeUpdate();
+        connection.commit();
+      } catch (SQLException e) {
+        logger.catching(Level.ERROR, e);
+        logger.error("Failed to merge field of study", fieldOfStudy);
+        rollBack(connection);
+        throw e;
+      }
     }
+
   }
 
   @Override

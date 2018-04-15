@@ -1,6 +1,10 @@
 package com.algorithm.manager.app.service;
 
-import com.algorithm.manager.model.*;
+import com.algorithm.manager.model.Algorithm;
+import com.algorithm.manager.model.Application;
+import com.algorithm.manager.model.AreaOfUse;
+import com.algorithm.manager.model.DesignParadigm;
+import com.algorithm.manager.model.FieldOfStudy;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +37,9 @@ public interface AlgorithmService {
 
   Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
 
-  DesignParadigm setParadigmName(DesignParadigm oldValue, String paradigm) throws Exception;
+  default boolean containsParadigm(DesignParadigm paradigm) throws Exception {
+    return getParadigmByName(paradigm.getParadigm()).isPresent();
+  }
 
   DesignParadigm createDesignParadigm(String paradigmName) throws Exception;
 
@@ -45,11 +51,13 @@ public interface AlgorithmService {
 
   Optional<FieldOfStudy> getFieldByName(String name) throws Exception;
 
+  default boolean containsField(FieldOfStudy fieldOfStudy) throws Exception {
+    return getParadigmByName(fieldOfStudy.getField()).isPresent();
+  }
+
   FieldOfStudy createFieldOfStudy(String fieldName) throws Exception;
 
   FieldOfStudy createFieldOfStudy(String fieldName, String fieldDescription) throws Exception;
-
-  FieldOfStudy setFieldName(FieldOfStudy newValue, String field) throws Exception;
 
   // ------------------------------------------------------------
 

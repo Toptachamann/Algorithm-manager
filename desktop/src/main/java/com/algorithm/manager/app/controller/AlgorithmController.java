@@ -1,10 +1,10 @@
 package com.algorithm.manager.app.controller;
 
+import com.algorithm.manager.app.service.AlgorithmService;
 import com.algorithm.manager.auxiliary.LogicException;
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.DesignParadigm;
 import com.algorithm.manager.model.FieldOfStudy;
-import com.algorithm.manager.app.service.AlgorithmService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,8 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,8 +98,7 @@ public class AlgorithmController extends AbstractController {
           FXCollections.observableArrayList(algorithmService.getAllFieldsOfStudy()));
     } catch (Exception e) {
       logger.error(e);
-      info.setContentText("Can't load algorithms' data. Check server connection.");
-      info.showAndWait();
+      info("Can't load algorithms' data. Check server connection.");
     }
     /*designParadigmCB
         .getEditor()
@@ -156,8 +153,7 @@ public class AlgorithmController extends AbstractController {
               String retrievedName = newParadigm.getRetrievedName();
               String retrievedDescription = newParadigm.getRetrievedDescription();
               if (StringUtils.isBlank(retrievedName)) {
-                info.setContentText("Design paradigm must have a name");
-                info.showAndWait();
+                info("Design paradigm must have a name");
               } else {
                 DesignParadigm designParadigm;
                 if (StringUtils.isBlank(retrievedDescription)) {
@@ -172,8 +168,7 @@ public class AlgorithmController extends AbstractController {
             }
           } catch (LogicException e1) {
             logger.warn(e1);
-            info.setContentText("Addition of the new design paradigm failed:\n" + e1.getMessage());
-            info.showAndWait();
+            info("Addition of the new design paradigm failed:\n" + e1.getMessage());
           } catch (Exception e1) {
             logger.error(e1);
             super.error();
@@ -187,8 +182,7 @@ public class AlgorithmController extends AbstractController {
               String retrievedName = newField.getRetrievedName();
               String retrievedDescription = newField.getRetrievedDescription();
               if (StringUtils.isBlank(retrievedName)) {
-                info.setContentText("Field of study must have a new name");
-                info.showAndWait();
+                info("Field of study must have a new name");
               } else {
                 FieldOfStudy fieldOfStudy;
                 if (StringUtils.isBlank(retrievedDescription)) {
@@ -203,8 +197,7 @@ public class AlgorithmController extends AbstractController {
             }
           } catch (LogicException e1) {
             logger.warn(e1);
-            info.setContentText("Addition of new field of study failed:\n" + e1.getMessage());
-            info.showAndWait();
+            info("Addition of new field of study failed:\n" + e1.getMessage());
           } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
@@ -221,17 +214,13 @@ public class AlgorithmController extends AbstractController {
             DesignParadigm designParadigm = designParadigmCB.getSelectionModel().getSelectedItem();
             FieldOfStudy fieldOfStudy = fieldOfStudyCB.getSelectionModel().getSelectedItem();
             if (StringUtils.isBlank(name)) {
-              info.setContentText("Algorithm must have a name");
-              info.showAndWait();
+              info("Algorithm must have a name");
             } else if (StringUtils.isBlank(complexity)) {
-              info.setContentText("Algorithm must have a complexity");
-              info.showAndWait();
+              info("Algorithm must have a complexity");
             } else if (designParadigm == null) {
-              info.setContentText("Algorithm must have a design paradigm");
-              info.showAndWait();
+              info("Algorithm must have a design paradigm");
             } else if (fieldOfStudy == null) {
-              info.setContentText("Algorithm must have a field of study");
-              info.showAndWait();
+              info("Algorithm must have a field of study");
             } else {
               Algorithm algorithm =
                   algorithmService.persist(name, complexity, designParadigm, fieldOfStudy);
@@ -240,8 +229,7 @@ public class AlgorithmController extends AbstractController {
             }
           } catch (LogicException e1) {
             logger.warn(e1);
-            info.setContentText("Addition of a new algorithm failed:\n" + e1.getMessage());
-            info.showAndWait();
+            info("Addition of a new algorithm failed:\n" + e1.getMessage());
           } catch (Exception e1) {
             logger.error(e1);
             error.setContentText(
@@ -343,8 +331,7 @@ public class AlgorithmController extends AbstractController {
           Algorithm algorithm = e.getRowValue();
           String newValue = e.getNewValue();
           if (StringUtils.isBlank(newValue)) {
-            info.setContentText("Algorithm's name can't be blank");
-            info.showAndWait();
+            info("Algorithm's name can't be blank");
             algorithmTableView.refresh();
           } else {
             try {
@@ -353,8 +340,7 @@ public class AlgorithmController extends AbstractController {
               algorithm.setName(newValue);
             } catch (LogicException e1) {
               logger.warn(e1);
-              info.setContentText("Algorithm's name wasn't changed:\n" + e1.getMessage());
-              info.showAndWait();
+              info("Algorithm's name wasn't changed:\n" + e1.getMessage());
             } catch (Exception e1) {
               logger.error(e1);
               error.setContentText(
@@ -370,8 +356,7 @@ public class AlgorithmController extends AbstractController {
           Algorithm algorithm = e.getRowValue();
           String newValue = e.getNewValue();
           if (StringUtils.isBlank(newValue)) {
-            info.setContentText("Algorithm's complexity can't be blank");
-            info.showAndWait();
+            info("Algorithm's complexity can't be blank");
             algorithmTableView.refresh();
           }
           try {
@@ -386,36 +371,6 @@ public class AlgorithmController extends AbstractController {
             error.showAndWait();
           }
         });
-  }
-
-  private <T> void updateTableView(
-      Class<T> tClass, List<T> items, String fieldName, Object oldValue, Object newValue) {
-    try {
-      String getter = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-      String setter = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-      Method getterMethod = tClass.getMethod(getter);
-      Method setterMethod = tClass.getMethod(setter, newValue.getClass());
-      if (!oldValue.getClass().equals(getterMethod.getReturnType())
-          || setterMethod.getParameterCount() != 1
-          || !newValue.getClass().equals(setterMethod.getParameterTypes()[0])) {
-        throw new IllegalAccessError();
-      }
-      for (T item : items) {
-        if (oldValue.equals(getterMethod.invoke(item))) {
-          setterMethod.invoke(item, newValue);
-        }
-      }
-    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private <T> void updateList(List<T> list, T oldValue, T newValue) {
-    for (int i = 0; i < list.size(); i++) {
-      if (list.get(i).equals(oldValue)) {
-        list.set(i, newValue);
-      }
-    }
   }
 
   /*private class KeyHandler implements EventHandler<KeyEvent> {
@@ -487,7 +442,7 @@ public class AlgorithmController extends AbstractController {
             if ((field = getItem()) != null) {
               if (e.getCode().equals(KeyCode.ENTER)) {
                 commitEdit(
-                    new FieldOfStudy(field.getId(), textField.getText(), field.getDescription()));
+                    new FieldOfStudy(textField.getText(), field.getDescription()));
               }
             }
           });
@@ -526,36 +481,19 @@ public class AlgorithmController extends AbstractController {
     public void commitEdit(FieldOfStudy newValue) {
       super.commitEdit(newValue);
       if (StringUtils.isBlank(newValue.getField())) {
-        info.setContentText("Algorithm's field of study can't be blank");
-        info.showAndWait();
+        info("Algorithm's field of study can't be blank");
         algorithmTableView.refresh();
       } else {
-        String newFieldOfStudy = newValue.getField().trim();
-        FieldOfStudy oldValue = getItem();
         try {
-          Optional<FieldOfStudy> field = algorithmService.getFieldByName(newFieldOfStudy);
-          if (field.isPresent()) {
-            Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
-            algorithmService.setFieldOfStudy(rowAlgorithm, field.get());
-            rowAlgorithm.setFieldOfStudy(field.get());
-          } else {
-            FieldOfStudy fieldOfStudy = algorithmService.setFieldName(oldValue, newFieldOfStudy);
-            AlgorithmController.this.updateTableView(
-                Algorithm.class,
-                algorithmTableView.getItems(),
-                "fieldOfStudy",
-                oldValue,
-                fieldOfStudy);
-            AlgorithmController.this.updateList(fieldOfStudyCB.getItems(), oldValue, fieldOfStudy);
-            algorithmTableView.refresh();
-          }
+          Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
+          algorithmService.setFieldOfStudy(rowAlgorithm, newValue);
         } catch (Exception e1) {
           logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");
           error.showAndWait();
-          setText(oldValue.getField());
+          setText(getItem().getField());
           setGraphic(null);
           algorithmTableView.refresh();
         }
@@ -594,8 +532,7 @@ public class AlgorithmController extends AbstractController {
             if ((paradigm = getItem()) != null) {
               if (e.getCode().equals(KeyCode.ENTER)) {
                 commitEdit(
-                    new DesignParadigm(
-                        paradigm.getId(), textField.getText(), paradigm.getDescription()));
+                    new DesignParadigm(textField.getText(), paradigm.getDescription()));
               }
             }
           });
@@ -635,37 +572,18 @@ public class AlgorithmController extends AbstractController {
       logger.trace("Committing changes, new value {}", newValue);
       super.commitEdit(newValue);
       if (StringUtils.isBlank(newValue.getParadigm())) {
-        info.setContentText("Algorithm's design paradigm can't be blank");
-        info.showAndWait();
+        info("Algorithm's design paradigm can't be blank");
         algorithmTableView.refresh();
       } else {
-        String newName = newValue.getParadigm().trim();
-        DesignParadigm oldValue = getItem();
         try {
-          Optional<DesignParadigm> paradigm = algorithmService.getParadigmByName(newName);
-          if (paradigm.isPresent()) {
-            Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
-            algorithmService.setDesignParadigm(rowAlgorithm, paradigm.get());
-            rowAlgorithm.setDesignParadigm(paradigm.get());
-          } else {
-            DesignParadigm designParadigm =
-                algorithmService.setParadigmName(oldValue, newValue.getParadigm());
-            AlgorithmController.this.updateTableView(
-                Algorithm.class,
-                algorithmTableView.getItems(),
-                "designParadigm",
-                oldValue,
-                designParadigm);
-            AlgorithmController.this.updateList(
-                designParadigmCB.getItems(), oldValue, designParadigm);
-            algorithmTableView.refresh();
-          }
+          Algorithm rowAlgorithm = algorithmTableView.getItems().get(getTableRow().getIndex());
+          algorithmService.setDesignParadigm(rowAlgorithm, newValue);
         } catch (Exception e1) {
           logger.error(e1);
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");
-          setText(oldValue.getParadigm());
+          setText(getItem().getParadigm());
           setGraphic(null);
           algorithmTableView.refresh();
         }

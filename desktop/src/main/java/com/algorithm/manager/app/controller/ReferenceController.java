@@ -358,7 +358,7 @@ public class ReferenceController extends AbstractController {
         a ->
             values.add(
                 "\t"
-                    + a.getAreaOfUse()
+                    + a.getAreaOfUse().getAreaOfUse()
                     + (StringUtils.isBlank(a.getAreaOfUse().getDescription())
                         ? ""
                         : "\n\t\t(" + a.getAreaOfUse().getDescription() + ")")));

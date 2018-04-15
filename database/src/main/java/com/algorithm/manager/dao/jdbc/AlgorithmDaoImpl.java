@@ -101,11 +101,11 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     String whereClause = "";
     if (!StringUtils.isBlank(algorithm)) {
       algorithm = Util.fixForLike(algorithm);
-      whereClause += " AND algorithm LIKE " + algorithm.trim();
+      whereClause += " AND algorithm LIKE " + algorithm;
     }
     if (!StringUtils.isBlank(complexity)) {
       complexity = Util.fixForLike(complexity);
-      whereClause += " AND complexity LIKE " + complexity.trim();
+      whereClause += " AND complexity LIKE " + complexity;
     }
     if (designParadigm != null) {
       whereClause += " AND paradigm_id = " + designParadigm.getParadigm();

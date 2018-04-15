@@ -12,17 +12,17 @@ public interface FieldDao {
 
   Optional<FieldOfStudy> getFieldByName(String name) throws Exception;
 
-  default boolean containsFieldOfStudy(String name) throws Exception {
+  Optional<FieldOfStudy> getFieldById(int id) throws Exception;
+
+  default boolean containsFieldOfStudy(FieldOfStudy fieldOfStudy) throws Exception {
+    return getFieldById(fieldOfStudy.getId()).isPresent();
+  }
+
+  default boolean containsFieldOfStudyWithName(String name) throws Exception {
     return getFieldByName(name).isPresent();
   }
 
-  Optional<FieldOfStudy> getFieldById(int id) throws Exception;
-
-  default boolean containsFieldOfStudy(int id) throws Exception {
-    return getFieldById(id).isPresent();
-  }
-
-  void setField(FieldOfStudy fieldOfStudy, String newName) throws Exception;
+  void merge(FieldOfStudy fieldOfStudy) throws Exception;
 
   void delete(FieldOfStudy fieldOfStudy) throws Exception;
 }

@@ -33,18 +33,22 @@ public abstract class AbstractController {
         .add(new Image(getClass().getResource("/confirm_icon_1.png").toString()));
   }
 
-  void error() {
-    error.setContentText(
-        "Operation wasn't completed due to some internal error.\nSee logs for details.");
+  protected void error() {
+    error("Operation wasn't completed due to some internal error.\nSee logs for details.");
+  }
+
+  protected void error(String errorMessage) {
+    error.setContentText(errorMessage);
     error.showAndWait();
   }
 
-  void warn() {
-    info.setContentText("Operation wasn't completed");
+  protected void info(String infoMessage) {
+    info.setContentText(infoMessage);
     info.showAndWait();
   }
 
-  void warn(Throwable e) {
+
+  protected void warn(Throwable e) {
     String message = e.getMessage();
     String processed =
         message.substring(0, 1).toLowerCase() + message.substring(1, message.length());

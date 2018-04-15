@@ -22,7 +22,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private PreparedStatement allParadigms;
   private PreparedStatement getParadigmById;
   private PreparedStatement getParadigmByName;
-  private PreparedStatement updateParadigm;
+  private PreparedStatement merge;
   private PreparedStatement deleteParadigm;
 
   public ParadigmDaoImpl() throws SQLException {
@@ -34,9 +34,9 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
         connection.prepareStatement("SELECT * FROM design_paradigm WHERE paradigm_id = ?");
     getParadigmByName =
         connection.prepareStatement("SELECT * FROM design_paradigm WHERE paradigm = ?");
-    updateParadigm =
+    merge =
         connection.prepareStatement(
-            "UPDATE design_paradigm SET paradigm = ? WHERE paradigm_id = ?");
+            "UPDATE design_paradigm SET paradigm = ?, description = ? WHERE paradigm_id = ?");
     deleteParadigm =
         connection.prepareStatement("DELETE FROM design_paradigm WHERE paradigm_id = ?");
   }
@@ -113,18 +113,23 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void setParadigm(DesignParadigm paradigm, String newName) throws SQLException {
-    try {
-      updateParadigm.setString(1, newName);
-      updateParadigm.setInt(2, paradigm.getId());
-      logger.debug(() -> Util.format(updateParadigm));
-      updateParadigm.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to set paradigm of the {} to {}", paradigm, newName);
-      rollBack(connection);
-      throw e;
+  public void merge(DesignParadigm paradigm) throws Exception {
+    if (!containsParadigm(paradigm)) {
+      persist(paradigm);
+    } else {
+      try {
+        merge.setString(1, paradigm.getParadigm());
+        merge.setString(2, paradigm.getDescription());
+        merge.setInt(3, paradigm.getId());
+        logger.debug(() -> Util.format(merge));
+        merge.executeUpdate();
+        connection.commit();
+      } catch (SQLException e) {
+        logger.catching(Level.ERROR, e);
+        logger.error("Failed to merge paradigm {}", paradigm);
+        rollBack(connection);
+        throw e;
+      }
     }
   }
 }

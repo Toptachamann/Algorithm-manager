@@ -14,15 +14,15 @@ public interface ParadigmDao {
 
   Optional<DesignParadigm> getParadigmByParadigm(String paradigm) throws Exception;
 
-  default boolean containsParadigm(String name) throws Exception {
-    return getParadigmByParadigm(name).isPresent();
-  }
-
   default boolean containsParadigm(DesignParadigm paradigm) throws Exception {
     return getParadigmById(paradigm.getId()).isPresent();
   }
 
-  void delete(DesignParadigm paradigm) throws Exception;
+  default boolean containsParadigmWithName(String name) throws Exception {
+    return getParadigmByParadigm(name).isPresent();
+  }
 
-  void setParadigm(DesignParadigm paradigm, String newName) throws Exception;
+  void merge(DesignParadigm paradigm) throws Exception;
+
+  void delete(DesignParadigm paradigm) throws Exception;
 }

@@ -1,6 +1,5 @@
 package com.algorithm.manager.dao.interf
 
-import com.algorithm.manager.dao.hibernate.FieldDaoImpl
 import com.algorithm.manager.model.FieldOfStudy
 import spock.lang.Shared
 import spock.lang.Specification
@@ -24,8 +23,8 @@ class FieldDaoImplTest extends Specification {
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
     then:
-    fieldDao.containsFieldOfStudy(fieldOfStudy.getId())
-    fieldDao.containsFieldOfStudy(name)
+    fieldDao.containsFieldOfStudy(fieldOfStudy)
+    fieldDao.containsFieldOfStudyWithName(name)
     fieldOfStudy.getField() == name
     fieldOfStudy.getDescription() == null
     def optField = fieldDao.getFieldByName(name)
@@ -46,8 +45,8 @@ class FieldDaoImplTest extends Specification {
     then:
     fieldOfStudy.getField() == name
     fieldOfStudy.getDescription() == description
-    fieldDao.containsFieldOfStudy(name)
-    fieldDao.containsFieldOfStudy(fieldOfStudy.getId())
+    fieldDao.containsFieldOfStudyWithName(name)
+    fieldDao.containsFieldOfStudy(fieldOfStudy)
     def optField = fieldDao.getFieldByName(name)
     optField.isPresent()
     def field = optField.get()
@@ -68,7 +67,7 @@ class FieldDaoImplTest extends Specification {
     when:
     fieldDao.delete(fieldOfStudy)
     then:
-    !fieldDao.containsFieldOfStudy(name)
+    !fieldDao.containsFieldOfStudyWithName(name)
     where:
     fieldDao << [jdbcDao, hibernateDao]
   }
@@ -79,10 +78,11 @@ class FieldDaoImplTest extends Specification {
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
     when:
-    fieldDao.setField(fieldOfStudy, updated)
+    fieldOfStudy.setField(updated)
+    fieldDao.merge(fieldOfStudy)
     then:
-    !fieldDao.containsFieldOfStudy(name)
-    fieldDao.containsFieldOfStudy(updated)
+    !fieldDao.containsFieldOfStudyWithName(name)
+    fieldDao.containsFieldOfStudyWithName(updated)
     cleanup:
     fieldDao.delete(fieldOfStudy)
     where:

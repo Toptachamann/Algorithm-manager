@@ -1,6 +1,5 @@
 package com.algorithm.manager.dao.interf
 
-import com.algorithm.manager.dao.hibernate.ParadigmDaoImpl
 import com.algorithm.manager.model.DesignParadigm
 import spock.lang.Shared
 import spock.lang.Specification
@@ -30,7 +29,7 @@ class ParadigmDaoImplTest extends Specification {
     created.getParadigm() == name
     created.getDescription() == null
     paradigmDao.containsParadigm(created)
-    paradigmDao.containsParadigm(created.getParadigm())
+    paradigmDao.containsParadigmWithName(created.getParadigm())
     paradigm == created
     cleanup:
     paradigmDao.delete(created)
@@ -50,7 +49,7 @@ class ParadigmDaoImplTest extends Specification {
     created.getParadigm() == name
     created.getDescription() == description
     paradigmDao.containsParadigm(created)
-    paradigmDao.containsParadigm(created.getParadigm())
+    paradigmDao.containsParadigmWithName(created.getParadigm())
     paradigm == created
     cleanup:
     paradigmDao.delete(created)
@@ -71,14 +70,15 @@ class ParadigmDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test update design paradigm"() {
+  def "test merge design paradigm"() {
     setup:
     def paradigm = new DesignParadigm(name)
     paradigmDao.persist(paradigm)
-    paradigmDao.setParadigm(paradigm, updatedName)
+    paradigm.setParadigm(updatedName)
+    paradigmDao.merge(paradigm)
     expect:
-    !paradigmDao.containsParadigm(name)
-    paradigmDao.containsParadigm(updatedName)
+    !paradigmDao.containsParadigmWithName(name)
+    paradigmDao.containsParadigmWithName(updatedName)
     cleanup:
     paradigmDao.delete(paradigm)
     where:

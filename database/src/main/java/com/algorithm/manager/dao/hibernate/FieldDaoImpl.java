@@ -6,17 +6,14 @@ import com.algorithm.manager.model.FieldOfStudy_;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
 
 public class FieldDaoImpl extends AbstractDao implements FieldDao {
 
-  public FieldDaoImpl() {
-  }
+  public FieldDaoImpl() {}
 
   @Override
   public void persist(FieldOfStudy fieldOfStudy) {
@@ -64,18 +61,10 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void setField(FieldOfStudy fieldOfStudy, String newName) {
+  public void merge(FieldOfStudy fieldOfStudy) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<FieldOfStudy> criteria = builder.createCriteriaUpdate(FieldOfStudy.class);
-    Root<FieldOfStudy> root = criteria.from(FieldOfStudy.class);
-    entityManager
-        .createQuery(
-            criteria
-                .set(FieldOfStudy_.field, newName)
-                .where(builder.equal(root.get(FieldOfStudy_.id), fieldOfStudy.getId())))
-        .executeUpdate();
+    entityManager.merge(fieldOfStudy);
     entityManager.getTransaction().commit();
   }
 
@@ -83,7 +72,8 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   public void delete(FieldOfStudy fieldOfStudy) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    entityManager.remove(entityManager.contains(fieldOfStudy) ? fieldOfStudy : entityManager.merge(fieldOfStudy));
+    entityManager.remove(
+        entityManager.contains(fieldOfStudy) ? fieldOfStudy : entityManager.merge(fieldOfStudy));
     entityManager.getTransaction().commit();
   }
 }

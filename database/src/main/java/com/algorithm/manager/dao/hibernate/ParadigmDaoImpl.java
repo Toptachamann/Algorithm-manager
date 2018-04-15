@@ -76,18 +76,10 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void setParadigm(DesignParadigm paradigm, String newName) {
+  public void merge(DesignParadigm paradigm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaUpdate<DesignParadigm> update = builder.createCriteriaUpdate(DesignParadigm.class);
-    Root<DesignParadigm> root = update.from(DesignParadigm.class);
-    entityManager
-        .createQuery(
-            update
-                .set(DesignParadigm_.paradigm, newName)
-                .where(builder.equal(root.get(DesignParadigm_.id), paradigm.getId())))
-        .executeUpdate();
+    entityManager.merge(paradigm);
     entityManager.getTransaction().commit();
   }
 }

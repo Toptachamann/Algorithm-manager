@@ -1,8 +1,16 @@
 package com.algorithm.manager.app.service;
 
 import com.algorithm.manager.auxiliary.LogicException;
-import com.algorithm.manager.dao.interf.*;
-import com.algorithm.manager.model.*;
+import com.algorithm.manager.dao.interf.AlgorithmDao;
+import com.algorithm.manager.dao.interf.ApplicationDao;
+import com.algorithm.manager.dao.interf.AreaDao;
+import com.algorithm.manager.dao.interf.FieldDao;
+import com.algorithm.manager.dao.interf.ParadigmDao;
+import com.algorithm.manager.model.Algorithm;
+import com.algorithm.manager.model.Application;
+import com.algorithm.manager.model.AreaOfUse;
+import com.algorithm.manager.model.DesignParadigm;
+import com.algorithm.manager.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
@@ -89,12 +97,24 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception {
+    Optional<DesignParadigm> optional = paradigmDao.getParadigmByParadigm(paradigm.getParadigm());
+    if (optional.isPresent()) {
+      paradigm = optional.get();
+    } else {
+      paradigmDao.persist(paradigm);
+    }
     algorithm.setDesignParadigm(paradigm);
     algorithmDao.merge(algorithm);
   }
 
   @Override
   public void setFieldOfStudy(Algorithm algorithm, FieldOfStudy field) throws Exception {
+    Optional<FieldOfStudy> optional = fieldDao.getFieldByName(field.getField());
+    if (optional.isPresent()) {
+      field = optional.get();
+    } else {
+      fieldDao.persist(field);
+    }
     algorithm.setFieldOfStudy(field);
     algorithmDao.merge(algorithm);
   }
@@ -158,22 +178,6 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   @Override
   public Optional<FieldOfStudy> getFieldByName(String name) throws Exception {
     return fieldDao.getFieldByName(name);
-  }
-
-  @Override
-  public DesignParadigm setParadigmName(DesignParadigm paradigm, String newParadigm)
-      throws Exception {
-    logger.trace("Updating design paradigm {}, new name is {}", paradigm, newParadigm);
-    Validate.isTrue(!StringUtils.isBlank(newParadigm));
-    paradigmDao.setParadigm(paradigm, newParadigm);
-    return new DesignParadigm(paradigm.getId(), newParadigm, paradigm.getDescription());
-  }
-
-  @Override
-  public FieldOfStudy setFieldName(FieldOfStudy field, String newField) throws Exception {
-    Validate.isTrue(!StringUtils.isBlank(newField));
-    fieldDao.setField(field, newField);
-    return new FieldOfStudy(field.getId(), newField, field.getDescription());
   }
 
   @Override

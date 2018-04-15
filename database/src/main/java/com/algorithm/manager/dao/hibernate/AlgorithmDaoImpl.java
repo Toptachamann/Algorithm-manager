@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
-  public AlgorithmDaoImpl() {
-  }
+  public AlgorithmDaoImpl() {}
 
   @Override
   public void persist(Algorithm algorithm) {
@@ -35,8 +34,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Algorithm> query = builder.createQuery(Algorithm.class);
     query.from(Algorithm.class);
-    List<Algorithm> result = entityManager.createQuery(query).getResultList();
-    return result;
+    return entityManager.createQuery(query).getResultList();
   }
 
   @Override
@@ -76,8 +74,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       predicates.add(builder.equal(root.get(Algorithm_.fieldOfStudy), fieldOfStudy));
     }
     query.where(predicates.toArray(new Predicate[] {}));
-    List<Algorithm> result = entityManager.createQuery(query).getResultList();
-    return result;
+    return entityManager.createQuery(query).getResultList();
   }
 
   @Override

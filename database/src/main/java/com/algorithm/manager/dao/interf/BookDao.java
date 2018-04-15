@@ -11,10 +11,10 @@ public interface BookDao {
 
   List<Book> getBooks() throws Exception;
 
+  Optional<Book> getBookById(int id) throws Exception;
+
   List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors)
       throws Exception;
-
-  Optional<Book> getBookById(int id) throws Exception;
 
   default boolean containsBook(Book book) throws Exception {
     return getBookById(book.getId()).isPresent();

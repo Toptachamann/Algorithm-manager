@@ -65,7 +65,7 @@ public class TextbookController extends AbstractController {
             Integer edition = null;
             String volumeStr = volumeCB.getSelectionModel().getSelectedItem();
             String editionStr = editionCB.getSelectionModel().getSelectedItem();
-            if (volumeStr != null) {
+            if (!StringUtils.isBlank(volumeStr)) {
               if (volumeStr.matches(numberPattern)) {
                 volume = Integer.valueOf(volumeStr.trim());
               } else {
@@ -74,7 +74,7 @@ public class TextbookController extends AbstractController {
                 return;
               }
             }
-            if (editionStr != null) {
+            if (!StringUtils.isBlank(editionStr)) {
               if (editionStr.matches(numberPattern)) {
                 edition = Integer.valueOf(editionStr.trim());
               } else {

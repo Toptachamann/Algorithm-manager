@@ -29,6 +29,11 @@ class AlgorithmDaoImplTest extends Specification {
     paradigm = new com.algorithm.manager.model.DesignParadigm("Test design paradigm")
     field = new FieldOfStudy("Test field of study")
     algorithm = new Algorithm("test name", "test complexity", paradigm, field)
+
+    hibernateDao.deleteByName(algorithm)
+    paradigmDao.deleteByParadigm(paradigm)
+    fieldDao.deleteByField(field)
+
     paradigmDao.persist(paradigm)
     fieldDao.persist(field)
   }

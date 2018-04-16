@@ -1,6 +1,6 @@
 package com.algorithm.manager.app.controller;
 
-import com.algorithm.manager.app.service.AlgorithmService;
+import com.algorithm.manager.service.AlgorithmService;
 import com.algorithm.manager.auxiliary.LogicException;
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.DesignParadigm;
@@ -223,7 +223,7 @@ public class AlgorithmController extends AbstractController {
               info("Algorithm must have a field of study");
             } else {
               Algorithm algorithm =
-                  algorithmService.persist(name, complexity, designParadigm, fieldOfStudy);
+                  algorithmService.persistAlgorithm(name, complexity, designParadigm, fieldOfStudy);
               algorithmTableView.getItems().add(algorithm);
               algorithmTableView.scrollTo(algorithmTableView.getItems().size() - 1);
             }
@@ -309,7 +309,7 @@ public class AlgorithmController extends AbstractController {
           if (algorithm != null) {
             if (e.getCode().equals(KeyCode.DELETE)) {
               confirm.setContentText(
-                  "Do you really want to delete this algorithm?\n" + "This operation is undoable");
+                  "Do you really want to deleteById this algorithm?\n" + "This operation is undoable");
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {
                 try {

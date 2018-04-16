@@ -26,7 +26,7 @@ class AuthorDaoTest extends Specification {
         optAuthor.isPresent()
         optAuthor.get() == author
         cleanup:
-        authorDao.delete(author)
+        authorDao.deleteById(author)
         where:
         authorDao << [jdbcDao, hibernateDao]
     }
@@ -38,7 +38,7 @@ class AuthorDaoTest extends Specification {
         authorDao.persist(author)
         expect:
         authorDao.containsAuthor(firstName, lastName)
-        authorDao.delete(author)
+        authorDao.deleteById(author)
         !authorDao.containsAuthor(firstName, lastName)
         !authorDao.getAuthor(firstName, lastName).isPresent()
         where:

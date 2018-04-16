@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -86,11 +87,23 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   }
 
   @Override
-  public void delete(Algorithm algorithm) {
+  public void deleteById(Algorithm algorithm) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(
         entityManager.contains(algorithm) ? algorithm : entityManager.merge(algorithm));
+    entityManager.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByName(Algorithm algorithm) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<Algorithm> delete = builder.createCriteriaDelete(Algorithm.class);
+    Root<Algorithm> root = delete.from(Algorithm.class);
+    delete.where(builder.equal(root.get(Algorithm_.name), algorithm.getName()));
+    entityManager.createQuery(delete).executeUpdate();
     entityManager.getTransaction().commit();
   }
 }

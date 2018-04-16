@@ -42,11 +42,11 @@
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>-->
 
-        <Logger name="com.algorithm.manager.app.service.AlgorithmServiceImpl" additivity="true">
+        <Logger name="com.algorithm.manager.service.AlgorithmServiceImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>
-        <Logger name="com.algorithm.manager.app.service.BookServiceImpl" additivity="true">
+        <Logger name="com.algorithm.manager.service.BookServiceImpl" additivity="true">
             <AppenderRef ref="ALL" level="ALL"/>
             <AppenderRef ref="ERROR" level="ERROR"/>
         </Logger>

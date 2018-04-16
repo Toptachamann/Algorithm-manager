@@ -18,6 +18,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   private PreparedStatement getAuthorByName;
   private PreparedStatement insertAuthor;
   private PreparedStatement deleteAuthor;
+  private PreparedStatement deleteByFullName;
 
   public AuthorDaoImpl() throws SQLException {
     insertAuthor =
@@ -25,6 +26,9 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
     getAuthorByName =
         connection.prepareStatement("SELECT * FROM author WHERE first_name = ? && last_name = ?");
     deleteAuthor = connection.prepareStatement("DELETE FROM author WHERE author_id = ?");
+    deleteByFullName =
+        connection.prepareStatement(
+            "DELETE FROM algorithms.author WHERE algorithms.author.first_name = ? and algorithms.author.last_name = ?");
   }
 
   @Override
@@ -49,14 +53,14 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
       author.setId(getLastId(connection));
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist author {}", author);
+      logger.error("Failed to persistAlgorithm author {}", author);
       rollBack(connection);
       throw e;
     }
   }
 
   @Override
-  public void delete(Author author) throws Exception {
+  public void deleteById(Author author) throws Exception {
     try {
       deleteAuthor.setInt(1, author.getId());
       logger.debug(() -> Util.format(deleteAuthor));
@@ -64,7 +68,23 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete author {}", author);
+      logger.error("Failed to deleteById author {}", author);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteByFullName(Author author) throws Exception {
+    try {
+      deleteByFullName.setString(1, author.getFirstName());
+      deleteByFullName.setString(2, author.getLastName());
+      logger.debug(() -> Util.format(deleteAuthor));
+      deleteByFullName.executeUpdate();
+      connection.commit();
+    } catch (Exception e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to deleteById author {} by full name");
       rollBack(connection);
       throw e;
     }

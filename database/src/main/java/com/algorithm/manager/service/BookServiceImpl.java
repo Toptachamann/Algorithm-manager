@@ -1,4 +1,4 @@
-package com.algorithm.manager.app.service;
+package com.algorithm.manager.service;
 
 import com.algorithm.manager.auxiliary.LogicException;
 import com.algorithm.manager.dao.interf.AuthorDao;

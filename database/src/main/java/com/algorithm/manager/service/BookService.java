@@ -1,4 +1,4 @@
-package com.algorithm.manager.app.service;
+package com.algorithm.manager.service;
 
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.Author;

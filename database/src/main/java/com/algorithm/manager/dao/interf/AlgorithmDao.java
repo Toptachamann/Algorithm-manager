@@ -25,5 +25,7 @@ public interface AlgorithmDao {
 
   void merge(Algorithm algorithm) throws Exception;
 
-  void delete(Algorithm algorithm) throws Exception;
+  void deleteById(Algorithm algorithm) throws Exception;
+
+  void deleteByName(Algorithm algorithm) throws Exception;
 }

@@ -18,17 +18,16 @@ import java.util.Optional;
 public class AreaDaoImpl extends AbstractDao implements AreaDao {
   private static final Logger logger = LogManager.getLogger(AreaDaoImpl.class);
 
-  private PreparedStatement createAreaByName;
   private PreparedStatement createArea;
   private PreparedStatement getAllAreas;
   private PreparedStatement getAreaById;
   private PreparedStatement getAreaByName;
   private PreparedStatement deleteAreaById;
+  private PreparedStatement deleteByArea;
 
   public AreaDaoImpl() throws SQLException {
     createArea =
         connection.prepareStatement("INSERT INTO area_of_use (area, description) VALUE (?, ?)");
-    createAreaByName = connection.prepareStatement("INSERT INTO area_of_use (area) VALUE (?)");
     getAllAreas = connection.prepareStatement("SELECT area_id, area, description FROM area_of_use");
     getAreaById =
         connection.prepareStatement(
@@ -38,6 +37,9 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
             "SELECT area_id, area, description FROM area_of_use WHERE area = ?");
     deleteAreaById =
         connection.prepareStatement("DELETE FROM algorithms.area_of_use WHERE area_id = ?");
+    deleteByArea =
+        connection.prepareStatement(
+            "DELETE FROM algorithms.area_of_use WHERE algorithms.area_of_use.area = ?");
   }
 
   @Override
@@ -55,7 +57,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist area of use {}", areaOfUse);
+      logger.error("Failed to persistAlgorithm area of use {}", areaOfUse);
       rollBack(connection);
       throw e;
     }
@@ -97,7 +99,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void delete(AreaOfUse areaOfUse) throws SQLException {
+  public void deleteById(AreaOfUse areaOfUse) throws SQLException {
     try {
       deleteAreaById.setInt(1, areaOfUse.getId());
       logger.debug(() -> Util.format(deleteAreaById));
@@ -105,7 +107,22 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete area of use", areaOfUse);
+      logger.error("Failed to deleteById area of use", areaOfUse);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteByArea(AreaOfUse areaOfUse) throws Exception {
+    try {
+      deleteByArea.setString(1, areaOfUse.getAreaOfUse());
+      logger.debug(() -> Util.format(deleteByArea));
+      deleteByArea.executeUpdate();
+      connection.commit();
+    } catch (Exception e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete area of use {} by area", areaOfUse);
       rollBack(connection);
       throw e;
     }

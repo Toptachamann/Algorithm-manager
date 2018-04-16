@@ -26,6 +26,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
   private PreparedStatement getAlgorithmByName;
   private PreparedStatement merge;
   private PreparedStatement deleteById;
+  private PreparedStatement deleteByName;
 
   public AlgorithmDaoImpl() throws SQLException {
     createAlgorithm =
@@ -39,12 +40,15 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
             + "    INNER JOIN field_of_study as fos ON algo_field_id = field_id)";
     allAlgorithms = connection.prepareStatement(bigQuery);
     getAlgorithmByName = connection.prepareStatement(bigQuery + " WHERE algorithm = ?");
-    deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
     merge =
         connection.prepareStatement(
             "UPDATE algorithm "
                 + "SET algorithm = ?, complexity = ?, algo_paradigm_id = ?, algo_field_id = ? "
                 + "WHERE algorithms.algorithm.algorithm_id = ?");
+    deleteById = connection.prepareStatement("DELETE FROM algorithm WHERE algorithm_id = ?");
+    deleteByName =
+        connection.prepareStatement(
+            "DELETE FROM algorithms.algorithm WHERE algorithms.algorithm.algorithm = ?");
   }
 
   @Override
@@ -60,7 +64,7 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist an algorithm {}", algorithm);
+      logger.error("Failed to persistAlgorithm an algorithm {}", algorithm);
       super.rollBack(connection);
       throw e;
     }
@@ -143,21 +147,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
   }
 
-  @Override
-  public void delete(Algorithm algorithm) throws SQLException {
-    try {
-      deleteById.setInt(1, algorithm.getId());
-      logger.debug(() -> Util.format(deleteById));
-      deleteById.executeUpdate();
-      connection.commit();
-    } catch (SQLException e) {
-      logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete an algorithm {}", algorithm);
-      connection.rollback();
-      throw e;
-    }
-  }
-
   private List<Algorithm> algorithmFromResultSet(ResultSet set) throws SQLException {
     List<Algorithm> algorithms = new ArrayList<>();
     while (set.next()) {
@@ -170,5 +159,35 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
               set.getInt(1), set.getString(2), set.getString(3), designParadigm, fieldOfStudy));
     }
     return algorithms;
+  }
+
+  @Override
+  public void deleteById(Algorithm algorithm) throws SQLException {
+    try {
+      deleteById.setInt(1, algorithm.getId());
+      logger.debug(() -> Util.format(deleteById));
+      deleteById.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to deleteById an algorithm {}", algorithm);
+      connection.rollback();
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteByName(Algorithm algorithm) throws Exception {
+    try {
+      deleteByName.setString(1, algorithm.getName());
+      logger.debug(() -> Util.format(deleteByName));
+      deleteByName.executeUpdate();
+      connection.commit();
+    } catch (Exception e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to deleteById algorithm {} by name", algorithm);
+      rollBack(connection);
+      throw e;
+    }
   }
 }

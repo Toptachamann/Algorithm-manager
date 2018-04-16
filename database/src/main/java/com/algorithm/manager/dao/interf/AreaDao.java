@@ -18,5 +18,7 @@ public interface AreaDao {
 
   Optional<AreaOfUse> getAreaByName(String name) throws Exception;
 
-  void delete(AreaOfUse areaOfUse) throws Exception;
+  void deleteById(AreaOfUse areaOfUse) throws Exception;
+
+  void deleteByArea(AreaOfUse areaOfUse) throws Exception;
 }

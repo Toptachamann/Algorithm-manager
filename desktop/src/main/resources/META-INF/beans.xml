@@ -35,7 +35,7 @@
     <bean id="jdbcAuthorDao" class="com.algorithm.manager.dao.jdbc.AuthorDaoImpl" parent="hibernateAbstractDao"/>
     <bean id="jdbcReferenceDao" class="com.algorithm.manager.dao.jdbc.ReferenceDaoImpl" parent="hibernateAbstractDao"/>
 
-    <bean id="algorithmService" class="com.algorithm.manager.app.service.AlgorithmServiceImpl">
+    <bean id="algorithmService" class="com.algorithm.manager.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="hibernateAlgorithmDao"/>
         <constructor-arg name="paradigmDao" ref="hibernateParadigmDao"/>
         <constructor-arg name="fieldDao" ref="hibernateFieldDao"/>
@@ -48,7 +48,7 @@
     </bean>
 
 
-    <bean id="bookService" class="com.algorithm.manager.app.service.BookServiceImpl">
+    <bean id="bookService" class="com.algorithm.manager.service.BookServiceImpl">
         <constructor-arg name="bookDao" ref="hibernateBookDao"/>
         <constructor-arg name="authorDao" ref="hibernateAuthorDao"/>
         <constructor-arg name="referenceDao" ref="hibernateReferenceDao"/>

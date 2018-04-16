@@ -13,5 +13,7 @@ public interface AuthorDao {
     return getAuthor(firstName, lastName).isPresent();
   }
 
-  void delete(Author author) throws Exception;
+  void deleteById(Author author) throws Exception;
+
+  void deleteByFullName(Author author) throws Exception;
 }

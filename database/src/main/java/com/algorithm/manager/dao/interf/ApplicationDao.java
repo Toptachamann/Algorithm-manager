@@ -17,9 +17,9 @@ public interface ApplicationDao {
 
   Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
-  void deleteApplication(Application application) throws Exception;
-
   List<Application> getApplicationsByArea(AreaOfUse area) throws Exception;
 
   List<Application> getApplicationsByAlgorithm(Algorithm algorithm) throws Exception;
+
+  void delete(Application application) throws Exception;
 }

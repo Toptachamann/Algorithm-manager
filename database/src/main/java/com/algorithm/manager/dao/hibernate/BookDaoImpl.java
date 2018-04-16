@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -16,8 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class BookDaoImpl extends AbstractDao implements BookDao {
-  public BookDaoImpl() {
-  }
+  public BookDaoImpl() {}
 
   @Override
   public void persist(Book book) {
@@ -86,6 +86,18 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(book) ? book : entityManager.merge(book));
+    entityManager.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByTitle(Book book) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<Book> delete = builder.createCriteriaDelete(Book.class);
+    Root<Book> root = delete.from(Book.class);
+    delete.where(builder.equal(root.get(Book_.title), book.getTitle()));
+    entityManager.createQuery(delete).executeUpdate();
     entityManager.getTransaction().commit();
   }
 }

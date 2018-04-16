@@ -83,7 +83,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist application {}", application);
+      logger.error("Failed to persistAlgorithm application {}", application);
       rollBack(connection);
       throw e;
     }
@@ -109,7 +109,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public void deleteApplication(Application application) throws SQLException {
+  public void delete(Application application) throws SQLException {
     try {
       deleteApplication.setInt(1, application.getAlgorithm().getId());
       deleteApplication.setInt(2, application.getAreaOfUse().getId());
@@ -119,7 +119,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
       logger.error(
-          "Failed to delete algorithm application {}", application);
+          "Failed to deleteById algorithm application {}", application);
       rollBack(connection);
       throw e;
     }

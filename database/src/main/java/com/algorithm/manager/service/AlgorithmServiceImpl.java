@@ -1,4 +1,4 @@
-package com.algorithm.manager.app.service;
+package com.algorithm.manager.service;
 
 import com.algorithm.manager.auxiliary.LogicException;
 import com.algorithm.manager.dao.interf.AlgorithmDao;
@@ -43,7 +43,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   }
 
   @Override
-  public Algorithm persist(
+  public Algorithm persistAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
     Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
@@ -71,11 +71,6 @@ public class AlgorithmServiceImpl implements AlgorithmService {
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
     return algorithmDao.searchAlgorithm(name, complexity, designParadigm, fieldOfStudy);
-  }
-
-  @Override
-  public List<Application> getApplicationsByArea(AreaOfUse areaOfUse) throws Exception {
-    return applicationDao.getApplicationsByArea(areaOfUse);
   }
 
   @Override
@@ -121,7 +116,13 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void deleteAlgorithm(Algorithm algorithm) throws Exception {
-    algorithmDao.delete(algorithm);
+    algorithmDao.deleteById(algorithm);
+  }
+
+  //------------------------------------------------------------------------
+  @Override
+  public List<Application> getApplicationsByArea(AreaOfUse areaOfUse) throws Exception {
+    return applicationDao.getApplicationsByArea(areaOfUse);
   }
 
   @Override
@@ -218,7 +219,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void deleteAreaOfUse(AreaOfUse areaOfUse) throws Exception {
-    areaDao.delete(areaOfUse);
+    areaDao.deleteById(areaOfUse);
   }
 
   @Override
@@ -237,7 +238,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     if (!applicationDao.containsApplication(application)) {
       throw new LogicException("This application didn't exist");
     } else {
-      applicationDao.deleteApplication(application);
+      applicationDao.delete(application);
     }
   }
 }

@@ -28,6 +28,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   private PreparedStatement mergeBook;
   private PreparedStatement resetAuthors;
   private PreparedStatement deleteBook;
+  private PreparedStatement deleteByTitle;
 
   public BookDaoImpl() throws SQLException {
     allBooks =
@@ -55,6 +56,8 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     resetAuthors =
         connection.prepareStatement(
             "DELETE FROM algorithms.textbook WHERE algorithms.textbook.txtbk_book_id = ?");
+    deleteByTitle =
+        connection.prepareStatement("DELETE FROM algorithms.book WHERE algorithms.book.title = ?");
   }
 
   @Override
@@ -73,7 +76,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist a book {}", book);
+      logger.error("Failed to persistAlgorithm a book {}", book);
       rollBack(connection);
       throw e;
     }
@@ -191,7 +194,22 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete book ", book);
+      logger.error("Failed to deleteById book ", book);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteByTitle(Book book) throws Exception {
+    try {
+      deleteByTitle.setString(1, book.getTitle());
+      logger.debug(() -> Util.format(deleteByTitle));
+      deleteByTitle.executeUpdate();
+      connection.commit();
+    } catch (Exception e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete book {} by title", book);
       rollBack(connection);
       throw e;
     }

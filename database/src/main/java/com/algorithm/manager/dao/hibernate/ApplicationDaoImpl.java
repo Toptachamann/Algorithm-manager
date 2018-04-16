@@ -41,7 +41,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
   }
 
   @Override
-  public void deleteApplication(Application application) {
+  public void delete(Application application) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(application) ? application : entityManager.merge(application));

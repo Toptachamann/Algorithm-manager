@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class AreaDaoImpl extends AbstractDao implements AreaDao {
-  public AreaDaoImpl() {
-  }
+  public AreaDaoImpl() {}
 
   @Override
   public List<AreaOfUse> getAllAreas() {
@@ -61,10 +60,23 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
   }
 
   @Override
-  public void delete(AreaOfUse areaOfUse) {
+  public void deleteById(AreaOfUse areaOfUse) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
-    entityManager.remove(entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));
+    entityManager.remove(
+        entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));
+    entityManager.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByArea(AreaOfUse areaOfUse) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<AreaOfUse> delete = builder.createCriteriaDelete(AreaOfUse.class);
+    Root<AreaOfUse> root = delete.from(AreaOfUse.class);
+    delete.where(builder.equal(root.get(AreaOfUse_.areaOfUse), areaOfUse.getAreaOfUse()));
+    entityManager.createQuery(delete).executeUpdate();
     entityManager.getTransaction().commit();
   }
 }

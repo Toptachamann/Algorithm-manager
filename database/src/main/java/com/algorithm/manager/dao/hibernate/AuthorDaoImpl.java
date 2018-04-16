@@ -14,8 +14,7 @@ import java.util.Optional;
 
 public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
 
-  public AuthorDaoImpl() {
-  }
+  public AuthorDaoImpl() {}
 
   @Override
   public void persist(Author author) {
@@ -26,10 +25,25 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public void delete(Author author) {
+  public void deleteById(Author author) {
     EntityManager entityManager = getEntityManager();
     entityManager.getTransaction().begin();
     entityManager.remove(entityManager.contains(author) ? author : entityManager.merge(author));
+    entityManager.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByFullName(Author author) throws Exception {
+    EntityManager entityManager = getEntityManager();
+    entityManager.getTransaction().begin();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaDelete<Author> delete = builder.createCriteriaDelete(Author.class);
+    Root<Author> root = delete.from(Author.class);
+    delete.where(
+        builder.and(
+            builder.equal(root.get(Author_.firstName), author.getFirstName()),
+            builder.equal(root.get(Author_.lastName), author.getLastName())));
+    entityManager.createQuery(delete).executeUpdate();
     entityManager.getTransaction().commit();
   }
 

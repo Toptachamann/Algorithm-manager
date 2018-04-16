@@ -24,6 +24,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   private PreparedStatement getFieldByName;
   private PreparedStatement merge;
   private PreparedStatement deleteFieldById;
+  private PreparedStatement deleteByField;
 
   public FieldDaoImpl() throws SQLException {
     allFieldsOfStudy = connection.prepareStatement("SELECT * FROM field_of_study");
@@ -36,6 +37,9 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
             "UPDATE algorithms.field_of_study "
                 + "SET algorithms.field_of_study.field = ?, field_of_study.description = ? WHERE algorithms.field_of_study.field_id = ?");
     deleteFieldById = connection.prepareStatement("DELETE FROM field_of_study WHERE field_id = ?");
+    deleteByField =
+        connection.prepareStatement(
+            "DELETE FROM algorithms.field_of_study WHERE algorithms.field_of_study.field = ?");
   }
 
   @Override
@@ -53,7 +57,7 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist field of study {}", fieldOfStudy);
+      logger.error("Failed to persistAlgorithm field of study {}", fieldOfStudy);
       rollBack(connection);
       throw e;
     }
@@ -96,9 +100,9 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
 
   @Override
   public void merge(FieldOfStudy fieldOfStudy) throws Exception {
-    if(!containsFieldOfStudy(fieldOfStudy)){
+    if (!containsFieldOfStudy(fieldOfStudy)) {
       persist(fieldOfStudy);
-    }else{
+    } else {
       try {
         merge.setString(1, fieldOfStudy.getField());
         merge.setString(2, fieldOfStudy.getDescription());
@@ -113,7 +117,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
         throw e;
       }
     }
-
   }
 
   @Override
@@ -125,7 +128,22 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete field of study", fieldOfStudy);
+      logger.error("Failed to deleteById field of study", fieldOfStudy);
+      rollBack(connection);
+      throw e;
+    }
+  }
+
+  @Override
+  public void deleteByField(FieldOfStudy fieldOfStudy) throws Exception {
+    try {
+      deleteByField.setString(1, fieldOfStudy.getField());
+      logger.debug(() -> Util.format(deleteByField));
+      deleteByField.executeUpdate();
+      connection.commit();
+    } catch (Exception e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete field of study {} by field", fieldOfStudy);
       rollBack(connection);
       throw e;
     }

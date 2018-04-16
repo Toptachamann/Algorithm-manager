@@ -28,7 +28,7 @@ class AreaDaoImplTest extends Specification {
         optCreated.isPresent()
         optCreated.get() == area
         cleanup:
-        areaDao.delete(area)
+        areaDao.deleteById(area)
         where:
         areaDao << [jdbcDao, hibernateDao]
     }
@@ -38,7 +38,7 @@ class AreaDaoImplTest extends Specification {
         setup:
         areaDao.persist(area)
         when:
-        areaDao.delete(area)
+        areaDao.deleteById(area)
         then:
         !areaDao.containsAreaOfUse(area.getAreaOfUse())
         where:

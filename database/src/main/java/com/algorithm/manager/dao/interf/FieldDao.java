@@ -25,4 +25,6 @@ public interface FieldDao {
   void merge(FieldOfStudy fieldOfStudy) throws Exception;
 
   void delete(FieldOfStudy fieldOfStudy) throws Exception;
+
+  void deleteByField(FieldOfStudy fieldOfStudy) throws Exception;
 }

@@ -3,7 +3,7 @@ package com.algorithm.manager.app.controller;
 import com.algorithm.manager.auxiliary.InputException;
 import com.algorithm.manager.model.Author;
 import com.algorithm.manager.model.Book;
-import com.algorithm.manager.app.service.BookService;
+import com.algorithm.manager.service.BookService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -180,7 +180,7 @@ public class TextbookController extends AbstractController {
             Book book = textbookTableView.getSelectionModel().getSelectedItem();
             if (book != null) {
               confirm.setContentText(
-                  "Do you really want to delete this book?\n" + "Operation is undoable.");
+                  "Do you really want to deleteById this book?\n" + "Operation is undoable.");
               Optional<ButtonType> buttonType = confirm.showAndWait();
               if (buttonType.isPresent() && buttonType.get().equals(ButtonType.OK)) {
                 try {
@@ -189,7 +189,7 @@ public class TextbookController extends AbstractController {
                 } catch (Exception e1) {
                   logger.error(e1);
                   error.setContentText(
-                      "Can't delete selected book due to some internal error.\n"
+                      "Can't deleteById selected book due to some internal error.\n"
                           + "See logs for details.");
                   error.showAndWait();
                 }
@@ -223,8 +223,9 @@ public class TextbookController extends AbstractController {
     editionColumn.setOnEditCommit(
         e -> {
           Integer newEdition = e.getNewValue();
-          if (newEdition == null || newEdition < 1) {
-            info.setContentText("Edition should be numeric value and should be greater than 0");
+          if (newEdition == null || newEdition < 1 || newEdition > Short.MAX_VALUE) {
+            info.setContentText(
+                "Edition should be numeric value in range and should be greater than 0");
             info.showAndWait();
             textbookTableView.refresh();
           } else {
@@ -234,9 +235,8 @@ public class TextbookController extends AbstractController {
               book.setEdition(newEdition);
             } catch (Exception e1) {
               logger.error(e1);
-              error.setContentText(
+              error(
                   "Edition wasn't changed due to some internal error.\n" + "See logs for details.");
-              error.showAndWait();
             }
           }
         });
@@ -292,7 +292,7 @@ public class TextbookController extends AbstractController {
             if (e.getCode().equals(KeyCode.ENTER)) {
               try {
                 List<Author> authorsFromInput = authorsFromStr(textField.getText());
-                logger.debug(()->"Entered authors: " + authorsFromInput.toString());
+                logger.debug(() -> "Entered authors: " + authorsFromInput.toString());
                 commitEdit(authorsFromInput);
               } catch (InputException e1) {
                 logger.error(e1);

@@ -49,7 +49,7 @@ class AlgorithmDaoImplTest extends Specification {
     def created = optCreated.get()
     created == algorithm
     cleanup:
-    algorithmDao.delete(algorithm)
+    algorithmDao.deleteById(algorithm)
     where:
     algorithmDao << [hibernateDao, jdbcDao]
   }
@@ -58,7 +58,7 @@ class AlgorithmDaoImplTest extends Specification {
   def "test algorithm deletion"() {
     setup:
     algorithmDao.persist(algorithm)
-    algorithmDao.delete(algorithm)
+    algorithmDao.deleteById(algorithm)
     expect:
     !algorithmDao.containsAlgorithm(algorithm.getName())
     where:
@@ -88,7 +88,7 @@ class AlgorithmDaoImplTest extends Specification {
     def created = optCreated.get()
     created == algorithm
     cleanup:
-    algorithmDao.delete(algorithm)
+    algorithmDao.deleteById(algorithm)
     paradigmDao.delete(updatedParadigm)
     fieldDao.delete(updatedField)
     where:

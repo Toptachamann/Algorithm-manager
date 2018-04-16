@@ -6,8 +6,8 @@ import com.algorithm.manager.model.Application;
 import com.algorithm.manager.model.AreaOfUse;
 import com.algorithm.manager.model.Book;
 import com.algorithm.manager.model.Reference;
-import com.algorithm.manager.app.service.AlgorithmService;
-import com.algorithm.manager.app.service.BookService;
+import com.algorithm.manager.service.AlgorithmService;
+import com.algorithm.manager.service.BookService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -102,11 +102,11 @@ public class ReferenceController extends AbstractController {
             Algorithm algorithm = areaAlgorithmCB.getSelectionModel().getSelectedItem();
             AreaOfUse areaOfUse = areaOfUseCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
-              info.setContentText("To delete an algorithmic application select an algorithm first");
+              info.setContentText("To deleteById an algorithmic application select an algorithm first");
               info.showAndWait();
             } else if (areaOfUse == null) {
               info.setContentText(
-                  "Select an area of use to delete an application of the specified algorithm");
+                  "Select an area of use to deleteById an application of the specified algorithm");
               info.showAndWait();
             } else {
               algorithmService.deleteApplication(algorithm, areaOfUse);
@@ -172,11 +172,11 @@ public class ReferenceController extends AbstractController {
             int index = areaOfUseCB.getSelectionModel().getSelectedIndex();
             if (selected == null) {
               info.setContentText(
-                  "To delete an area of use you have to select it in area of use combo-box");
+                  "To deleteById an area of use you have to select it in area of use combo-box");
               info.showAndWait();
             } else {
               confirm.setContentText(
-                  "Do you really want to delete this area of use?\n"
+                  "Do you really want to deleteById this area of use?\n"
                       + "All algorithms' applications, connected to this area of use, will also be deleted.\n"
                       + "This operation is undoable.");
               Optional<ButtonType> buttonType = confirm.showAndWait();
@@ -197,10 +197,10 @@ public class ReferenceController extends AbstractController {
             Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
             Book book = bookCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
-              info.setContentText("To persist a reference to an algorithm select it first");
+              info.setContentText("To persistAlgorithm a reference to an algorithm select it first");
               info.showAndWait();
             } else if (book == null) {
-              info.setContentText("To persist a reference you have to select a book");
+              info.setContentText("To persistAlgorithm a reference you have to select a book");
               info.showAndWait();
             } else {
               bookService.createReference(algorithm, book);
@@ -234,11 +234,11 @@ public class ReferenceController extends AbstractController {
             Algorithm algorithm = refAlgorithmCB.getSelectionModel().getSelectedItem();
             Book book = bookCB.getSelectionModel().getSelectedItem();
             if (algorithm == null) {
-              info.setContentText("To delete a reference select an algorithm first");
+              info.setContentText("To deleteById a reference select an algorithm first");
               info.showAndWait();
             } else if (book == null) {
               info.setContentText(
-                  "To delete a reference to the selected algorithm you have to select a book");
+                  "To deleteById a reference to the selected algorithm you have to select a book");
               info.showAndWait();
             } else {
               bookService.deleteReference(algorithm, book);

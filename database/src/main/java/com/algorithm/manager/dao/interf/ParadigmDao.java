@@ -25,4 +25,6 @@ public interface ParadigmDao {
   void merge(DesignParadigm paradigm) throws Exception;
 
   void delete(DesignParadigm paradigm) throws Exception;
+
+  void deleteByParadigm(DesignParadigm paradigm) throws Exception;
 }

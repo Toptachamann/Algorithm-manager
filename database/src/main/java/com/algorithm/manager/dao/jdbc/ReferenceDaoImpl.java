@@ -59,7 +59,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist reference {}", reference);
+      logger.error("Failed to persistAlgorithm reference {}", reference);
       rollBack(connection);
       throw e;
     }
@@ -104,7 +104,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete reference {}", reference);
+      logger.error("Failed to deleteById reference {}", reference);
       rollBack(connection);
       throw e;
     }

@@ -61,12 +61,12 @@ class ReferenceDaoImplTest extends Specification {
     }
 
     def cleanupSpec() {
-        algorithmDao.delete(algorithm)
+        algorithmDao.deleteById(algorithm)
         paradigmDao.delete(paradigm)
         fieldDao.delete(field)
         bookDao.delete(book)
-        authorDao.delete(author1)
-        authorDao.delete(author2)
+        authorDao.deleteById(author1)
+        authorDao.deleteById(author2)
     }
 
     @Unroll

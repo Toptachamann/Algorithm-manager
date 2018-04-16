@@ -1,4 +1,4 @@
-package com.algorithm.manager.app.service;
+package com.algorithm.manager.service;
 
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.Application;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface AlgorithmService {
 
-  Algorithm persist(
+  Algorithm persistAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception;
 

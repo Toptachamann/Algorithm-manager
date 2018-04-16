@@ -23,7 +23,8 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   private PreparedStatement getParadigmById;
   private PreparedStatement getParadigmByName;
   private PreparedStatement merge;
-  private PreparedStatement deleteParadigm;
+  private PreparedStatement deleteById;
+  private PreparedStatement deleteByParadigm;
 
   public ParadigmDaoImpl() throws SQLException {
     createParadigm =
@@ -37,8 +38,10 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     merge =
         connection.prepareStatement(
             "UPDATE design_paradigm SET paradigm = ?, description = ? WHERE paradigm_id = ?");
-    deleteParadigm =
-        connection.prepareStatement("DELETE FROM design_paradigm WHERE paradigm_id = ?");
+    deleteById = connection.prepareStatement("DELETE FROM design_paradigm WHERE paradigm_id = ?");
+    deleteByParadigm =
+        connection.prepareStatement(
+            "DELETE FROM algorithms.design_paradigm WHERE algorithms.design_paradigm.paradigm = ?");
   }
 
   @Override
@@ -56,7 +59,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to persist design paradigm {}", paradigm);
+      logger.error("Failed to persistAlgorithm design paradigm {}", paradigm);
       rollBack(connection);
       throw e;
     }
@@ -88,13 +91,13 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   @Override
   public void delete(DesignParadigm paradigm) throws Exception {
     try {
-      deleteParadigm.setInt(1, paradigm.getId());
-      logger.debug(() -> Util.format(deleteParadigm));
-      deleteParadigm.executeUpdate();
+      deleteById.setInt(1, paradigm.getId());
+      logger.debug(() -> Util.format(deleteById));
+      deleteById.executeUpdate();
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to delete design paradigm {}", paradigm);
+      logger.error("Failed to deleteById design paradigm {}", paradigm);
       rollBack(connection);
       throw e;
     }
@@ -130,6 +133,21 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
         rollBack(connection);
         throw e;
       }
+    }
+  }
+
+  @Override
+  public void deleteByParadigm(DesignParadigm paradigm) throws Exception {
+    try {
+      deleteByParadigm.setString(1, paradigm.getParadigm());
+      logger.debug(() -> Util.format(deleteByParadigm));
+      deleteByParadigm.executeUpdate();
+      connection.commit();
+    } catch (SQLException e) {
+      logger.catching(Level.ERROR, e);
+      logger.error("Failed to delete design paradigm {} by paradigm", paradigm);
+      rollBack(connection);
+      throw e;
     }
   }
 }

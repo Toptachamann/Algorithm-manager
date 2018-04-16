@@ -28,7 +28,7 @@ class BookDaoImplTest extends Specification {
 
     def cleanup() {
         for (Author author : authors) {
-            authorDao.delete(author)
+            authorDao.deleteById(author)
         }
     }
 

@@ -20,18 +20,19 @@ class ParadigmDaoImplTest extends Specification {
     setup:
     def paradigm = new DesignParadigm(name)
     paradigmDao.persist(paradigm)
-    def optCreated = paradigmDao.getParadigmById(paradigm.getId())
+    def optCreatedById = paradigmDao.getParadigmById(paradigm.getId())
+    def optCreatedByName = paradigmDao.getParadigmByName(paradigm.getName())
     expect:
-    optCreated.isPresent()
-    def created = optCreated.get()
-    created.getName() == name
-    created.getDescription() == null
-    paradigmDao.containsParadigmWithId(created.getId())
-    paradigmDao.containsParadigmWithName(created.getName())
-    paradigmDao.containsParadigmWithName(created.getName())
-    paradigm == created
+    optCreatedById.isPresent()
+    optCreatedByName.isPresent()
+    def createdById = optCreatedById.get()
+    def createdByName = optCreatedByName.get()
+    createdById == paradigm
+    createdByName == paradigm
+    paradigmDao.containsParadigmWithId(createdById.getId())
+    paradigmDao.containsParadigmWithName(createdById.getName())
     cleanup:
-    paradigmDao.delete(created)
+    paradigmDao.delete(createdById)
     where:
     paradigmDao << [hibernateDao]
   }
@@ -57,18 +58,6 @@ class ParadigmDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test paradigm deletion"() {
-    setup:
-    def paradigm = new DesignParadigm(name)
-    paradigmDao.persist(paradigm)
-    paradigmDao.delete(paradigm)
-    expect:
-    !paradigmDao.containsParadigmWithId(paradigm.getId())
-    where:
-    paradigmDao << [hibernateDao]
-  }
-
-  @Unroll
   def "test merge design paradigm"() {
     setup:
     def paradigm = new DesignParadigm(name)
@@ -80,6 +69,43 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.containsParadigmWithName(updatedName)
     cleanup:
     paradigmDao.delete(paradigm)
+    where:
+    paradigmDao << [hibernateDao]
+  }
+
+  @Unroll
+  def "test paradigm deletion"() {
+    setup:
+    def paradigm = new DesignParadigm(name)
+    paradigmDao.persist(paradigm)
+    paradigmDao.delete(paradigm)
+    expect:
+    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithName(paradigm.getName())
+    where:
+    paradigmDao << [hibernateDao]
+  }
+
+  def "test paradigm deletion by id"() {
+    setup:
+    def paradigm = new DesignParadigm(name)
+    int id = paradigmDao.persist(paradigm)
+    paradigmDao.deleteById(id)
+    expect:
+    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithName(paradigm.getName())
+    where:
+    paradigmDao << [hibernateDao]
+  }
+
+  def "test paradigm deletion by name"() {
+    setup:
+    def paradigm = new DesignParadigm(name)
+    paradigmDao.persist(paradigm)
+    paradigmDao.deleteByName(paradigm.getName())
+    expect:
+    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithName(paradigm.getName())
     where:
     paradigmDao << [hibernateDao]
   }

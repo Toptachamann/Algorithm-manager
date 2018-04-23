@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="Gradle : Algorithm manager : alg_manager-web-0.2.0.war">
+    <output-path>$PROJECT_DIR$/alg_manager-web/build/libs</output-path>
+    <properties id="gradle-properties">
+      <options external-project-path="$PROJECT_DIR$" />
+    </properties>
+    <root id="archive" name="alg_manager-web-0.2.0.war">
+      <element id="artifact" artifact-name="Gradle : Algorithm manager : alg_manager-web-0.2.0.war (exploded)" />
+    </root>
+  </artifact>
+</component>

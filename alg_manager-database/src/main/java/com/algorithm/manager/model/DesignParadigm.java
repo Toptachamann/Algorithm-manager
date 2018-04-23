@@ -3,6 +3,7 @@ package com.algorithm.manager.model;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,7 +31,7 @@ public class DesignParadigm {
     this.name = name;
   }
 
-  public DesignParadigm(int id, String name, String description) {
+  public DesignParadigm(int id, String name, @Nullable String description) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -38,7 +39,7 @@ public class DesignParadigm {
 
   public DesignParadigm() {}
 
-  public DesignParadigm(String name, String description) {
+  public DesignParadigm(String name, @Nullable String description) {
     this.name = name;
     this.description = description;
   }
@@ -65,11 +66,7 @@ public class DesignParadigm {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(id)
-        .append(name)
-        .append(description)
-        .toHashCode();
+    return new HashCodeBuilder(17, 37).append(id).append(name).append(description).toHashCode();
   }
 
   public int getId() {

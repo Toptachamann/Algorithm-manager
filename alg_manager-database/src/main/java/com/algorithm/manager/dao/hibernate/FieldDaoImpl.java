@@ -4,10 +4,12 @@ import com.algorithm.manager.dao.interf.FieldDao;
 import com.algorithm.manager.model.FieldOfStudy;
 import com.algorithm.manager.model.FieldOfStudy_;
 import org.hibernate.Session;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,13 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     session.saveOrUpdate(fieldOfStudy);
     session.getTransaction().commit();
     return fieldOfStudy.getId();
+  }
+
+  @Override
+  public FieldOfStudy persist(String name, @Nullable String description) {
+    FieldOfStudy fieldOfStudy = new FieldOfStudy(name, description);
+    persist(fieldOfStudy);
+    return fieldOfStudy;
   }
 
   @Override
@@ -65,6 +74,34 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     Session session = getSession();
     session.getTransaction().begin();
     session.merge(fieldOfStudy);
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void setName(int id, String name) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<FieldOfStudy> update = builder.createCriteriaUpdate(FieldOfStudy.class);
+    Root<FieldOfStudy> root = update.from(FieldOfStudy.class);
+    update
+        .where(builder.equal(root.get(FieldOfStudy_.id), id))
+        .set(root.get(FieldOfStudy_.name), name);
+    session.createQuery(update).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void setDescription(int id, String description) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<FieldOfStudy> update = builder.createCriteriaUpdate(FieldOfStudy.class);
+    Root<FieldOfStudy> root = update.from(FieldOfStudy.class);
+    update
+        .where(builder.equal(root.get(FieldOfStudy_.id), id))
+        .set(root.get(FieldOfStudy_.description), description);
+    session.createQuery(update).executeUpdate();
     session.getTransaction().commit();
   }
 

@@ -28,7 +28,7 @@ subprojects {
   }
 }
 
-project(':database') {
+project(':alg_manager-database') {
   version '0.2.0'
   dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
@@ -48,13 +48,12 @@ project(':database') {
   }
 }
 
-project(':desktop') {
+project('alg_manager-desktop') {
   apply plugin: 'application'
   version '0.2.0'
   mainClassName = "com.algorithm.manager.app.App"
   dependencies {
-    compile project(':database')
-    testCompile project(':database')
+    compile project(':alg_manager-database')
   }
 
   jar {
@@ -71,7 +70,7 @@ project(':desktop') {
   }
 }
 
-project('web') {
+project(':alg_manager-web') {
   version '0.2.0'
   apply plugin: 'application'
   apply plugin: 'war'
@@ -79,7 +78,7 @@ project('web') {
   mainClassName = "Main"
 
   dependencies {
-    compile project(':database')
+    compile project(':alg_manager-database')
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.5'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind

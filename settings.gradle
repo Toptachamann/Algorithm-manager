@@ -1,5 +1,4 @@
 rootProject.name = 'Algorithm manager'
-include 'web'
-include 'database'
-include 'desktop'
-
+include 'alg_manager-database'
+include 'alg_manager-desktop'
+include 'alg_manager-web'

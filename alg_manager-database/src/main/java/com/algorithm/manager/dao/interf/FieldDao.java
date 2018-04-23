@@ -1,12 +1,15 @@
 package com.algorithm.manager.dao.interf;
 
 import com.algorithm.manager.model.FieldOfStudy;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface FieldDao {
   int persist(FieldOfStudy fieldOfStudy) throws Exception;
+
+  FieldOfStudy persist(String name, @Nullable String description) throws Exception;
 
   List<FieldOfStudy> getFieldsOfStudy() throws Exception;
 
@@ -23,6 +26,10 @@ public interface FieldDao {
   }
 
   void merge(FieldOfStudy fieldOfStudy) throws Exception;
+
+  void setName(int id, String name) throws Exception;
+
+  void setDescription(int id, String description) throws Exception;
 
   void delete(FieldOfStudy fieldOfStudy) throws Exception;
 

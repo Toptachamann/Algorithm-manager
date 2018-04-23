@@ -10,6 +10,18 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="alg_manager-database_main" target="1.8" />
+      <module name="alg_manager-database_test" target="1.8" />
+      <module name="alg_manager-desktop_main" target="1.8" />
+      <module name="alg_manager-desktop_test" target="1.8" />
+      <module name="alg_manager-web_main" target="1.8" />
+      <module name="alg_manager-web_test" target="1.8" />
+      <module name="alg_namager-database_main" target="1.8" />
+      <module name="alg_namager-database_test" target="1.8" />
+      <module name="alg_namager-desktop_main" target="1.8" />
+      <module name="alg_namager-desktop_test" target="1.8" />
+      <module name="alg_namager-web_main" target="1.8" />
+      <module name="alg_namager-web_test" target="1.8" />
       <module name="Algorithm_main" target="1.8" />
       <module name="Algorithm_manager_main" target="1.8" />
       <module name="Algorithm_manager_test" target="1.8" />

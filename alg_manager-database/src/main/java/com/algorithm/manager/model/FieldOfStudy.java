@@ -3,6 +3,7 @@ package com.algorithm.manager.model;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +22,7 @@ public class FieldOfStudy {
 
   @Column(name = "field", nullable = false, unique = true, length = 50)
   private String name;
+
   @Column(name = "description")
   private String description;
 
@@ -28,13 +30,13 @@ public class FieldOfStudy {
     this.name = name;
   }
 
-  public FieldOfStudy(String name, String description) {
+  public FieldOfStudy(String name, @Nullable String description) {
 
     this.name = name;
     this.description = description;
   }
 
-  public FieldOfStudy(int id, String name, String description) {
+  public FieldOfStudy(int id, String name, @Nullable String description) {
 
     this.id = id;
     this.name = name;
@@ -66,11 +68,7 @@ public class FieldOfStudy {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(id)
-        .append(name)
-        .append(description)
-        .toHashCode();
+    return new HashCodeBuilder(17, 37).append(id).append(name).append(description).toHashCode();
   }
 
   public int getId() {

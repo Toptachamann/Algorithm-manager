@@ -7,6 +7,14 @@ import java.util.Optional;
 public interface AuthorDao {
   int persist(Author author) throws Exception;
 
+  default Author persist(String firstName, String lastName) throws Exception {
+    Author author = new Author(firstName, lastName);
+    persist(author);
+    return author;
+  }
+
+  void refresh(Author author) throws Exception;
+
   Optional<Author> getByFullName(String firstName, String lastName) throws Exception;
 
   Optional<Author> getById(int id) throws Exception;
@@ -21,9 +29,17 @@ public interface AuthorDao {
 
   void merge(Author author) throws Exception;
 
+  void setFullName(int id, String firstName, String lastName) throws Exception;
+
+  default void setFullName(Author author, String firstName, String lastName) throws Exception {
+    setFullName(author.getId(), firstName, lastName);
+    author.setFirstName(firstName);
+    author.setLastName(lastName);
+  }
+
   void delete(Author author) throws Exception;
 
-  void deleteById(int id) throws Exception;
+  int deleteById(int id) throws Exception;
 
-  void deleteByFullName(String firstName, String lastName) throws Exception;
+  int deleteByFullName(String firstName, String lastName) throws Exception;
 }

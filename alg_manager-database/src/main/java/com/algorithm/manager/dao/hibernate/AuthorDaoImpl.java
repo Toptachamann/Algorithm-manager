@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +25,31 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
+  public void refresh(Author author) {
+    Session session = getSession();
+    session.refresh(author);
+  }
+
+  @Override
   public void merge(Author author) {
     Session session = getSession();
     session.getTransaction().begin();
     session.merge(author);
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void setFullName(int id, String firstName, String lastName) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<Author> update = builder.createCriteriaUpdate(Author.class);
+    Root<Author> root = update.from(Author.class);
+    update
+        .set(root.get(Author_.firstName), firstName)
+        .set(root.get(Author_.lastName), lastName)
+        .where(builder.equal(root.get(Author_.id), id));
+    session.createQuery(update).executeUpdate();
     session.getTransaction().commit();
   }
 
@@ -57,15 +79,16 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public void deleteById(int id) {
+  public int deleteById(int id) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<Author> delete = builder.createCriteriaDelete(Author.class);
     Root<Author> root = delete.from(Author.class);
     delete.where(builder.equal(root.get(Author_.id), id));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 
   @Override
@@ -77,7 +100,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
   }
 
   @Override
-  public void deleteByFullName(String firstName, String lastName) {
+  public int deleteByFullName(String firstName, String lastName) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -87,7 +110,8 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
         builder.and(
             builder.equal(root.get(Author_.firstName), firstName),
             builder.equal(root.get(Author_.lastName), lastName)));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 }

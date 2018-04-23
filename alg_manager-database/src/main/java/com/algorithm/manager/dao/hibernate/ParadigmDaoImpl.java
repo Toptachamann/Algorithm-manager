@@ -26,16 +26,9 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void refresh(DesignParadigm paradigm) throws Exception {
+  public void refresh(DesignParadigm paradigm) {
     Session session = getSession();
     session.refresh(paradigm);
-  }
-
-  @Override
-  public DesignParadigm persist(String name, @Nullable String description) {
-    DesignParadigm designParadigm = new DesignParadigm(name, description);
-    persist(designParadigm);
-    return designParadigm;
   }
 
   @Override
@@ -121,26 +114,28 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public void deleteByName(String name) {
+  public int deleteByName(String name) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
     Root<DesignParadigm> root = delete.from(DesignParadigm.class);
     delete.where(builder.equal(root.get(DesignParadigm_.name), name));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 
   @Override
-  public void deleteById(int id) {
+  public int deleteById(int id) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
     Root<DesignParadigm> root = delete.from(DesignParadigm.class);
     delete.where(builder.equal(root.get(DesignParadigm_.id), id));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 }

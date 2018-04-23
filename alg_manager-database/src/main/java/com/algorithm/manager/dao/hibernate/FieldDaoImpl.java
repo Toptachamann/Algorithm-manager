@@ -4,7 +4,6 @@ import com.algorithm.manager.dao.interf.FieldDao;
 import com.algorithm.manager.model.FieldOfStudy;
 import com.algorithm.manager.model.FieldOfStudy_;
 import org.hibernate.Session;
-import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -26,10 +25,9 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public FieldOfStudy persist(String name, @Nullable String description) {
-    FieldOfStudy fieldOfStudy = new FieldOfStudy(name, description);
-    persist(fieldOfStudy);
-    return fieldOfStudy;
+  public void refresh(FieldOfStudy fieldOfStudy) {
+    Session session = getSession();
+    session.refresh(fieldOfStudy);
   }
 
   @Override
@@ -114,26 +112,28 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
   }
 
   @Override
-  public void deleteByName(String name) {
+  public int deleteByName(String name) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<FieldOfStudy> delete = builder.createCriteriaDelete(FieldOfStudy.class);
     Root<FieldOfStudy> root = delete.from(FieldOfStudy.class);
     delete.where(builder.equal(root.get(FieldOfStudy_.name), name));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 
   @Override
-  public void deleteById(int id) {
+  public int deleteById(int id) {
     Session session = getSession();
     session.getTransaction().begin();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<FieldOfStudy> delete = builder.createCriteriaDelete(FieldOfStudy.class);
     Root<FieldOfStudy> root = delete.from(FieldOfStudy.class);
     delete.where(builder.equal(root.get(FieldOfStudy_.id), id));
-    session.createQuery(delete).executeUpdate();
+    int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
+    return rowNumber;
   }
 }

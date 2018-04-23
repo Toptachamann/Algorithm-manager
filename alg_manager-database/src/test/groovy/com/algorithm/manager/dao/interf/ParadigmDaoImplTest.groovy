@@ -9,11 +9,11 @@ class ParadigmDaoImplTest extends Specification {
   @Shared
   def name = "test paradigm"
   @Shared
-  def updatedName = "test updated paradigm"
+  def updatedName = "test updatedName paradigm"
   @Shared
   def description = "test description"
   @Shared
-  def updatedDescription = "test updated description"
+  def updatedDescription = "test updatedName description"
   @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.ParadigmDaoImpl()
 

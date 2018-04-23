@@ -15,7 +15,11 @@ public interface ParadigmDao {
 
   void refresh(DesignParadigm paradigm) throws Exception;
 
-  DesignParadigm persist(String name, @Nullable String description) throws Exception;
+  default DesignParadigm persist(String name, @Nullable String description) throws Exception {
+    DesignParadigm designParadigm = new DesignParadigm(name, description);
+    persist(designParadigm);
+    return designParadigm;
+  }
 
   List<DesignParadigm> getAllParadigms() throws Exception;
 
@@ -37,9 +41,19 @@ public interface ParadigmDao {
 
   void setDescription(int id, @Nullable String description) throws Exception;
 
+  default void setName(DesignParadigm designParadigm, String name) throws Exception {
+    setName(designParadigm.getId(), name);
+    designParadigm.setName(name);
+  }
+
+  default void setDescription(DesignParadigm designParadigm, String description) throws Exception {
+    setDescription(designParadigm.getId(), description);
+    designParadigm.setDescription(description);
+  }
+
   void delete(DesignParadigm paradigm) throws Exception;
 
-  void deleteByName(String name) throws Exception;
+  int deleteByName(String name) throws Exception;
 
-  void deleteById(int id) throws Exception;
+  int deleteById(int id) throws Exception;
 }

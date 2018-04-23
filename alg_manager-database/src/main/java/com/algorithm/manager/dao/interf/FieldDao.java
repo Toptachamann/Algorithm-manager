@@ -9,7 +9,17 @@ import java.util.Optional;
 public interface FieldDao {
   int persist(FieldOfStudy fieldOfStudy) throws Exception;
 
-  FieldOfStudy persist(String name, @Nullable String description) throws Exception;
+  default FieldOfStudy persist(String name, @Nullable String description) throws Exception {
+    FieldOfStudy fieldOfStudy = new FieldOfStudy(name, description);
+    persist(fieldOfStudy);
+    return fieldOfStudy;
+  }
+
+  default FieldOfStudy persist(String name) throws Exception {
+    return persist(name, null);
+  }
+
+  void refresh(FieldOfStudy fieldOfStudy) throws Exception;
 
   List<FieldOfStudy> getFieldsOfStudy() throws Exception;
 
@@ -29,11 +39,22 @@ public interface FieldDao {
 
   void setName(int id, String name) throws Exception;
 
+  default void setName(FieldOfStudy fieldOfStudy, String name) throws Exception {
+    setName(fieldOfStudy.getId(), name);
+    fieldOfStudy.setName(name);
+  }
+
   void setDescription(int id, String description) throws Exception;
+
+  default void setDescription(FieldOfStudy fieldOfStudy, @Nullable String description)
+      throws Exception {
+    setDescription(fieldOfStudy.getId(), description);
+    fieldOfStudy.setDescription(description);
+  }
 
   void delete(FieldOfStudy fieldOfStudy) throws Exception;
 
-  void deleteByName(String name) throws Exception;
+  int deleteByName(String name) throws Exception;
 
-  void deleteById(int id) throws Exception;
+  int deleteById(int id) throws Exception;
 }

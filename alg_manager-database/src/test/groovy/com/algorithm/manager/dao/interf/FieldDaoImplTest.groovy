@@ -9,14 +9,16 @@ class FieldDaoImplTest extends Specification {
   @Shared
   def name = "Test field of study"
   @Shared
-  def updated = "Updated test field of study"
-  @Shared
   def description = "Test field description"
+  @Shared
+  def updatedName = "Updated test field of study"
+  @Shared
+  def updatedDescription = "Test updated description"
   @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.FieldDaoImpl()
 
   @Unroll
-  def "test field creation by name"() {
+  def "test persist by name"() {
     when:
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
@@ -37,7 +39,7 @@ class FieldDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test field creation by name and description"() {
+  def "test persist by name and description"() {
     when:
     def fieldOfStudy = new FieldOfStudy(name, description)
     fieldDao.persist(fieldOfStudy)
@@ -59,7 +61,110 @@ class FieldDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test field deletion"() {
+  def "test merge"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
+    when:
+    fieldOfStudy.setName(updatedName)
+    fieldDao.merge(fieldOfStudy)
+    then:
+    !fieldDao.containsFieldOfStudyWithName(name)
+    fieldDao.containsFieldOfStudyWithName(updatedName)
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  def "test contains with id"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    int id = fieldDao.persist(fieldOfStudy)
+    expect:
+    fieldDao.containsFieldOfStudyWithId(id)
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  def "test contains with name"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
+    expect:
+    fieldDao.containsFieldOfStudyWithName(name)
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  def "test get by id"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    int id = fieldDao.persist(fieldOfStudy)
+    expect:
+    def optCreated = fieldDao.getFieldOfStudyById(id)
+    optCreated.isPresent()
+    def created = optCreated.get()
+    created == fieldOfStudy
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  def "test get by name"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    fieldDao.persist(fieldOfStudy)
+    expect:
+    def optCreated = fieldDao.getFieldOfStudyByName(name)
+    optCreated.isPresent()
+    def created = optCreated.get()
+    created == fieldOfStudy
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  @Unroll
+  def "test set name"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    int id = fieldDao.persist(fieldOfStudy)
+    when:
+    fieldDao.setName(id, updatedName)
+    then:
+    !fieldDao.containsFieldOfStudyWithName(name)
+    fieldDao.containsFieldOfStudyWithName(updatedName)
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  @Unroll
+  def "test set description"() {
+    setup:
+    def fieldOfStudy = new FieldOfStudy(name)
+    int id = fieldDao.persist(fieldOfStudy)
+    when:
+    fieldDao.setDescription(id, updatedDescription)
+    fieldDao.refresh(fieldOfStudy)
+    then:
+    fieldOfStudy.getDescription() == updatedDescription
+    cleanup:
+    fieldDao.delete(fieldOfStudy)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  @Unroll
+  def "test delete"() {
     setup:
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
@@ -72,18 +177,26 @@ class FieldDaoImplTest extends Specification {
   }
 
   @Unroll
-  def "test field update"() {
+  def "test delete by id"() {
     setup:
     def fieldOfStudy = new FieldOfStudy(name)
-    fieldDao.persist(fieldOfStudy)
+    int id = fieldDao.persist(fieldOfStudy)
     when:
-    fieldOfStudy.setName(updated)
-    fieldDao.merge(fieldOfStudy)
+    fieldDao.deleteById(id)
+    then:
+    !fieldDao.containsFieldOfStudyWithId(id)
+    where:
+    fieldDao << [hibernateDao]
+  }
+
+  @Unroll
+  def "test delete by name"() {
+    setup:
+    fieldDao.persist(name)
+    when:
+    fieldDao.deleteByName(name)
     then:
     !fieldDao.containsFieldOfStudyWithName(name)
-    fieldDao.containsFieldOfStudyWithName(updated)
-    cleanup:
-    fieldDao.delete(fieldOfStudy)
     where:
     fieldDao << [hibernateDao]
   }

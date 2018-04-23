@@ -71,22 +71,22 @@ class AlgorithmDaoImplTest extends Specification {
   @Unroll
   def "test set name"() {
     setup:
-    def updatedParadigm = new DesignParadigm("Test updated design paradigm")
-    def updatedField = new FieldOfStudy("Test updated field of study")
+    def updatedParadigm = new DesignParadigm("Test updatedName design paradigm")
+    def updatedField = new FieldOfStudy("Test updatedName field of study")
     paradigmDao.persist(updatedParadigm)
     fieldDao.persist(updatedField)
 
     algorithmDao.persist(algorithm)
     def oldName = algorithm.getName()
-    algorithm.setName("Test updated name")
+    algorithm.setName("Test updatedName name")
     algorithm.setComplexity("Test updatedComplexity")
     algorithm.setDesignParadigm(updatedParadigm)
     algorithm.setFieldOfStudy(updatedField)
     algorithmDao.merge(algorithm)
     expect:
     !algorithmDao.containsAlgorithmWithName(oldName)
-    algorithmDao.containsAlgorithmWithName("Test updated name")
-    def optCreated = algorithmDao.getAlgorithmByName("Test updated name")
+    algorithmDao.containsAlgorithmWithName("Test updatedName name")
+    def optCreated = algorithmDao.getAlgorithmByName("Test updatedName name")
     optCreated.isPresent()
     def created = optCreated.get()
     created == algorithm

@@ -8,8 +8,8 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Application.class)
 public abstract class Application_ {
 
+	public static volatile SingularAttribute<Application, Integer> id;
 	public static volatile SingularAttribute<Application, AreaOfUse> areaOfUse;
-	public static volatile SingularAttribute<Application, Integer> applicationId;
 	public static volatile SingularAttribute<Application, Algorithm> algorithm;
 
 }

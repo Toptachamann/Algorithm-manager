@@ -92,7 +92,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public void setDesignParadigm(Algorithm algorithm, DesignParadigm paradigm) throws Exception {
-    Optional<DesignParadigm> optional = paradigmDao.getParadigmByName(paradigm.getName());
+    Optional<DesignParadigm> optional = paradigmDao.getDesignParadigmByName(paradigm.getName());
     if (optional.isPresent()) {
       paradigm = optional.get();
     } else {
@@ -134,7 +134,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public DesignParadigm createDesignParadigm(String paradigmName, String description)
       throws Exception {
     Validate.isTrue(!StringUtils.isBlank(paradigmName));
-    if (paradigmDao.getParadigmByName(paradigmName).isPresent()) {
+    if (paradigmDao.getDesignParadigmByName(paradigmName).isPresent()) {
       throw new SQLException("This design paradigm already exists");
     } else {
       DesignParadigm paradigm = new DesignParadigm(paradigmName, description);
@@ -150,7 +150,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 
   @Override
   public Optional<DesignParadigm> getDesignParadigmByName(String name) throws Exception {
-    return paradigmDao.getParadigmByName(name);
+    return paradigmDao.getDesignParadigmByName(name);
   }
 
   @Override

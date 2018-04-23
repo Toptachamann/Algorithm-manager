@@ -8,7 +8,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(FieldOfStudy.class)
 public abstract class FieldOfStudy_ {
 
-	public static volatile SingularAttribute<FieldOfStudy, String> field;
+	public static volatile SingularAttribute<FieldOfStudy, String> name;
 	public static volatile SingularAttribute<FieldOfStudy, String> description;
 	public static volatile SingularAttribute<FieldOfStudy, Integer> id;
 

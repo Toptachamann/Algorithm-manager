@@ -26,6 +26,12 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
+  public void refresh(DesignParadigm paradigm) throws Exception {
+    Session session = getSession();
+    session.refresh(paradigm);
+  }
+
+  @Override
   public DesignParadigm persist(String name, @Nullable String description) {
     DesignParadigm designParadigm = new DesignParadigm(name, description);
     persist(designParadigm);
@@ -57,7 +63,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmByName(String name) {
+  public Optional<DesignParadigm> getDesignParadigmByName(String name) {
     Session session = getSession();
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);

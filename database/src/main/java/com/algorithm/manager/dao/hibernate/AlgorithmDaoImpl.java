@@ -7,11 +7,12 @@ import com.algorithm.manager.model.Algorithm_;
 import com.algorithm.manager.model.DesignParadigm;
 import com.algorithm.manager.model.FieldOfStudy;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Session;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -19,33 +20,40 @@ import java.util.List;
 import java.util.Optional;
 
 public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
-  public AlgorithmDaoImpl() {}
 
   @Override
-  public void persist(Algorithm algorithm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(algorithm);
-    entityManager.getTransaction().commit();
+  public int persist(Algorithm algorithm) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.saveOrUpdate(algorithm);
+    session.getTransaction().commit();
+    return algorithm.getId();
   }
 
   @Override
-  public List<Algorithm> getAllAlgorithms() {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public List<Algorithm> getAlgorithms() {
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Algorithm> query = builder.createQuery(Algorithm.class);
     query.from(Algorithm.class);
-    return entityManager.createQuery(query).getResultList();
+    return session.createQuery(query).getResultList();
+  }
+
+  @Override
+  public Optional<Algorithm> getAlgorithmById(int id) {
+    Session session = getSession();
+    Algorithm algorithm = session.get(Algorithm.class, id);
+    return algorithm == null ? Optional.empty() : Optional.of(algorithm);
   }
 
   @Override
   public Optional<Algorithm> getAlgorithmByName(String name) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Algorithm> query = builder.createQuery(Algorithm.class);
     Root<Algorithm> root = query.from(Algorithm.class);
     List<Algorithm> result =
-        entityManager
+        session
             .createQuery(query.where(builder.equal(root.get(Algorithm_.name), name)))
             .getResultList();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
@@ -57,8 +65,8 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       String complexity,
       DesignParadigm designParadigm,
       FieldOfStudy fieldOfStudy) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Algorithm> query = builder.createQuery(Algorithm.class);
     Root<Algorithm> root = query.from(Algorithm.class);
     List<Predicate> predicates = new ArrayList<>();
@@ -75,35 +83,98 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       predicates.add(builder.equal(root.get(Algorithm_.fieldOfStudy), fieldOfStudy));
     }
     query.where(predicates.toArray(new Predicate[] {}));
-    return entityManager.createQuery(query).getResultList();
+    return session.createQuery(query).getResultList();
   }
 
   @Override
   public void merge(Algorithm algorithm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.merge(algorithm);
-    entityManager.getTransaction().commit();
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.merge(algorithm);
+    session.getTransaction().commit();
   }
 
   @Override
-  public void deleteById(Algorithm algorithm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.remove(
-        entityManager.contains(algorithm) ? algorithm : entityManager.merge(algorithm));
-    entityManager.getTransaction().commit();
+  public void setName(int id, String name) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
+    Root<Algorithm> root = update.from(Algorithm.class);
+    update.set(root.get(Algorithm_.name), name);
+    update.where(builder.equal(root.get(Algorithm_.id), id));
+    session.createQuery(update).executeUpdate();
+    session.getTransaction().commit();
   }
 
   @Override
-  public void deleteByName(Algorithm algorithm) throws Exception {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public void setComplexity(int id, String complexity) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
+    Root<Algorithm> root = update.from(Algorithm.class);
+    update.set(root.get(Algorithm_.complexity), complexity);
+    update.where(builder.equal(root.get(Algorithm_.id), id));
+    session.createQuery(update).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void setDesignParadigm(int id, DesignParadigm designParadigm) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
+    Root<Algorithm> root = update.from(Algorithm.class);
+    update.set(root.get(Algorithm_.designParadigm), designParadigm);
+    update.where(builder.equal(root.get(Algorithm_.id), id));
+    session.createQuery(update).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void setFieldOfStudy(int id, FieldOfStudy fieldOfStudy) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaUpdate<Algorithm> update = builder.createCriteriaUpdate(Algorithm.class);
+    Root<Algorithm> root = update.from(Algorithm.class);
+    update.set(root.get(Algorithm_.fieldOfStudy), fieldOfStudy);
+    update.where(builder.equal(root.get(Algorithm_.id), id));
+    session.createQuery(update).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void delete(Algorithm algorithm) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.remove(session.contains(algorithm) ? algorithm : session.merge(algorithm));
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteById(int id) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<Algorithm> delete = builder.createCriteriaDelete(Algorithm.class);
     Root<Algorithm> root = delete.from(Algorithm.class);
-    delete.where(builder.equal(root.get(Algorithm_.name), algorithm.getName()));
-    entityManager.createQuery(delete).executeUpdate();
-    entityManager.getTransaction().commit();
+    delete.where(builder.equal(root.get(Algorithm_.id), id));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByName(String name) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaDelete<Algorithm> delete = builder.createCriteriaDelete(Algorithm.class);
+    Root<Algorithm> root = delete.from(Algorithm.class);
+    delete.where(builder.equal(root.get(Algorithm_.name), name));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
   }
 }

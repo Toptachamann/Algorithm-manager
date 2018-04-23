@@ -1,18 +1,12 @@
 package com.algorithm.manager.dao.interf
 
-import com.algorithm.manager.dao.hibernate.AlgorithmDaoImpl
-import com.algorithm.manager.dao.hibernate.AuthorDaoImpl
-import com.algorithm.manager.dao.hibernate.FieldDaoImpl
-import com.algorithm.manager.dao.hibernate.ParadigmDaoImpl
-import com.algorithm.manager.dao.jdbc.BookDaoImpl
+import com.algorithm.manager.dao.hibernate.*
 import com.algorithm.manager.model.*
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class ReferenceDaoImplTest extends Specification {
-  @Shared
-  def jdbcDao = new com.algorithm.manager.dao.jdbc.ReferenceDaoImpl()
   @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.ReferenceDaoImpl()
   @Shared
@@ -52,11 +46,11 @@ class ReferenceDaoImplTest extends Specification {
     authorDao = new AuthorDaoImpl()
     bookDao = new BookDaoImpl()
 
-    algorithmDao.deleteByName(algorithm)
-    paradigmDao.deleteByParadigm(paradigm)
-    fieldDao.deleteByField(field)
-    authorDao.deleteByFullName(author1)
-    authorDao.deleteByFullName(author2)
+    algorithmDao.deleteByName(algorithm.getName())
+    paradigmDao.deleteByName(paradigm.getName())
+    fieldDao.deleteByName(field.getName())
+    authorDao.deleteByFullName(author1.getFirstName(), author1.getLastName())
+    authorDao.deleteByFullName(author2.getFirstName(), author2.getLastName())
     bookDao.delete(book)
 
     paradigmDao.persist(paradigm)
@@ -68,12 +62,12 @@ class ReferenceDaoImplTest extends Specification {
   }
 
   def cleanupSpec() {
-    algorithmDao.deleteById(algorithm)
+    algorithmDao.deleteByName(algorithm.getName())
     paradigmDao.delete(paradigm)
     fieldDao.delete(field)
     bookDao.delete(book)
-    authorDao.deleteById(author1)
-    authorDao.deleteById(author2)
+    authorDao.deleteByFullName(author1.getFirstName(), author1.getLastName())
+    authorDao.deleteByFullName(author2.getFirstName(), author2.getLastName())
   }
 
   @Unroll
@@ -83,9 +77,9 @@ class ReferenceDaoImplTest extends Specification {
     referenceDao.persist(reference)
     then:
     referenceDao.containsReference(algorithm, book)
-    def optCreated = referenceDao.getReference(algorithm, book)
-    optCreated.isPresent()
-    def created = optCreated.get()
+    def list = referenceDao.getReferences(algorithm, book)
+    !list.isEmpty()
+    def created = list.get(0)
     created == reference
     def referenceList = referenceDao.getAlgorithmReferences(algorithm)
     referenceList.size() == 1
@@ -93,7 +87,7 @@ class ReferenceDaoImplTest extends Specification {
     cleanup:
     referenceDao.delete(reference)
     where:
-    referenceDao << [jdbcDao, hibernateDao]
+    referenceDao << [hibernateDao]
   }
 
   @Unroll
@@ -105,12 +99,12 @@ class ReferenceDaoImplTest extends Specification {
     referenceDao.delete(reference)
     then:
     !referenceDao.containsReference(algorithm, book)
-    def optDeleted = referenceDao.getReference(algorithm, book)
-    !optDeleted.isPresent()
+    def list = referenceDao.getReferences(algorithm, book)
+    list.isEmpty()
     def referenceList = referenceDao.getAlgorithmReferences(algorithm)
     referenceList.size() == 0
     where:
-    referenceDao << [jdbcDao, hibernateDao]
+    referenceDao << [hibernateDao]
   }
 
 }

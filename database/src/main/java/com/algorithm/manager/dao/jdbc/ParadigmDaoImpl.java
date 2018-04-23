@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.ParadigmDao;
 import com.algorithm.manager.model.DesignParadigm;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
+public class ParadigmDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(ParadigmDaoImpl.class);
 
   private PreparedStatement createParadigm;
@@ -44,10 +43,9 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
             "DELETE FROM algorithms.design_paradigm WHERE algorithms.design_paradigm.paradigm = ?");
   }
 
-  @Override
   public void persist(DesignParadigm paradigm) throws SQLException {
     try {
-      createParadigm.setString(1, paradigm.getParadigm());
+      createParadigm.setString(1, paradigm.getName());
       if (paradigm.getDescription() == null) {
         createParadigm.setNull(2, Types.VARCHAR);
       } else {
@@ -65,7 +63,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     }
   }
 
-  @Override
   public List<DesignParadigm> getAllParadigms() throws SQLException {
     logger.debug(() -> Util.format(allParadigms));
     ResultSet result = allParadigms.executeQuery();
@@ -76,7 +73,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     return paradigms;
   }
 
-  @Override
   public Optional<DesignParadigm> getParadigmByParadigm(String paradigm) throws SQLException {
     getParadigmByName.setString(1, paradigm);
     logger.debug(() -> Util.format(getParadigmByName));
@@ -88,7 +84,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     }
   }
 
-  @Override
   public void delete(DesignParadigm paradigm) throws Exception {
     try {
       deleteById.setInt(1, paradigm.getId());
@@ -103,7 +98,6 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     }
   }
 
-  @Override
   public Optional<DesignParadigm> getParadigmById(int id) throws SQLException {
     getParadigmById.setInt(1, id);
     logger.debug(() -> Util.format(getParadigmById));
@@ -115,13 +109,16 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     }
   }
 
-  @Override
+  private boolean containsParadigm(DesignParadigm paradigm) throws Exception {
+    return getParadigmById(paradigm.getId()).isPresent();
+  }
+
   public void merge(DesignParadigm paradigm) throws Exception {
     if (!containsParadigm(paradigm)) {
       persist(paradigm);
     } else {
       try {
-        merge.setString(1, paradigm.getParadigm());
+        merge.setString(1, paradigm.getName());
         merge.setString(2, paradigm.getDescription());
         merge.setInt(3, paradigm.getId());
         logger.debug(() -> Util.format(merge));
@@ -136,10 +133,9 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     }
   }
 
-  @Override
   public void deleteByParadigm(DesignParadigm paradigm) throws Exception {
     try {
-      deleteByParadigm.setString(1, paradigm.getParadigm());
+      deleteByParadigm.setString(1, paradigm.getName());
       logger.debug(() -> Util.format(deleteByParadigm));
       deleteByParadigm.executeUpdate();
       connection.commit();

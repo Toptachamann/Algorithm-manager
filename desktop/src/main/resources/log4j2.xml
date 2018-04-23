@@ -10,7 +10,6 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout
             pattern="%d{HH:mm:ss,SSS} [%highlight{%level}] %logger {%t} %c{1} --- %m%n"/>
-
         </Console>
         <RollingFile name="ALL" fileName="${baseDir}/${trace_file_name}"
                      filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">

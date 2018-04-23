@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.AreaDao;
 import com.algorithm.manager.model.AreaOfUse;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AreaDaoImpl extends AbstractDao implements AreaDao {
+public class AreaDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(AreaDaoImpl.class);
 
   private PreparedStatement createArea;
@@ -42,10 +41,10 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
             "DELETE FROM algorithms.area_of_use WHERE algorithms.area_of_use.area = ?");
   }
 
-  @Override
+  
   public void persist(AreaOfUse areaOfUse) throws SQLException {
     try {
-      createArea.setString(1, areaOfUse.getAreaOfUse());
+      createArea.setString(1, areaOfUse.getName());
       if (areaOfUse.getDescription() == null) {
         createArea.setNull(2, Types.VARCHAR);
       } else {
@@ -63,7 +62,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
+  
   public List<AreaOfUse> getAllAreas() throws SQLException {
     logger.debug(() -> Util.format(getAllAreas));
     ResultSet set = getAllAreas.executeQuery();
@@ -74,8 +73,8 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     return result;
   }
 
-  @Override
-  public Optional<AreaOfUse> getAreaById(int id) throws SQLException {
+  
+  public Optional<AreaOfUse> getAreaOfUseById(int id) throws SQLException {
     getAreaById.setInt(1, id);
     logger.debug(() -> Util.format(getAreaById));
     ResultSet set = getAreaById.executeQuery();
@@ -86,8 +85,8 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
-  public Optional<AreaOfUse> getAreaByName(String name) throws SQLException {
+  
+  public Optional<AreaOfUse> getAreaOfUseByName(String name) throws SQLException {
     getAreaByName.setString(1, name);
     logger.debug(() -> Util.format(getAreaByName));
     ResultSet set = getAreaByName.executeQuery();
@@ -98,7 +97,7 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
+  
   public void deleteById(AreaOfUse areaOfUse) throws SQLException {
     try {
       deleteAreaById.setInt(1, areaOfUse.getId());
@@ -113,10 +112,10 @@ public class AreaDaoImpl extends AbstractDao implements AreaDao {
     }
   }
 
-  @Override
-  public void deleteByArea(AreaOfUse areaOfUse) throws Exception {
+  
+  public void delete(AreaOfUse areaOfUse) throws Exception {
     try {
-      deleteByArea.setString(1, areaOfUse.getAreaOfUse());
+      deleteByArea.setString(1, areaOfUse.getName());
       logger.debug(() -> Util.format(deleteByArea));
       deleteByArea.executeUpdate();
       connection.commit();

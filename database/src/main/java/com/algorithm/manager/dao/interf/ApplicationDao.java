@@ -5,21 +5,24 @@ import com.algorithm.manager.model.Application;
 import com.algorithm.manager.model.AreaOfUse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ApplicationDao {
 
-  void persist(Application application) throws Exception;
+  int persist(Application application) throws Exception;
 
-  default boolean containsApplication(Application application) throws Exception {
-    return getApplicationOf(application.getAlgorithm(), application.getAreaOfUse()).isPresent();
+  default boolean containsApplication(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception {
+    return !getApplicationsOf(algorithm, areaOfUse).isEmpty();
   }
 
-  Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
+  List<Application> getApplicationsOf(Algorithm algorithm, AreaOfUse areaOfUse) throws Exception;
 
   List<Application> getApplicationsByArea(AreaOfUse area) throws Exception;
 
   List<Application> getApplicationsByAlgorithm(Algorithm algorithm) throws Exception;
 
-  void delete(Application application) throws Exception;
+  void delete(Application application);
+
+  void deleteApplications(Algorithm algorithm, AreaOfUse areaOfUse);
+
+  void deleteById(int id) throws Exception;
 }

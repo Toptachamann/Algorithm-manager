@@ -13,7 +13,7 @@ public class Application {
   @Id
   @Column(name = "application_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int applicationId;
+  private int id;
 
   @ManyToOne(cascade = {CascadeType.REFRESH}, optional = false)
   @JoinColumn(name = "app_algorithm_id", referencedColumnName = "algorithm_id",
@@ -24,8 +24,8 @@ public class Application {
       nullable = false, foreignKey = @ForeignKey(name = "fk_area_application"))
   private AreaOfUse areaOfUse;
 
-  public Application(int applicationId, Algorithm algorithm, AreaOfUse areaOfUse) {
-    this.applicationId = applicationId;
+  public Application(int id, Algorithm algorithm, AreaOfUse areaOfUse) {
+    this.id = id;
     this.algorithm = algorithm;
     this.areaOfUse = areaOfUse;
   }
@@ -42,7 +42,7 @@ public class Application {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
-        .append("applicationId", applicationId)
+        .append("applicationId", id)
         .append("algorithm", algorithm)
         .append("areaOfUse", areaOfUse)
         .toString();
@@ -57,7 +57,7 @@ public class Application {
     Application that = (Application) o;
 
     return new EqualsBuilder()
-        .append(applicationId, that.applicationId)
+        .append(id, that.id)
         .append(algorithm, that.algorithm)
         .append(areaOfUse, that.areaOfUse)
         .isEquals();
@@ -66,18 +66,18 @@ public class Application {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
-        .append(applicationId)
+        .append(id)
         .append(algorithm)
         .append(areaOfUse)
         .toHashCode();
   }
 
-  public int getApplicationId() {
-    return applicationId;
+  public int getId() {
+    return id;
   }
 
-  public void setApplicationId(int applicationId) {
-    this.applicationId = applicationId;
+  public void setId(int applicationId) {
+    this.id = applicationId;
   }
 
   public Algorithm getAlgorithm() {

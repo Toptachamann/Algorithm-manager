@@ -13,8 +13,6 @@ class FieldDaoImplTest extends Specification {
   @Shared
   def description = "Test field description"
   @Shared
-  def jdbcDao = new com.algorithm.manager.dao.jdbc.FieldDaoImpl()
-  @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.FieldDaoImpl()
 
   @Unroll
@@ -23,40 +21,41 @@ class FieldDaoImplTest extends Specification {
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
     then:
-    fieldDao.containsFieldOfStudy(fieldOfStudy)
+    fieldDao.containsFieldOfStudyWithId(fieldOfStudy.getId())
+    fieldDao.containsFieldOfStudyWithName(fieldOfStudy.getName())
     fieldDao.containsFieldOfStudyWithName(name)
-    fieldOfStudy.getField() == name
+    fieldOfStudy.getName() == name
     fieldOfStudy.getDescription() == null
-    def optField = fieldDao.getFieldByName(name)
+    def optField = fieldDao.getFieldOfStudyByName(name)
     optField.isPresent()
     def field = optField.get()
     field == fieldOfStudy
     cleanup:
     fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [jdbcDao, hibernateDao]
+    fieldDao << [hibernateDao]
   }
 
   @Unroll
   def "test field creation by name and description"() {
     when:
-    def fieldOfStudy = new FieldOfStudy(name, description);
+    def fieldOfStudy = new FieldOfStudy(name, description)
     fieldDao.persist(fieldOfStudy)
     then:
-    fieldOfStudy.getField() == name
+    fieldOfStudy.getName() == name
     fieldOfStudy.getDescription() == description
     fieldDao.containsFieldOfStudyWithName(name)
-    fieldDao.containsFieldOfStudy(fieldOfStudy)
-    def optField = fieldDao.getFieldByName(name)
+    fieldDao.containsFieldOfStudyWithName(fieldOfStudy.getName())
+    def optField = fieldDao.getFieldOfStudyByName(name)
     optField.isPresent()
     def field = optField.get()
-    field.getField() == name
+    field.getName() == name
     field.getDescription() == description
     field.getId() == fieldOfStudy.getId()
     cleanup:
     fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [jdbcDao, hibernateDao]
+    fieldDao << [hibernateDao]
   }
 
   @Unroll
@@ -69,7 +68,7 @@ class FieldDaoImplTest extends Specification {
     then:
     !fieldDao.containsFieldOfStudyWithName(name)
     where:
-    fieldDao << [jdbcDao, hibernateDao]
+    fieldDao << [hibernateDao]
   }
 
   @Unroll
@@ -78,7 +77,7 @@ class FieldDaoImplTest extends Specification {
     def fieldOfStudy = new FieldOfStudy(name)
     fieldDao.persist(fieldOfStudy)
     when:
-    fieldOfStudy.setField(updated)
+    fieldOfStudy.setName(updated)
     fieldDao.merge(fieldOfStudy)
     then:
     !fieldDao.containsFieldOfStudyWithName(name)
@@ -86,6 +85,6 @@ class FieldDaoImplTest extends Specification {
     cleanup:
     fieldDao.delete(fieldOfStudy)
     where:
-    fieldDao << [jdbcDao, hibernateDao]
+    fieldDao << [hibernateDao]
   }
 }

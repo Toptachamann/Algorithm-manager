@@ -24,7 +24,7 @@ public class Algorithm {
     cascade = {CascadeType.REFRESH},
     optional = false,
     targetEntity = DesignParadigm.class,
-    fetch = FetchType.LAZY
+    fetch = FetchType.EAGER
   )
   @JoinColumn(
     name = "algo_paradigm_id",
@@ -37,7 +37,8 @@ public class Algorithm {
   @ManyToOne(
     cascade = {CascadeType.REFRESH},
     optional = false,
-    targetEntity = FieldOfStudy.class
+    targetEntity = FieldOfStudy.class,
+    fetch = FetchType.EAGER
   )
   @JoinColumn(
     name = "algo_field_id",

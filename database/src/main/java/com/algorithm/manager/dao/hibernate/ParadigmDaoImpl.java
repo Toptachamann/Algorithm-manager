@@ -3,8 +3,8 @@ package com.algorithm.manager.dao.hibernate;
 import com.algorithm.manager.dao.interf.ParadigmDao;
 import com.algorithm.manager.model.DesignParadigm;
 import com.algorithm.manager.model.DesignParadigm_;
+import org.hibernate.Session;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -14,36 +14,33 @@ import java.util.Optional;
 
 public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
 
-  public ParadigmDaoImpl() {}
-
   @Override
-  public void persist(DesignParadigm paradigm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(paradigm);
-    entityManager.getTransaction().commit();
+  public int persist(DesignParadigm paradigm) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.saveOrUpdate(paradigm);
+    session.getTransaction().commit();
+    return paradigm.getId();
   }
 
   @Override
   public List<DesignParadigm> getAllParadigms() {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
-    List<DesignParadigm> paradigms =
-        entityManager
-            .createQuery(criteria.select(criteria.from(DesignParadigm.class)))
-            .getResultList();
-    return paradigms;
+    return session
+        .createQuery(criteria.select(criteria.from(DesignParadigm.class)))
+        .getResultList();
   }
 
   @Override
   public Optional<DesignParadigm> getParadigmById(int id) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
     Root<DesignParadigm> root = criteria.from(DesignParadigm.class);
     List<DesignParadigm> paradigms =
-        entityManager
+        session
             .createQuery(
                 criteria.select(root).where(builder.equal(root.get(DesignParadigm_.id), id)))
             .getResultList();
@@ -51,47 +48,58 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
   }
 
   @Override
-  public Optional<DesignParadigm> getParadigmByParadigm(String paradigm) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public Optional<DesignParadigm> getParadigmByName(String name) {
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<DesignParadigm> criteria = builder.createQuery(DesignParadigm.class);
     Root<DesignParadigm> root = criteria.from(DesignParadigm.class);
     List<DesignParadigm> paradigms =
-        entityManager
+        session
             .createQuery(
                 criteria
                     .select(root)
-                    .where(builder.equal(root.get(DesignParadigm_.paradigm), paradigm)))
+                    .where(builder.equal(root.get(DesignParadigm_.name), name)))
             .getResultList();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
 
   @Override
   public void delete(DesignParadigm paradigm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.remove(
-        entityManager.contains(paradigm) ? paradigm : entityManager.merge(paradigm));
-    entityManager.getTransaction().commit();
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.remove(session.contains(paradigm) ? paradigm : session.merge(paradigm));
+    session.getTransaction().commit();
   }
 
   @Override
-  public void deleteByParadigm(DesignParadigm paradigm) throws Exception {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public void deleteByName(String name) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
     Root<DesignParadigm> root = delete.from(DesignParadigm.class);
-    delete.where(builder.equal(root.get(DesignParadigm_.paradigm), paradigm.getParadigm()));
-    entityManager.createQuery(delete).executeUpdate();
-    entityManager.getTransaction().commit();
+    delete.where(builder.equal(root.get(DesignParadigm_.name), name));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteById(int id) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
+    Root<DesignParadigm> root = delete.from(DesignParadigm.class);
+    delete.where(builder.equal(root.get(DesignParadigm_.id), id));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
   }
 
   @Override
   public void merge(DesignParadigm paradigm) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.merge(paradigm);
-    entityManager.getTransaction().commit();
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.merge(paradigm);
+    session.getTransaction().commit();
   }
 }

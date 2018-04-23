@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.ReferenceDao;
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.Author;
 import com.algorithm.manager.model.Book;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
+public class ReferenceDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(ReferenceDaoImpl.class);
 
   private PreparedStatement countReferences;
@@ -48,14 +47,14 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
                 + "ORDER BY book_id, author_id");
   }
 
-  @Override
+  
   public void persist(Reference reference) throws SQLException {
     try {
       createReference.setInt(1, reference.getAlgorithm().getId());
       createReference.setInt(2, reference.getBook().getId());
       logger.debug(() -> Util.format(createReference));
       createReference.executeUpdate();
-      reference.setReferenceId(getLastId(connection));
+      reference.setId(getLastId(connection));
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
@@ -65,7 +64,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     }
   }
 
-  @Override
+  
   public Optional<Reference> getReference(Algorithm algorithm, Book book) throws SQLException {
     getReference.setInt(1, algorithm.getId());
     getReference.setInt(2, book.getId());
@@ -76,7 +75,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
         : Optional.empty();
   }
 
-  @Override
+  
   public List<Reference> getAlgorithmReferences(Algorithm algorithm) throws SQLException {
     getAlgorithmReferences.setInt(1, algorithm.getId());
     logger.debug(() -> Util.format(getAlgorithmReferences));
@@ -84,7 +83,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     return referencesFromResultSet(set, algorithm);
   }
 
-  @Override
+  
   public boolean containsReference(Algorithm algorithm, Book book) throws SQLException {
     countReferences.setInt(1, algorithm.getId());
     countReferences.setInt(2, book.getId());
@@ -94,7 +93,7 @@ public class ReferenceDaoImpl extends AbstractDao implements ReferenceDao {
     return set.getInt(1) == 1;
   }
 
-  @Override
+  
   public void delete(Reference reference) throws SQLException {
     try {
       deleteReference.setInt(1, reference.getAlgorithm().getId());

@@ -20,32 +20,32 @@ public class DesignParadigm {
   private int id;
 
   @Column(name = "paradigm", unique = true, nullable = false, length = 50)
-  private String paradigm;
+  private String name;
 
   @Column(name = "description")
   private String description;
 
-  public DesignParadigm(int id, String paradigm) {
+  public DesignParadigm(int id, String name) {
     this.id = id;
-    this.paradigm = paradigm;
+    this.name = name;
   }
 
-  public DesignParadigm(int id, String paradigm, String description) {
+  public DesignParadigm(int id, String name, String description) {
     this.id = id;
-    this.paradigm = paradigm;
+    this.name = name;
     this.description = description;
   }
 
   public DesignParadigm() {}
 
-  public DesignParadigm(String paradigm, String description) {
-    this.paradigm = paradigm;
+  public DesignParadigm(String name, String description) {
+    this.name = name;
     this.description = description;
   }
 
-  public DesignParadigm(String paradigm) {
+  public DesignParadigm(String name) {
 
-    this.paradigm = paradigm;
+    this.name = name;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class DesignParadigm {
 
     return new EqualsBuilder()
         .append(id, that.id)
-        .append(paradigm, that.paradigm)
+        .append(name, that.name)
         .append(description, that.description)
         .isEquals();
   }
@@ -67,7 +67,7 @@ public class DesignParadigm {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(id)
-        .append(paradigm)
+        .append(name)
         .append(description)
         .toHashCode();
   }
@@ -80,12 +80,12 @@ public class DesignParadigm {
     this.id = id;
   }
 
-  public String getParadigm() {
-    return paradigm;
+  public String getName() {
+    return name;
   }
 
-  public void setParadigm(String paradigm) {
-    this.paradigm = paradigm;
+  public void setName(String paradigm) {
+    this.name = paradigm;
   }
 
   public String getDescription() {
@@ -100,7 +100,7 @@ public class DesignParadigm {
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
-        .append("paradigm", paradigm)
+        .append("paradigm", name)
         .append("description", description)
         .toString();
   }

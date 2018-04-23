@@ -23,7 +23,7 @@ public interface ParadigmDaoImpl extends JpaRepository<DesignParadigm, Integer> 
   @Modifying
   @Query(
     value =
-        "UPDATE DesignParadigm paradigm SET paradigm.paradigm = :newName WHERE paradigm.id = :id"
+        "UPDATE DesignParadigm paradigm SET paradigm.name = :newName WHERE paradigm.id = :id"
   )
   void setParadigm(@Param("id") int id, @Param("newName") String newName) throws Exception;
 }

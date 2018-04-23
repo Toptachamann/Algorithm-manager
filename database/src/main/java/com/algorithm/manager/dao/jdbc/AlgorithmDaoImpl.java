@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.AlgorithmDao;
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.DesignParadigm;
 import com.algorithm.manager.model.FieldOfStudy;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
+public class AlgorithmDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(AlgorithmDaoImpl.class);
 
   private PreparedStatement createAlgorithm;
@@ -51,7 +50,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
             "DELETE FROM algorithms.algorithm WHERE algorithms.algorithm.algorithm = ?");
   }
 
-  @Override
   public void persist(Algorithm algorithm) throws SQLException {
     try {
       createAlgorithm.setString(1, algorithm.getName());
@@ -70,14 +68,12 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
   }
 
-  @Override
-  public List<Algorithm> getAllAlgorithms() throws SQLException {
+  public List<Algorithm> getAlgorithms() throws SQLException {
     logger.debug(() -> Util.format(allAlgorithms));
     ResultSet result = allAlgorithms.executeQuery();
     return algorithmFromResultSet(result);
   }
 
-  @Override
   public Optional<Algorithm> getAlgorithmByName(String name) throws SQLException {
     getAlgorithmByName.setString(1, name);
     logger.debug(() -> Util.format(getAlgorithmByName));
@@ -89,7 +85,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
   }
 
-  @Override
   public List<Algorithm> searchAlgorithm(
       String algorithm, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws SQLException {
@@ -112,13 +107,13 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
       whereClause += " AND complexity LIKE " + complexity;
     }
     if (designParadigm != null) {
-      whereClause += " AND paradigm_id = " + designParadigm.getParadigm();
+      whereClause += " AND paradigm_id = " + designParadigm.getName();
     }
     if (fieldOfStudy != null) {
-      whereClause += " AND field_id = " + fieldOfStudy.getField();
+      whereClause += " AND field_id = " + fieldOfStudy.getName();
     }
     if (whereClause.length() == 0) {
-      return getAllAlgorithms();
+      return getAlgorithms();
     } else {
       Statement statement = connection.createStatement();
       String allQuery = query + whereClause;
@@ -128,7 +123,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
   }
 
-  @Override
   public void merge(Algorithm algorithm) throws SQLException {
     try {
       merge.setString(1, algorithm.getName());
@@ -161,7 +155,6 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     return algorithms;
   }
 
-  @Override
   public void deleteById(Algorithm algorithm) throws SQLException {
     try {
       deleteById.setInt(1, algorithm.getId());
@@ -176,16 +169,15 @@ public class AlgorithmDaoImpl extends AbstractDao implements AlgorithmDao {
     }
   }
 
-  @Override
-  public void deleteByName(Algorithm algorithm) throws Exception {
+  public void deleteByName(String name) throws Exception {
     try {
-      deleteByName.setString(1, algorithm.getName());
+      deleteByName.setString(1, name);
       logger.debug(() -> Util.format(deleteByName));
       deleteByName.executeUpdate();
       connection.commit();
     } catch (Exception e) {
       logger.catching(Level.ERROR, e);
-      logger.error("Failed to deleteById algorithm {} by name", algorithm);
+      logger.error("Failed to deleteById algorithm {} by name", name);
       rollBack(connection);
       throw e;
     }

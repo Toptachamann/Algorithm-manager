@@ -3,8 +3,8 @@ package com.algorithm.manager.dao.hibernate;
 import com.algorithm.manager.dao.interf.AreaDao;
 import com.algorithm.manager.model.AreaOfUse;
 import com.algorithm.manager.model.AreaOfUse_;
+import org.hibernate.Session;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -13,70 +13,80 @@ import java.util.List;
 import java.util.Optional;
 
 public class AreaDaoImpl extends AbstractDao implements AreaDao {
-  public AreaDaoImpl() {}
+
+  @Override
+  public int persist(AreaOfUse areaOfUse) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.persist(areaOfUse);
+    session.getTransaction().commit();
+    return areaOfUse.getId();
+  }
 
   @Override
   public List<AreaOfUse> getAllAreas() {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<AreaOfUse> query = builder.createQuery(AreaOfUse.class);
     query.from(AreaOfUse.class);
-    List<AreaOfUse> areas = entityManager.createQuery(query).getResultList();
-    return areas;
+    return session.createQuery(query).getResultList();
   }
 
   @Override
-  public void persist(AreaOfUse areaOfUse) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(areaOfUse);
-    entityManager.getTransaction().commit();
-  }
-
-  @Override
-  public Optional<AreaOfUse> getAreaById(int id) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public Optional<AreaOfUse> getAreaOfUseById(int id) {
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<AreaOfUse> query = builder.createQuery(AreaOfUse.class);
     Root<AreaOfUse> root = query.from(AreaOfUse.class);
     List<AreaOfUse> result =
-        entityManager
+        session
             .createQuery(query.where(builder.equal(root.get(AreaOfUse_.id), id)))
             .getResultList();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
   @Override
-  public Optional<AreaOfUse> getAreaByName(String name) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public Optional<AreaOfUse> getAreaOfUseByName(String name) {
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<AreaOfUse> query = builder.createQuery(AreaOfUse.class);
     Root<AreaOfUse> root = query.from(AreaOfUse.class);
     List<AreaOfUse> result =
-        entityManager
-            .createQuery(query.where(builder.equal(root.get(AreaOfUse_.areaOfUse), name)))
+        session
+            .createQuery(query.where(builder.equal(root.get(AreaOfUse_.name), name)))
             .getResultList();
     return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
   }
 
   @Override
-  public void deleteById(AreaOfUse areaOfUse) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.remove(
-        entityManager.contains(areaOfUse) ? areaOfUse : entityManager.merge(areaOfUse));
-    entityManager.getTransaction().commit();
+  public void delete(AreaOfUse areaOfUse) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.remove(session.contains(areaOfUse) ? areaOfUse : session.merge(areaOfUse));
+    session.getTransaction().commit();
   }
 
   @Override
-  public void deleteByArea(AreaOfUse areaOfUse) throws Exception {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public void deleteById(int id) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<AreaOfUse> delete = builder.createCriteriaDelete(AreaOfUse.class);
     Root<AreaOfUse> root = delete.from(AreaOfUse.class);
-    delete.where(builder.equal(root.get(AreaOfUse_.areaOfUse), areaOfUse.getAreaOfUse()));
-    entityManager.createQuery(delete).executeUpdate();
-    entityManager.getTransaction().commit();
+    delete.where(builder.equal(root.get(AreaOfUse_.id), id));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteByName(String name) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaDelete<AreaOfUse> delete = builder.createCriteriaDelete(AreaOfUse.class);
+    Root<AreaOfUse> root = delete.from(AreaOfUse.class);
+    delete.where(builder.equal(root.get(AreaOfUse_.name), name));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
   }
 }

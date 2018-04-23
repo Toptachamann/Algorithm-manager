@@ -5,15 +5,25 @@ import com.algorithm.manager.model.Author;
 import java.util.Optional;
 
 public interface AuthorDao {
-  void persist(Author author) throws Exception;
+  int persist(Author author) throws Exception;
 
-  Optional<Author> getAuthor(String firstName, String lastName) throws Exception;
+  Optional<Author> getByFullName(String firstName, String lastName) throws Exception;
 
-  default boolean containsAuthor(String firstName, String lastName) throws Exception {
-    return getAuthor(firstName, lastName).isPresent();
+  Optional<Author> getById(int id) throws Exception;
+
+  default boolean containsAuthorWithId(int id) throws Exception {
+    return getById(id).isPresent();
   }
 
-  void deleteById(Author author) throws Exception;
+  default boolean containsAuthorWithFullName(String firstName, String lastName) throws Exception {
+    return getByFullName(firstName, lastName).isPresent();
+  }
 
-  void deleteByFullName(Author author) throws Exception;
+  void merge(Author author) throws Exception;
+
+  void delete(Author author) throws Exception;
+
+  void deleteById(int id) throws Exception;
+
+  void deleteByFullName(String firstName, String lastName) throws Exception;
 }

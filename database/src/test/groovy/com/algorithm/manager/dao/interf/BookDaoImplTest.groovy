@@ -11,8 +11,6 @@ class BookDaoImplTest extends Specification {
   @Shared
   def authorDao = new AuthorDaoImpl()
   @Shared
-  def jdbcDao = new com.algorithm.manager.dao.jdbc.BookDaoImpl()
-  @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.BookDaoImpl()
   @Shared
   List<Author> authors
@@ -22,14 +20,14 @@ class BookDaoImplTest extends Specification {
     def author2 = new Author("test first name 2", "test last name 2")
     authors = [author1, author2]
     for (Author author : authors) {
-      authorDao.deleteByFullName(author)
+      authorDao.deleteByFullName(author.getFirstName(), author.getLastName())
       authorDao.persist(author)
     }
   }
 
   def cleanup() {
     for (Author author : authors) {
-      authorDao.deleteById(author)
+      authorDao.delete(author)
     }
   }
 
@@ -39,7 +37,8 @@ class BookDaoImplTest extends Specification {
     def book = new Book("Test book title", volume, 1, authors)
     bookDao.persist(book)
     expect:
-    bookDao.containsBook(book)
+    bookDao.containsBookWithId(book.getId())
+    bookDao.containsBookWithTitle(book.getTitle())
     def optCreated = bookDao.getBookById(book.getId())
     optCreated.isPresent()
     def created = optCreated.get()
@@ -48,14 +47,7 @@ class BookDaoImplTest extends Specification {
     bookDao.delete(book)
     where:
     bookDao      | volume
-    jdbcDao      | null
-    jdbcDao      | 1
     hibernateDao | null
     hibernateDao | 1
   }
-
-  /*def "test book deletion"() {
-    where:
-    bookDao << [hibernateDao, jdbcDao]
-  }*/
 }

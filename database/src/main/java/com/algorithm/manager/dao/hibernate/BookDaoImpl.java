@@ -5,8 +5,8 @@ import com.algorithm.manager.model.Author;
 import com.algorithm.manager.model.Book;
 import com.algorithm.manager.model.Book_;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Session;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
@@ -20,28 +20,28 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
   public BookDaoImpl() {}
 
   @Override
-  public void persist(Book book) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(book);
-    entityManager.getTransaction().commit();
+  public int persist(Book book) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.persist(book);
+    session.getTransaction().commit();
+    return book.getId();
   }
 
   @Override
   public List<Book> getBooks() {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Book> query = builder.createQuery(Book.class);
     query.from(Book.class);
-    List<Book> books = entityManager.createQuery(query).getResultList();
-    return books;
+    return session.createQuery(query).getResultList();
   }
 
   @Override
   public List<Book> searchBooks(
       String title, Integer volume, Integer edition, List<Author> authors) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Book> query = builder.createQuery(Book.class);
     Root<Book> root = query.from(Book.class);
     List<Predicate> predicates = new ArrayList<>();
@@ -58,46 +58,45 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
       // TODO: fix
     }
     query.where(predicates.toArray(new Predicate[] {}));
-    List<Book> books = entityManager.createQuery(query).getResultList();
-    return books;
+    return session.createQuery(query).getResultList();
   }
 
   @Override
   public Optional<Book> getBookById(int id) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Book> query = builder.createQuery(Book.class);
     Root<Book> root = query.from(Book.class);
     query.where(builder.equal(root.get(Book_.id), id));
-    List<Book> books = entityManager.createQuery(query).getResultList();
+    List<Book> books = session.createQuery(query).getResultList();
     return books.isEmpty() ? Optional.empty() : Optional.of(books.get(0));
   }
 
   @Override
   public void merge(Book book) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.merge(book);
-    entityManager.getTransaction().commit();
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.merge(book);
+    session.getTransaction().commit();
   }
 
   @Override
   public void delete(Book book) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.remove(entityManager.contains(book) ? book : entityManager.merge(book));
-    entityManager.getTransaction().commit();
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.remove(session.contains(book) ? book : session.merge(book));
+    session.getTransaction().commit();
   }
 
   @Override
-  public void deleteByTitle(Book book) throws Exception {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public void deleteById(int id) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<Book> delete = builder.createCriteriaDelete(Book.class);
     Root<Book> root = delete.from(Book.class);
-    delete.where(builder.equal(root.get(Book_.title), book.getTitle()));
-    entityManager.createQuery(delete).executeUpdate();
-    entityManager.getTransaction().commit();
+    delete.where(builder.equal(root.get(Book_.title), id));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
   }
 }

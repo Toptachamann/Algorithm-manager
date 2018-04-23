@@ -6,25 +6,27 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParadigmDao {
-  void persist(DesignParadigm paradigm) throws Exception;
+  int persist(DesignParadigm paradigm) throws Exception;
 
   List<DesignParadigm> getAllParadigms() throws Exception;
 
   Optional<DesignParadigm> getParadigmById(int id) throws Exception;
 
-  Optional<DesignParadigm> getParadigmByParadigm(String paradigm) throws Exception;
+  Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
 
-  default boolean containsParadigm(DesignParadigm paradigm) throws Exception {
-    return getParadigmById(paradigm.getId()).isPresent();
+  default boolean containsParadigmWithId(int id) throws Exception {
+    return getParadigmById(id).isPresent();
   }
 
   default boolean containsParadigmWithName(String name) throws Exception {
-    return getParadigmByParadigm(name).isPresent();
+    return getParadigmByName(name).isPresent();
   }
 
   void merge(DesignParadigm paradigm) throws Exception;
 
   void delete(DesignParadigm paradigm) throws Exception;
 
-  void deleteByParadigm(DesignParadigm paradigm) throws Exception;
+  void deleteByName(String name) throws Exception;
+
+  void deleteById(int id) throws Exception;
 }

@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
+public class AuthorDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(AuthorDaoImpl.class);
 
   private PreparedStatement getAuthorByName;
@@ -31,7 +31,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
             "DELETE FROM algorithms.author WHERE algorithms.author.first_name = ? and algorithms.author.last_name = ?");
   }
 
-  @Override
+  
   public Optional<Author> getAuthor(String firstName, String lastName) throws SQLException {
     getAuthorByName.setString(1, firstName);
     getAuthorByName.setString(2, lastName);
@@ -42,7 +42,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
         : Optional.empty();
   }
 
-  @Override
+  
   public void persist(Author author) throws SQLException {
     try {
       insertAuthor.setString(1, author.getFirstName());
@@ -59,7 +59,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
     }
   }
 
-  @Override
+  
   public void deleteById(Author author) throws Exception {
     try {
       deleteAuthor.setInt(1, author.getId());
@@ -74,7 +74,7 @@ public class AuthorDaoImpl extends AbstractDao implements AuthorDao {
     }
   }
 
-  @Override
+  
   public void deleteByFullName(Author author) throws Exception {
     try {
       deleteByFullName.setString(1, author.getFirstName());

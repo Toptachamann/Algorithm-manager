@@ -21,8 +21,6 @@ class AlgorithmDaoImplTest extends Specification {
   @Shared
   def fieldDao = new FieldDaoImpl()
   @Shared
-  def jdbcDao = new com.algorithm.manager.dao.jdbc.AlgorithmDaoImpl()
-  @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.AlgorithmDaoImpl()
 
   def setup() {
@@ -30,9 +28,9 @@ class AlgorithmDaoImplTest extends Specification {
     field = new FieldOfStudy("Test field of study")
     algorithm = new Algorithm("test name", "test complexity", paradigm, field)
 
-    hibernateDao.deleteByName(algorithm)
-    paradigmDao.deleteByParadigm(paradigm)
-    fieldDao.deleteByField(field)
+    hibernateDao.deleteByName(algorithm.getName())
+    paradigmDao.deleteByName(paradigm.getName())
+    fieldDao.deleteByName(field.getName())
 
     paradigmDao.persist(paradigm)
     fieldDao.persist(field)
@@ -48,26 +46,26 @@ class AlgorithmDaoImplTest extends Specification {
     setup:
     algorithmDao.persist(algorithm)
     expect:
-    algorithmDao.containsAlgorithm(algorithm.getName())
+    algorithmDao.containsAlgorithmWithName(algorithm.getName())
     def optCreated = algorithmDao.getAlgorithmByName(algorithm.getName())
     optCreated.isPresent()
     def created = optCreated.get()
     created == algorithm
     cleanup:
-    algorithmDao.deleteById(algorithm)
+    algorithmDao.delete(algorithm)
     where:
-    algorithmDao << [hibernateDao, jdbcDao]
+    algorithmDao << [hibernateDao]
   }
 
   @Unroll
   def "test algorithm deletion"() {
     setup:
     algorithmDao.persist(algorithm)
-    algorithmDao.deleteById(algorithm)
+    algorithmDao.delete(algorithm)
     expect:
-    !algorithmDao.containsAlgorithm(algorithm.getName())
+    !algorithmDao.containsAlgorithmWithName(algorithm.getName())
     where:
-    algorithmDao << [hibernateDao, jdbcDao]
+    algorithmDao << [hibernateDao]
   }
 
   @Unroll
@@ -86,17 +84,17 @@ class AlgorithmDaoImplTest extends Specification {
     algorithm.setFieldOfStudy(updatedField)
     algorithmDao.merge(algorithm)
     expect:
-    !algorithmDao.containsAlgorithm(oldName)
-    algorithmDao.containsAlgorithm("Test updated name")
+    !algorithmDao.containsAlgorithmWithName(oldName)
+    algorithmDao.containsAlgorithmWithName("Test updated name")
     def optCreated = algorithmDao.getAlgorithmByName("Test updated name")
     optCreated.isPresent()
     def created = optCreated.get()
     created == algorithm
     cleanup:
-    algorithmDao.deleteById(algorithm)
+    algorithmDao.delete(algorithm)
     paradigmDao.delete(updatedParadigm)
     fieldDao.delete(updatedField)
     where:
-    algorithmDao << [hibernateDao, jdbcDao]
+    algorithmDao << [hibernateDao]
   }
 }

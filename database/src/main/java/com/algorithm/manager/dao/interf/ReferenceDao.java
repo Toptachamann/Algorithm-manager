@@ -5,19 +5,24 @@ import com.algorithm.manager.model.Book;
 import com.algorithm.manager.model.Reference;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ReferenceDao {
 
-  void persist(Reference reference) throws Exception;
+  int persist(Reference reference) throws Exception;
 
-  Optional<Reference> getReference(Algorithm algorithm, Book book) throws Exception;
+  List<Reference> getReferences(Algorithm algorithm, Book book) throws Exception;
 
   default boolean containsReference(Algorithm algorithm, Book book) throws Exception {
-    return getReference(algorithm, book).isPresent();
+    return !getReferences(algorithm, book).isEmpty();
   }
 
   List<Reference> getAlgorithmReferences(Algorithm algorithm) throws Exception;
 
+  List<Reference> getReferencesInBook(Book book) throws Exception;
+
   void delete(Reference reference) throws Exception;
+
+  void deleteById(int id) throws Exception;
+
+  void deleteReferences(Algorithm algorithm, Book book) throws Exception;
 }

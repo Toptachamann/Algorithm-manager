@@ -25,15 +25,15 @@
     <bean id="jdbcAbstractDao" class="com.algorithm.manager.dao.jdbc.AbstractDao" abstract="true"
           destroy-method="cleanUp"/>
 
-    <bean id="jdbcAlgorithmDao" class="com.algorithm.manager.dao.jdbc.AlgorithmDaoImpl" parent="hibernateAbstractDao"/>
-    <bean id="jdbcParadigmDao" class="com.algorithm.manager.dao.jdbc.ParadigmDaoImpl" parent="hibernateAbstractDao"/>
-    <bean id="jdbcFieldDao" class="com.algorithm.manager.dao.jdbc.FieldDaoImpl" parent="hibernateAbstractDao"/>
-    <bean id="jdbcAreaDao" class="com.algorithm.manager.dao.jdbc.AreaDaoImpl" parent="hibernateAbstractDao"/>
+    <!--<bean id="jdbcAlgorithmDao" class="com.algorithm.manager.dao.jdbc.AlgorithmDaoImpl" parent="jdbcAbstractDao"/>
+    <bean id="jdbcParadigmDao" class="com.algorithm.manager.dao.jdbc.ParadigmDaoImpl" parent="jdbcAbstractDao"/>
+    <bean id="jdbcFieldDao" class="com.algorithm.manager.dao.jdbc.FieldDaoImpl" parent="jdbcAbstractDao"/>
+    <bean id="jdbcAreaDao" class="com.algorithm.manager.dao.jdbc.AreaDaoImpl" parent="jdbcAbstractDao"/>
     <bean id="jdbcApplicationDao" class="com.algorithm.manager.dao.jdbc.ApplicationDaoImpl"
-          parent="hibernateAbstractDao"/>
-    <bean id="jdbcBookDao" class="com.algorithm.manager.dao.jdbc.BookDaoImpl" parent="hibernateAbstractDao"/>
-    <bean id="jdbcAuthorDao" class="com.algorithm.manager.dao.jdbc.AuthorDaoImpl" parent="hibernateAbstractDao"/>
-    <bean id="jdbcReferenceDao" class="com.algorithm.manager.dao.jdbc.ReferenceDaoImpl" parent="hibernateAbstractDao"/>
+          parent="jdbcAbstractDao"/>
+    <bean id="jdbcBookDao" class="com.algorithm.manager.dao.jdbc.BookDaoImpl" parent="jdbcAbstractDao"/>
+    <bean id="jdbcAuthorDao" class="com.algorithm.manager.dao.jdbc.AuthorDaoImpl" parent="jdbcAbstractDao"/>
+    <bean id="jdbcReferenceDao" class="com.algorithm.manager.dao.jdbc.ReferenceDaoImpl" parent="jdbcAbstractDao"/>-->
 
     <bean id="algorithmService" class="com.algorithm.manager.service.AlgorithmServiceImpl">
         <constructor-arg name="algorithmDao" ref="hibernateAlgorithmDao"/>

@@ -35,10 +35,10 @@ public interface AlgorithmService {
 
   List<DesignParadigm> getDesignParadigms() throws Exception;
 
-  Optional<DesignParadigm> getParadigmByName(String name) throws Exception;
+  Optional<DesignParadigm> getDesignParadigmByName(String name) throws Exception;
 
   default boolean containsParadigm(DesignParadigm paradigm) throws Exception {
-    return getParadigmByName(paradigm.getParadigm()).isPresent();
+    return getDesignParadigmByName(paradigm.getName()).isPresent();
   }
 
   DesignParadigm createDesignParadigm(String paradigmName) throws Exception;
@@ -49,10 +49,10 @@ public interface AlgorithmService {
 
   List<FieldOfStudy> getAllFieldsOfStudy() throws Exception;
 
-  Optional<FieldOfStudy> getFieldByName(String name) throws Exception;
+  Optional<FieldOfStudy> getFieldOfStudyByName(String name) throws Exception;
 
   default boolean containsField(FieldOfStudy fieldOfStudy) throws Exception {
-    return getParadigmByName(fieldOfStudy.getField()).isPresent();
+    return getDesignParadigmByName(fieldOfStudy.getName()).isPresent();
   }
 
   FieldOfStudy createFieldOfStudy(String fieldName) throws Exception;

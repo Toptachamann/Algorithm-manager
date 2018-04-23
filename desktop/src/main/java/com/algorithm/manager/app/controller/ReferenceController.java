@@ -305,7 +305,7 @@ public class ReferenceController extends AbstractController {
         new StringConverter<AreaOfUse>() {
           @Override
           public String toString(AreaOfUse areaOfUse) {
-            return areaOfUse == null ? null : areaOfUse.getAreaOfUse();
+            return areaOfUse == null ? null : areaOfUse.getName();
           }
 
           @Override
@@ -313,7 +313,7 @@ public class ReferenceController extends AbstractController {
             return areaOfUseCB
                 .getItems()
                 .stream()
-                .filter(a -> string.equalsIgnoreCase(a.getAreaOfUse()))
+                .filter(a -> string.equalsIgnoreCase(a.getName()))
                 .findFirst()
                 .orElse(null);
           }
@@ -358,7 +358,7 @@ public class ReferenceController extends AbstractController {
         a ->
             values.add(
                 "\t"
-                    + a.getAreaOfUse().getAreaOfUse()
+                    + a.getAreaOfUse().getName()
                     + (StringUtils.isBlank(a.getAreaOfUse().getDescription())
                         ? ""
                         : "\n\t\t(" + a.getAreaOfUse().getDescription() + ")")));
@@ -368,7 +368,7 @@ public class ReferenceController extends AbstractController {
   private void displayAlgorithms(AreaOfUse area, List<Application> algorithms) {
     ObservableList<String> values = FXCollections.observableArrayList();
     values.add(
-        area.getAreaOfUse()
+        area.getName()
             + (area.getDescription() == null ? " " : " (" + area.getDescription() + ") (")
             + (algorithms.size() == 0
                 ? "has no connected algorithms yet"
@@ -428,7 +428,7 @@ public class ReferenceController extends AbstractController {
   private void loadAreas() throws Exception {
     ObservableList<AreaOfUse> areas =
         FXCollections.observableArrayList(algorithmService.getAllAreas());
-    areas.sort((a, b) -> a.getAreaOfUse().compareToIgnoreCase(b.getAreaOfUse()));
+    areas.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
     areaOfUseCB.setItems(areas);
   }
 

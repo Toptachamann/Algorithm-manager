@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class BookDaoImpl extends AbstractDao implements BookDao {
+public class BookDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger("BookDaoImpl");
 
   private PreparedStatement createBook;
@@ -60,7 +60,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
         connection.prepareStatement("DELETE FROM algorithms.book WHERE algorithms.book.title = ?");
   }
 
-  @Override
+  
   public void persist(Book book) throws SQLException {
     try {
       createBook.setString(1, book.getTitle());
@@ -82,13 +82,13 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
+  
   public List<Book> getBooks() throws SQLException {
     logger.debug(() -> Util.format(allBooks));
     return booksFromSet(allBooks.executeQuery());
   }
 
-  @Override
+  
   public List<Book> searchBooks(String title, Integer volume, Integer edition, List<Author> authors)
       throws SQLException {
     StringBuilder builder = new StringBuilder();
@@ -144,7 +144,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
+  
   public Optional<Book> getBookById(int id) throws SQLException {
     bookById.setInt(1, id);
     logger.debug(() -> Util.format(bookById));
@@ -162,7 +162,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
+  
   public void merge(Book book) throws SQLException {
     try {
       mergeBook.setString(1, book.getTitle());
@@ -185,7 +185,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
+  
   public void delete(Book book) throws SQLException {
     try {
       deleteBook.setInt(1, book.getId());
@@ -200,7 +200,7 @@ public class BookDaoImpl extends AbstractDao implements BookDao {
     }
   }
 
-  @Override
+  
   public void deleteByTitle(Book book) throws Exception {
     try {
       deleteByTitle.setString(1, book.getTitle());

@@ -21,25 +21,25 @@ public class AreaOfUse {
   private int id;
 
   @Column(name = "area", length = 50, nullable = false, unique = true)
-  private String areaOfUse;
+  private String name;
 
   @Column(name = "description")
   private String description;
 
-  public AreaOfUse(String areaOfUse, String description) {
-    this.areaOfUse = areaOfUse;
+  public AreaOfUse(String name, String description) {
+    this.name = name;
     this.description = description;
   }
 
-  public AreaOfUse(int id, String areaOfUse) {
+  public AreaOfUse(int id, String name) {
     this.id = id;
-    this.areaOfUse = areaOfUse;
+    this.name = name;
   }
 
-  public AreaOfUse(int id, String areaOfUse, String description) {
+  public AreaOfUse(int id, String name, String description) {
 
     this.id = id;
-    this.areaOfUse = areaOfUse;
+    this.name = name;
     this.description = description;
   }
 
@@ -53,7 +53,7 @@ public class AreaOfUse {
 
     return new EqualsBuilder()
         .append(id, areaOfUse1.id)
-        .append(areaOfUse, areaOfUse1.areaOfUse)
+        .append(name, areaOfUse1.name)
         .append(description, areaOfUse1.description)
         .isEquals();
   }
@@ -62,13 +62,13 @@ public class AreaOfUse {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(id)
-        .append(areaOfUse)
+        .append(name)
         .append(description)
         .toHashCode();
   }
 
-  public AreaOfUse(String areaOfUse) {
-    this.areaOfUse = areaOfUse;
+  public AreaOfUse(String name) {
+    this.name = name;
   }
 
   public AreaOfUse() {}
@@ -77,7 +77,7 @@ public class AreaOfUse {
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
-        .append("areaOfUse", areaOfUse)
+        .append("areaOfUse", name)
         .append("description", description)
         .toString();
   }
@@ -90,12 +90,12 @@ public class AreaOfUse {
     this.id = id;
   }
 
-  public String getAreaOfUse() {
-    return areaOfUse;
+  public String getName() {
+    return name;
   }
 
-  public void setAreaOfUse(String areaOfUse) {
-    this.areaOfUse = areaOfUse;
+  public void setName(String areaOfUse) {
+    this.name = areaOfUse;
   }
 
   public String getDescription() {

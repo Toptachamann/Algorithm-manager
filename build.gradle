@@ -5,74 +5,93 @@ version '0.2.0'
 
 
 subprojects {
-    apply plugin: 'groovy'
-    apply plugin: 'java'
+  apply plugin: 'groovy'
+  apply plugin: 'java'
 
-    dependencies {
-        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-        // https://mvnrepository.com/artifact/com.intellij/annotations
-        compile group: 'com.intellij', name: 'annotations', version: '12.0'
-        // https://mvnrepository.com/artifact/org.springframework/spring-context
-        compile group: 'org.springframework', name: 'spring-context', version: '5.0.4.RELEASE'
-        // https://mvnrepository.com/artifact/org.spockframework/spock-core
-        testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
-        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
-        compile 'org.codehaus.groovy:groovy-all:2.3.11'
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-    }
+  dependencies {
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    // https://mvnrepository.com/artifact/com.intellij/annotations
+    compile group: 'com.intellij', name: 'annotations', version: '12.0'
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    compile group: 'org.springframework', name: 'spring-context', version: '5.0.4.RELEASE'
+    // https://mvnrepository.com/artifact/org.spockframework/spock-core
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+  }
 
-    repositories {
-        mavenCentral()
-    }
+  repositories {
+    mavenCentral()
+  }
 }
 
 project(':database') {
-    version '0.2.0'
-    dependencies {
-        // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-        compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
-        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
-        compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.5.RELEASE'
-        // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
-        compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.12.Final'
-        // https://mvnrepository.com/artifact/org.hibernate/hibernate-jpamodelgen
-        compile group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.2.10.Final'
-    }
+  version '0.2.0'
+  dependencies {
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.5'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.5'
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.5.RELEASE'
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.12.Final'
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-jpamodelgen
+    compile group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.2.10.Final'
+  }
 }
 
 project(':desktop') {
-    apply plugin: 'application'
-    version '0.2.0'
-    mainClassName = "com.algorithm.manager.app.App"
-    dependencies {
-        compile project(':database')
-        testCompile project(':database')
-    }
+  apply plugin: 'application'
+  version '0.2.0'
+  mainClassName = "com.algorithm.manager.app.App"
+  dependencies {
+    compile project(':database')
+    testCompile project(':database')
+  }
 
-    jar {
-        manifest {
-            attributes(
-                    'Main-Class': 'com.algorithm.manager.app.App'
-            )
-        }
-        baseName = project.name
-        version = project.version
-        println project.version
-        from {
-            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-        }
+  jar {
+    manifest {
+      attributes(
+          'Main-Class': 'com.algorithm.manager.app.App'
+      )
     }
+    baseName = project.name
+    version = project.version
+    from {
+      configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+  }
 }
 
 project('web') {
-    version '0.2.0'
-    apply plugin: 'application'
-    apply plugin: 'war'
+  version '0.2.0'
+  apply plugin: 'application'
+  apply plugin: 'war'
 
-    mainClassName = "Main"
-    dependencies {
-        compile project(':database')
-    }
+  mainClassName = "Main"
+
+  dependencies {
+    compile project(':database')
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.5'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.5'
+    // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+    compile group: 'org.springframework', name: 'spring-webmvc', version: '5.0.5.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework/spring-web
+    compile group: 'org.springframework', name: 'spring-web', version: '5.0.5.RELEASE'
+    // https://mvnrepository.com/artifact/javax.servlet/servlet-api
+    compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+  }
 }
+

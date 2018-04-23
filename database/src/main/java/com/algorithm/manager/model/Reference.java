@@ -12,7 +12,7 @@ public class Reference {
   @Id
   @Column(name = "reference_id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int referenceId;
+  private int id;
 
   @ManyToOne(
     cascade = {CascadeType.REFRESH},
@@ -40,8 +40,8 @@ public class Reference {
 
   public Reference() {}
 
-  public Reference(int referenceId, Algorithm algorithm, Book book) {
-    this.referenceId = referenceId;
+  public Reference(int id, Algorithm algorithm, Book book) {
+    this.id = id;
     this.algorithm = algorithm;
     this.book = book;
   }
@@ -54,7 +54,7 @@ public class Reference {
   @Override
   public String toString() {
     return new ToStringBuilder(this)
-        .append("referenceId", referenceId)
+        .append("referenceId", id)
         .append("algorithm", algorithm)
         .append("bookId", book)
         .toString();
@@ -69,7 +69,7 @@ public class Reference {
     Reference reference = (Reference) o;
 
     return new EqualsBuilder()
-        .append(referenceId, reference.referenceId)
+        .append(id, reference.id)
         .append(algorithm, reference.algorithm)
         .append(book, reference.book)
         .isEquals();
@@ -78,19 +78,19 @@ public class Reference {
   @Override
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
-        .append(referenceId)
+        .append(id)
         .append(algorithm)
         .append(book)
         .toHashCode();
   }
 
-  public int getReferenceId() {
+  public int getId() {
 
-    return referenceId;
+    return id;
   }
 
-  public void setReferenceId(int referenceId) {
-    this.referenceId = referenceId;
+  public void setId(int referenceId) {
+    this.id = referenceId;
   }
 
   public Algorithm getAlgorithm() {

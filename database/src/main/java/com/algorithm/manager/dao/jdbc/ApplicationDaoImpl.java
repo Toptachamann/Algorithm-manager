@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.ApplicationDao;
 import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.Application;
 import com.algorithm.manager.model.AreaOfUse;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
+public class ApplicationDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(ApplicationDaoImpl.class);
 
   private PreparedStatement createApp;
@@ -72,14 +71,14 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
                 + "INNER JOIN area_of_use ON areas.app_area_id = area_id");
   }
 
-  @Override
+  
   public void persist(Application application) throws SQLException {
     try {
       createApp.setInt(1, application.getAlgorithm().getId());
       createApp.setInt(2, application.getAreaOfUse().getId());
       logger.debug(() -> Util.format(createApp));
       createApp.executeUpdate();
-      application.setApplicationId(getLastId(connection));
+      application.setId(getLastId(connection));
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
@@ -89,7 +88,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     }
   }
 
-  @Override
+  
   public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse)
       throws SQLException {
     try {
@@ -108,7 +107,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     }
   }
 
-  @Override
+  
   public void delete(Application application) throws SQLException {
     try {
       deleteApplication.setInt(1, application.getAlgorithm().getId());
@@ -125,7 +124,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     }
   }
 
-  @Override
+  
   public List<Application> getApplicationsByArea(AreaOfUse area) throws SQLException {
     try {
       getApplicationsByArea.setInt(1, area.getId());
@@ -150,7 +149,7 @@ public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
     }
   }
 
-  @Override
+  
   public List<Application> getApplicationsByAlgorithm(Algorithm algorithm) throws Exception {
     try {
       getApplicationsByAlgorithm.setInt(1, algorithm.getId());

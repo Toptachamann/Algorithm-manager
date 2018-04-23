@@ -1,7 +1,6 @@
 package com.algorithm.manager.dao.jdbc;
 
 import com.algorithm.manager.auxiliary.Util;
-import com.algorithm.manager.dao.interf.FieldDao;
 import com.algorithm.manager.model.FieldOfStudy;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FieldDaoImpl extends AbstractDao implements FieldDao {
+public class FieldDaoImpl extends AbstractDao {
   private static final Logger logger = LogManager.getLogger(FieldDaoImpl.class);
 
   private PreparedStatement createField;
@@ -42,10 +41,9 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
             "DELETE FROM algorithms.field_of_study WHERE algorithms.field_of_study.field = ?");
   }
 
-  @Override
   public void persist(FieldOfStudy fieldOfStudy) throws SQLException {
     try {
-      createField.setString(1, fieldOfStudy.getField());
+      createField.setString(1, fieldOfStudy.getName());
       if (fieldOfStudy.getDescription() == null) {
         createField.setNull(2, Types.VARCHAR);
       } else {
@@ -63,7 +61,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     }
   }
 
-  @Override
   public List<FieldOfStudy> getAllFieldsOfStudy() throws SQLException {
     logger.debug(() -> Util.format(allFieldsOfStudy));
     ResultSet result = allFieldsOfStudy.executeQuery();
@@ -74,7 +71,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     return fields;
   }
 
-  @Override
   public Optional<FieldOfStudy> getFieldByName(String name) throws SQLException {
     getFieldByName.setString(1, name);
     logger.debug(() -> Util.format(getFieldByName));
@@ -86,7 +82,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     }
   }
 
-  @Override
   public Optional<FieldOfStudy> getFieldById(int id) throws SQLException {
     getFieldById.setInt(1, id);
     logger.debug(() -> Util.format(getFieldById));
@@ -98,13 +93,16 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     }
   }
 
-  @Override
+  private boolean containsFieldOfStudy(FieldOfStudy fieldOfStudy) throws SQLException {
+    return getFieldById(fieldOfStudy.getId()).isPresent();
+  }
+
   public void merge(FieldOfStudy fieldOfStudy) throws Exception {
     if (!containsFieldOfStudy(fieldOfStudy)) {
       persist(fieldOfStudy);
     } else {
       try {
-        merge.setString(1, fieldOfStudy.getField());
+        merge.setString(1, fieldOfStudy.getName());
         merge.setString(2, fieldOfStudy.getDescription());
         merge.setInt(3, fieldOfStudy.getId());
         logger.debug(() -> Util.format(merge));
@@ -119,7 +117,6 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     }
   }
 
-  @Override
   public void delete(FieldOfStudy fieldOfStudy) throws Exception {
     try {
       deleteFieldById.setInt(1, fieldOfStudy.getId());
@@ -134,10 +131,9 @@ public class FieldDaoImpl extends AbstractDao implements FieldDao {
     }
   }
 
-  @Override
   public void deleteByField(FieldOfStudy fieldOfStudy) throws Exception {
     try {
-      deleteByField.setString(1, fieldOfStudy.getField());
+      deleteByField.setString(1, fieldOfStudy.getName());
       logger.debug(() -> Util.format(deleteByField));
       deleteByField.executeUpdate();
       connection.commit();

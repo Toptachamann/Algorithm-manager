@@ -20,33 +20,33 @@ public class FieldOfStudy {
   private int id;
 
   @Column(name = "field", nullable = false, unique = true, length = 50)
-  private String field;
+  private String name;
   @Column(name = "description")
   private String description;
 
-  public FieldOfStudy(String field) {
-    this.field = field;
+  public FieldOfStudy(String name) {
+    this.name = name;
   }
 
-  public FieldOfStudy(String field, String description) {
+  public FieldOfStudy(String name, String description) {
 
-    this.field = field;
+    this.name = name;
     this.description = description;
   }
 
-  public FieldOfStudy(int id, String field, String description) {
+  public FieldOfStudy(int id, String name, String description) {
 
     this.id = id;
-    this.field = field;
+    this.name = name;
     this.description = description;
   }
 
   public FieldOfStudy() {}
 
-  public FieldOfStudy(int id, String field) {
+  public FieldOfStudy(int id, String name) {
 
     this.id = id;
-    this.field = field;
+    this.name = name;
   }
 
   @Override
@@ -59,7 +59,7 @@ public class FieldOfStudy {
 
     return new EqualsBuilder()
         .append(id, that.id)
-        .append(field, that.field)
+        .append(name, that.name)
         .append(description, that.description)
         .isEquals();
   }
@@ -68,7 +68,7 @@ public class FieldOfStudy {
   public int hashCode() {
     return new HashCodeBuilder(17, 37)
         .append(id)
-        .append(field)
+        .append(name)
         .append(description)
         .toHashCode();
   }
@@ -81,12 +81,12 @@ public class FieldOfStudy {
     this.id = id;
   }
 
-  public String getField() {
-    return field;
+  public String getName() {
+    return name;
   }
 
-  public void setField(String field) {
-    this.field = field;
+  public void setName(String field) {
+    this.name = field;
   }
 
   public String getDescription() {
@@ -101,7 +101,7 @@ public class FieldOfStudy {
   public String toString() {
     return new ToStringBuilder(this)
         .append("id", id)
-        .append("field", field)
+        .append("field", name)
         .append("description", description)
         .toString();
   }

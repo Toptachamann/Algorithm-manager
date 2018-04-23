@@ -58,7 +58,7 @@ public class AlgorithmController extends AbstractController {
         new StringConverter<DesignParadigm>() {
           @Override
           public String toString(DesignParadigm object) {
-            return object == null ? null : object.getParadigm();
+            return object == null ? null : object.getName();
           }
 
           @Override
@@ -66,7 +66,7 @@ public class AlgorithmController extends AbstractController {
             return designParadigmCB
                 .getItems()
                 .stream()
-                .filter(dp -> StringUtils.equalsIgnoreCase(dp.getParadigm(), string))
+                .filter(dp -> StringUtils.equalsIgnoreCase(dp.getName(), string))
                 .findFirst()
                 .orElse(null);
           }
@@ -75,7 +75,7 @@ public class AlgorithmController extends AbstractController {
         new StringConverter<FieldOfStudy>() {
           @Override
           public String toString(FieldOfStudy object) {
-            return object == null ? null : object.getField();
+            return object == null ? null : object.getName();
           }
 
           @Override
@@ -83,7 +83,7 @@ public class AlgorithmController extends AbstractController {
             return fieldOfStudyCB
                 .getItems()
                 .stream()
-                .filter(fos -> StringUtils.equalsIgnoreCase(fos.getField(), string))
+                .filter(fos -> StringUtils.equalsIgnoreCase(fos.getName(), string))
                 .findFirst()
                 .orElse(null);
           }
@@ -279,7 +279,7 @@ public class AlgorithmController extends AbstractController {
                 if (empty || item == null) {
                   setText(null);
                 } else {
-                  setText(item.getParadigm());
+                  setText(item.getName());
                 }
               }
             });
@@ -292,7 +292,7 @@ public class AlgorithmController extends AbstractController {
                 if (empty || item == null) {
                   setText(null);
                 } else {
-                  setText(item.getField());
+                  setText(item.getName());
                 }
               }
             });
@@ -461,7 +461,7 @@ public class AlgorithmController extends AbstractController {
           setGraphic(textField);
         } else {
           setGraphic(null);
-          setText(item.getField());
+          setText(item.getName());
         }
       }
     }
@@ -480,7 +480,7 @@ public class AlgorithmController extends AbstractController {
     @Override
     public void commitEdit(FieldOfStudy newValue) {
       super.commitEdit(newValue);
-      if (StringUtils.isBlank(newValue.getField())) {
+      if (StringUtils.isBlank(newValue.getName())) {
         info("Algorithm's field of study can't be blank");
         algorithmTableView.refresh();
       } else {
@@ -493,7 +493,7 @@ public class AlgorithmController extends AbstractController {
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");
           error.showAndWait();
-          setText(getItem().getField());
+          setText(getItem().getName());
           setGraphic(null);
           algorithmTableView.refresh();
         }
@@ -509,7 +509,7 @@ public class AlgorithmController extends AbstractController {
 
     private String getString() {
       FieldOfStudy item = getItem();
-      return item == null ? "None" : item.getField();
+      return item == null ? "None" : item.getName();
     }
   }
 
@@ -551,7 +551,7 @@ public class AlgorithmController extends AbstractController {
           setGraphic(textField);
         } else {
           setGraphic(null);
-          setText(item.getParadigm());
+          setText(item.getName());
         }
       }
     }
@@ -571,7 +571,7 @@ public class AlgorithmController extends AbstractController {
     public void commitEdit(DesignParadigm newValue) {
       logger.trace("Committing changes, new value {}", newValue);
       super.commitEdit(newValue);
-      if (StringUtils.isBlank(newValue.getParadigm())) {
+      if (StringUtils.isBlank(newValue.getName())) {
         info("Algorithm's design paradigm can't be blank");
         algorithmTableView.refresh();
       } else {
@@ -583,7 +583,7 @@ public class AlgorithmController extends AbstractController {
           error.setContentText(
               "Algorithm's design paradigm wasn't changed due to some internal error.\n"
                   + "See logs for details.");
-          setText(getItem().getParadigm());
+          setText(getItem().getName());
           setGraphic(null);
           algorithmTableView.refresh();
         }
@@ -599,7 +599,7 @@ public class AlgorithmController extends AbstractController {
 
     private String getString() {
       DesignParadigm item = getItem();
-      return item == null ? "None" : item.getParadigm();
+      return item == null ? "None" : item.getName();
     }
   }
 }

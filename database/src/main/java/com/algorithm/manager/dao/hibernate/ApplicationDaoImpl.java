@@ -5,68 +5,89 @@ import com.algorithm.manager.model.Algorithm;
 import com.algorithm.manager.model.Application;
 import com.algorithm.manager.model.Application_;
 import com.algorithm.manager.model.AreaOfUse;
+import org.hibernate.Session;
 
-import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
-import java.util.Optional;
 
 public class ApplicationDaoImpl extends AbstractDao implements ApplicationDao {
-  public ApplicationDaoImpl() {
+
+  @Override
+  public int persist(Application application) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.saveOrUpdate(application);
+    session.getTransaction().commit();
+    return application.getId();
   }
 
   @Override
-  public void persist(Application application) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.persist(application);
-    entityManager.getTransaction().commit();
-  }
-
-  @Override
-  public Optional<Application> getApplicationOf(Algorithm algorithm, AreaOfUse areaOfUse) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public List<Application> getApplicationsOf(Algorithm algorithm, AreaOfUse areaOfUse) {
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
     Root<Application> root = query.from(Application.class);
     query.where(
         builder.and(
             builder.equal(root.get(Application_.algorithm), algorithm),
             builder.equal(root.get(Application_.areaOfUse), areaOfUse)));
-    List<Application> result = entityManager.createQuery(query).getResultList();
-    return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
-  }
-
-  @Override
-  public void delete(Application application) {
-    EntityManager entityManager = getEntityManager();
-    entityManager.getTransaction().begin();
-    entityManager.remove(entityManager.contains(application) ? application : entityManager.merge(application));
-    entityManager.getTransaction().commit();
+    return session.createQuery(query).getResultList();
   }
 
   @Override
   public List<Application> getApplicationsByArea(AreaOfUse area) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
     Root<Application> root = query.from(Application.class);
     query.where(builder.equal(root.get(Application_.areaOfUse), area));
-    List<Application> result = entityManager.createQuery(query).getResultList();
-    return result;
+    return session.createQuery(query).getResultList();
   }
 
   @Override
   public List<Application> getApplicationsByAlgorithm(Algorithm algorithm) {
-    EntityManager entityManager = getEntityManager();
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Session session = getSession();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaQuery<Application> query = builder.createQuery(Application.class);
     Root<Application> root = query.from(Application.class);
     query.where(builder.equal(root.get(Application_.algorithm), algorithm));
-    List<Application> applications = entityManager.createQuery(query).getResultList();
-    return applications;
+    return session.createQuery(query).getResultList();
+  }
+
+  @Override
+  public void delete(Application application) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    session.remove(session.contains(application) ? application : session.merge(application));
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteApplications(Algorithm algorithm, AreaOfUse areaOfUse) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaDelete<Application> delete = builder.createCriteriaDelete(Application.class);
+    Root<Application> root = delete.from(Application.class);
+    delete.where(
+        builder.and(builder.equal(root.get(Application_.algorithm), algorithm)),
+        builder.equal(root.get(Application_.areaOfUse), areaOfUse));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
+  }
+
+  @Override
+  public void deleteById(int id) {
+    Session session = getSession();
+    session.getTransaction().begin();
+    CriteriaBuilder builder = session.getCriteriaBuilder();
+    CriteriaDelete<Application> delete = builder.createCriteriaDelete(Application.class);
+    Root<Application> root = delete.from(Application.class);
+    delete.where(builder.equal(root.get(Application_.id), id));
+    session.createQuery(delete).executeUpdate();
+    session.getTransaction().commit();
   }
 }

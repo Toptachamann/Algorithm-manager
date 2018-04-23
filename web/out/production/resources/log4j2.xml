@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="warn" name="Algorithm manager" schema="">
+    <Properties>
+        <Property name="baseDir">logs</Property>
+        <Property name="trace_file_name">web.log</Property>
+        <Property name="error_file_name">web.err</Property>
+        <Property name="project_name">web</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="[%highlight{%level}] %d{HH:mm:ss,SSS}  %logger {%t} %c{1} --- %m%n"/>
+        </Console>
+        <RollingFile name="ALL" fileName="C:/Java_Projects/Algorithm manager/web/${baseDir}/${trace_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.log.zip">
+            <PatternLayout
+                    pattern="[%highlight{%level}] %d{HH:mm:ss,SSS}  %logger {%t} %c{1} --- %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="500 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+        <RollingFile name="ERROR" fileName="C:/Java_Projects/Algorithm manager/web/${baseDir}/${error_file_name}"
+                     filePattern="${baseDir}/$${date:MM-yyyy}/${project_name}-%d{dd-MM-yyyy}-%i.err.zip">
+            <PatternLayout
+                    pattern="[%highlight{%level}] %d{HH:mm:ss,SSS}  %logger {%t} %c{1} --- %m%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10" min="1" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="all">
+            <AppenderRef ref="console"/>
+        </Root>
+        <Logger name="org.springframework" level="error" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+        <Logger name="org.hibernate.type" level="trace" additivity="true">
+            <AppenderRef ref="ALL" level="ALL"/>
+            <AppenderRef ref="ERROR" level="ERROR"/>
+        </Logger>
+    </Loggers>
+</Configuration>

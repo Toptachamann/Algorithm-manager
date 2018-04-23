@@ -13,8 +13,6 @@ class ParadigmDaoImplTest extends Specification {
   @Shared
   def description = "test description"
   @Shared
-  def jdbcDao = new com.algorithm.manager.dao.jdbc.ParadigmDaoImpl()
-  @Shared
   def hibernateDao = new com.algorithm.manager.dao.hibernate.ParadigmDaoImpl()
 
   @Unroll
@@ -26,15 +24,16 @@ class ParadigmDaoImplTest extends Specification {
     expect:
     optCreated.isPresent()
     def created = optCreated.get()
-    created.getParadigm() == name
+    created.getName() == name
     created.getDescription() == null
-    paradigmDao.containsParadigm(created)
-    paradigmDao.containsParadigmWithName(created.getParadigm())
+    paradigmDao.containsParadigmWithId(created.getId())
+    paradigmDao.containsParadigmWithName(created.getName())
+    paradigmDao.containsParadigmWithName(created.getName())
     paradigm == created
     cleanup:
     paradigmDao.delete(created)
     where:
-    paradigmDao << [jdbcDao, hibernateDao]
+    paradigmDao << [hibernateDao]
   }
 
   @Unroll
@@ -46,15 +45,15 @@ class ParadigmDaoImplTest extends Specification {
     expect:
     optCreated.isPresent()
     def created = optCreated.get()
-    created.getParadigm() == name
+    created.getName() == name
     created.getDescription() == description
-    paradigmDao.containsParadigm(created)
-    paradigmDao.containsParadigmWithName(created.getParadigm())
+    paradigmDao.containsParadigmWithName(created.getName())
+    paradigmDao.containsParadigmWithName(created.getName())
     paradigm == created
     cleanup:
     paradigmDao.delete(created)
     where:
-    paradigmDao << [jdbcDao, hibernateDao]
+    paradigmDao << [hibernateDao]
   }
 
   @Unroll
@@ -64,9 +63,9 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.persist(paradigm)
     paradigmDao.delete(paradigm)
     expect:
-    !paradigmDao.containsParadigm(paradigm)
+    !paradigmDao.containsParadigmWithId(paradigm.getId())
     where:
-    paradigmDao << [jdbcDao, hibernateDao]
+    paradigmDao << [hibernateDao]
   }
 
   @Unroll
@@ -74,7 +73,7 @@ class ParadigmDaoImplTest extends Specification {
     setup:
     def paradigm = new DesignParadigm(name)
     paradigmDao.persist(paradigm)
-    paradigm.setParadigm(updatedName)
+    paradigm.setName(updatedName)
     paradigmDao.merge(paradigm)
     expect:
     !paradigmDao.containsParadigmWithName(name)
@@ -82,7 +81,7 @@ class ParadigmDaoImplTest extends Specification {
     cleanup:
     paradigmDao.delete(paradigm)
     where:
-    paradigmDao << [jdbcDao, hibernateDao]
+    paradigmDao << [hibernateDao]
   }
 
 }

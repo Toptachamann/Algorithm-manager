@@ -54,7 +54,7 @@ public class AlgorithmDaoImpl extends AbstractDao {
     try {
       createAlgorithm.setString(1, algorithm.getName());
       createAlgorithm.setString(2, algorithm.getComplexity());
-      createAlgorithm.setInt(3, algorithm.getDesignParadigm().getId());
+      createAlgorithm.setInt(3, algorithm.getDesignParadigm().getDesignParadigmId());
       createAlgorithm.setInt(4, algorithm.getFieldOfStudy().getId());
       logger.debug(() -> Util.format(createAlgorithm));
       createAlgorithm.executeUpdate();
@@ -127,7 +127,7 @@ public class AlgorithmDaoImpl extends AbstractDao {
     try {
       merge.setString(1, algorithm.getName());
       merge.setString(2, algorithm.getComplexity());
-      merge.setInt(3, algorithm.getDesignParadigm().getId());
+      merge.setInt(3, algorithm.getDesignParadigm().getDesignParadigmId());
       merge.setInt(4, algorithm.getFieldOfStudy().getId());
       merge.setInt(5, algorithm.getId());
       logger.debug(() -> Util.format(merge));

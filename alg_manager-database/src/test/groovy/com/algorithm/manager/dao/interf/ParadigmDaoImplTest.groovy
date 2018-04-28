@@ -27,7 +27,7 @@ class ParadigmDaoImplTest extends Specification {
     setup:
     def paradigm = paradigmDao.persist(name)
     expect:
-    paradigmDao.containsParadigmWithId(paradigm.getId())
+    paradigmDao.containsParadigmWithId(paradigm.getDesignParadigmId())
     cleanup:
     paradigmDao.delete(paradigm)
     where:
@@ -39,7 +39,7 @@ class ParadigmDaoImplTest extends Specification {
     setup:
     def paradigm = new DesignParadigm(name, description)
     paradigmDao.persist(paradigm)
-    def optCreated = paradigmDao.getParadigmById(paradigm.getId())
+    def optCreated = paradigmDao.getParadigmById(paradigm.getDesignParadigmId())
     expect:
     optCreated.isPresent()
     def created = optCreated.get()
@@ -83,7 +83,7 @@ class ParadigmDaoImplTest extends Specification {
   def "test get by id"() {
     setup:
     def paradigm = paradigmDao.persist(name, description)
-    def optCreated = paradigmDao.getParadigmById(paradigm.getId())
+    def optCreated = paradigmDao.getParadigmById(paradigm.getDesignParadigmId())
     expect:
     optCreated.isPresent()
     def created = optCreated.get()
@@ -165,7 +165,7 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.persist(paradigm)
     paradigmDao.delete(paradigm)
     expect:
-    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithId(paradigm.getDesignParadigmId())
     !paradigmDao.containsParadigmWithName(paradigm.getName())
     where:
     paradigmDao << [hibernateDao]
@@ -178,7 +178,7 @@ class ParadigmDaoImplTest extends Specification {
     int id = paradigmDao.persist(paradigm)
     paradigmDao.deleteById(id)
     expect:
-    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithId(paradigm.getDesignParadigmId())
     !paradigmDao.containsParadigmWithName(paradigm.getName())
     where:
     paradigmDao << [hibernateDao]
@@ -191,7 +191,7 @@ class ParadigmDaoImplTest extends Specification {
     paradigmDao.persist(paradigm)
     paradigmDao.deleteByName(paradigm.getName())
     expect:
-    !paradigmDao.containsParadigmWithId(paradigm.getId())
+    !paradigmDao.containsParadigmWithId(paradigm.getDesignParadigmId())
     !paradigmDao.containsParadigmWithName(paradigm.getName())
     where:
     paradigmDao << [hibernateDao]

@@ -1,5 +1,5 @@
-group 'com.algorithm.manager'
-version '0.2.0'
+project.group = 'com.algorithm.manager'
+project.version = '0.2.0'
 
 
 
@@ -29,7 +29,7 @@ subprojects {
 }
 
 project(':alg_manager-database') {
-  version '0.2.0'
+  //version '0.2.0'
   dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.5'
@@ -45,12 +45,14 @@ project(':alg_manager-database') {
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.12.Final'
     // https://mvnrepository.com/artifact/org.hibernate/hibernate-jpamodelgen
     compile group: 'org.hibernate', name: 'hibernate-jpamodelgen', version: '5.2.10.Final'
+    // https://mvnrepository.com/artifact/org.springframework.hateoas/spring-hateoas
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
   }
 }
 
 project('alg_manager-desktop') {
   apply plugin: 'application'
-  version '0.2.0'
+  //version '0.2.0'
   mainClassName = "com.algorithm.manager.app.App"
   dependencies {
     compile project(':alg_manager-database')
@@ -71,11 +73,11 @@ project('alg_manager-desktop') {
 }
 
 project(':alg_manager-web') {
-  version '0.2.0'
+  //version '0.2.0'
   apply plugin: 'application'
   apply plugin: 'war'
 
-  mainClassName = "Main"
+  mainClassName = "com.algorithm.manager.Main"
 
   dependencies {
     compile project(':alg_manager-database')
@@ -91,6 +93,8 @@ project(':alg_manager-web') {
     compile group: 'org.springframework', name: 'spring-web', version: '5.0.5.RELEASE'
     // https://mvnrepository.com/artifact/javax.servlet/servlet-api
     compile group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+    // https://mvnrepository.com/artifact/org.springframework.hateoas/spring-hateoas
+    compile group: 'org.springframework.hateoas', name: 'spring-hateoas', version: '0.24.0.RELEASE'
   }
 }
 

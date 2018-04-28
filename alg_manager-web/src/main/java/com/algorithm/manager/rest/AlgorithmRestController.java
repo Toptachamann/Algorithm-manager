@@ -6,6 +6,9 @@ import com.algorithm.manager.model.FieldOfStudy;
 import com.algorithm.manager.service.AlgorithmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.core.DummyInvocationUtils;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +30,7 @@ public class AlgorithmRestController {
   public ResponseEntity<List<Algorithm>> getAllAlgorithms() {
     try {
       List<Algorithm> algorithms = algorithmService.getAllAlgorithms();
+
       return new ResponseEntity<>(algorithms, HttpStatus.OK);
     } catch (Exception e) {
       e.printStackTrace();
@@ -38,9 +42,19 @@ public class AlgorithmRestController {
   public ResponseEntity<DesignParadigm> getDesignParadigmByName(@Param("name") String name) {
     try {
       Optional<DesignParadigm> optParadigm = algorithmService.getDesignParadigmByName(name);
-      return optParadigm
-          .map(designParadigm -> new ResponseEntity<>(designParadigm, HttpStatus.FOUND))
-          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+      if (optParadigm.isPresent()) {
+        DesignParadigm designParadigm = optParadigm.get();
+        Link selfLink =
+            ControllerLinkBuilder.linkTo(
+                    DummyInvocationUtils.methodOn(AlgorithmRestController.class)
+                        .getDesignParadigmByName(name))
+                .slash(designParadigm.getId())
+                .withSelfRel();
+        designParadigm.add(selfLink);
+        return new ResponseEntity<>(designParadigm, HttpStatus.FOUND);
+      } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
     } catch (Exception e) {
       e.printStackTrace();
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

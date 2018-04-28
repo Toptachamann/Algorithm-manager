@@ -46,7 +46,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
   public Algorithm persistAlgorithm(
       String name, String complexity, DesignParadigm designParadigm, FieldOfStudy fieldOfStudy)
       throws Exception {
-    Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getId());
+    Optional<DesignParadigm> paradigm = paradigmDao.getParadigmById(designParadigm.getDesignParadigmId());
     Optional<FieldOfStudy> field = fieldDao.getFieldOfStudyById(fieldOfStudy.getId());
     Optional<Algorithm> algorithm = algorithmDao.getAlgorithmByName(name.trim());
     if (!paradigm.isPresent()) {

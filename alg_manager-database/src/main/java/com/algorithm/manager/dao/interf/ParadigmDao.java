@@ -42,12 +42,12 @@ public interface ParadigmDao {
   void setDescription(int id, @Nullable String description) throws Exception;
 
   default void setName(DesignParadigm designParadigm, String name) throws Exception {
-    setName(designParadigm.getId(), name);
+    setName(designParadigm.getDesignParadigmId(), name);
     designParadigm.setName(name);
   }
 
   default void setDescription(DesignParadigm designParadigm, String description) throws Exception {
-    setDescription(designParadigm.getId(), description);
+    setDescription(designParadigm.getDesignParadigmId(), description);
     designParadigm.setDescription(description);
   }
 

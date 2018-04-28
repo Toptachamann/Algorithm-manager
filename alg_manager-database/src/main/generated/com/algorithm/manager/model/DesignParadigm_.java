@@ -10,7 +10,7 @@ public abstract class DesignParadigm_ {
 
 	public static volatile SingularAttribute<DesignParadigm, String> name;
 	public static volatile SingularAttribute<DesignParadigm, String> description;
-	public static volatile SingularAttribute<DesignParadigm, Integer> id;
+	public static volatile SingularAttribute<DesignParadigm, Integer> designParadigmId;
 
 }
 

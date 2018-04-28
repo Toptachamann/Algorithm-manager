@@ -22,7 +22,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     session.getTransaction().begin();
     session.saveOrUpdate(paradigm);
     session.getTransaction().commit();
-    return paradigm.getId();
+    return paradigm.getDesignParadigmId();
   }
 
   @Override
@@ -50,7 +50,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     List<DesignParadigm> paradigms =
         session
             .createQuery(
-                criteria.select(root).where(builder.equal(root.get(DesignParadigm_.id), id)))
+                criteria.select(root).where(builder.equal(root.get(DesignParadigm_.designParadigmId), id)))
             .getResultList();
     return paradigms.size() == 1 ? Optional.of(paradigms.get(0)) : Optional.empty();
   }
@@ -85,7 +85,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     CriteriaUpdate<DesignParadigm> update = builder.createCriteriaUpdate(DesignParadigm.class);
     Root<DesignParadigm> root = update.from(DesignParadigm.class);
     update
-        .where(builder.equal(root.get(DesignParadigm_.id), id))
+        .where(builder.equal(root.get(DesignParadigm_.designParadigmId), id))
         .set(root.get(DesignParadigm_.name), name);
     session.createQuery(update).executeUpdate();
     session.getTransaction().commit();
@@ -99,7 +99,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     CriteriaUpdate<DesignParadigm> update = builder.createCriteriaUpdate(DesignParadigm.class);
     Root<DesignParadigm> root = update.from(DesignParadigm.class);
     update
-        .where(builder.equal(root.get(DesignParadigm_.id), id))
+        .where(builder.equal(root.get(DesignParadigm_.designParadigmId), id))
         .set(root.get(DesignParadigm_.description), description);
     session.createQuery(update).executeUpdate();
     session.getTransaction().commit();
@@ -133,7 +133,7 @@ public class ParadigmDaoImpl extends AbstractDao implements ParadigmDao {
     CriteriaBuilder builder = session.getCriteriaBuilder();
     CriteriaDelete<DesignParadigm> delete = builder.createCriteriaDelete(DesignParadigm.class);
     Root<DesignParadigm> root = delete.from(DesignParadigm.class);
-    delete.where(builder.equal(root.get(DesignParadigm_.id), id));
+    delete.where(builder.equal(root.get(DesignParadigm_.designParadigmId), id));
     int rowNumber = session.createQuery(delete).executeUpdate();
     session.getTransaction().commit();
     return rowNumber;

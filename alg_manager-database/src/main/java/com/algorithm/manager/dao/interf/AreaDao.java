@@ -6,9 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AreaDao {
-  List<AreaOfUse> getAllAreas() throws Exception;
-
   int persist(AreaOfUse areaOfUse) throws Exception;
+
+  default AreaOfUse persist(String name, String description) throws Exception {
+    AreaOfUse areaOfUse = new AreaOfUse(name, description);
+    persist(areaOfUse);
+    return areaOfUse;
+  }
+
+  List<AreaOfUse> getAllAreas() throws Exception;
 
   default boolean containsAreaOfUseWithName(String name) throws Exception {
     return getAreaOfUseByName(name).isPresent();

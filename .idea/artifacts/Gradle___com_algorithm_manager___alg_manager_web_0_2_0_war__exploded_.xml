@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="Gradle : com.algorithm.manager : alg_manager-web-0.2.0.war (exploded)">
-    <output-path>$PROJECT_DIR$/alg_manager-web/build/libs/exploded/alg_manager-web-0.2.0.war</output-path>
+    <output-path />
     <properties id="gradle-properties">
       <options external-project-path="$PROJECT_DIR$">
         <manifest>TWFuaWZlc3QtVmVyc2lvbjogMS4wDQoNCg==</manifest>
@@ -57,6 +57,7 @@
           <element id="library" level="project" name="Gradle: org.springframework:spring-expression:5.0.5.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework:spring-core:5.0.5.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework:spring-jcl:5.0.5.RELEASE" />
+          <element id="file-copy" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.hateoas/spring-hateoas/0.24.0.RELEASE/b6401a781a58e0b2ab95242a553683e04300fe69/spring-hateoas-0.24.0.RELEASE.jar" />
         </element>
       </element>
     </root>

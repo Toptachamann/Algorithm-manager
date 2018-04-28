@@ -53,7 +53,7 @@ public class ParadigmDaoImpl extends AbstractDao {
       }
       logger.debug(() -> Util.format(createParadigm));
       createParadigm.executeUpdate();
-      paradigm.setId(getLastId(connection));
+      paradigm.setDesignParadigmId(getLastId(connection));
       connection.commit();
     } catch (SQLException e) {
       logger.catching(Level.ERROR, e);
@@ -86,7 +86,7 @@ public class ParadigmDaoImpl extends AbstractDao {
 
   public void delete(DesignParadigm paradigm) throws Exception {
     try {
-      deleteById.setInt(1, paradigm.getId());
+      deleteById.setInt(1, paradigm.getDesignParadigmId());
       logger.debug(() -> Util.format(deleteById));
       deleteById.executeUpdate();
       connection.commit();
@@ -110,7 +110,7 @@ public class ParadigmDaoImpl extends AbstractDao {
   }
 
   private boolean containsParadigm(DesignParadigm paradigm) throws Exception {
-    return getParadigmById(paradigm.getId()).isPresent();
+    return getParadigmById(paradigm.getDesignParadigmId()).isPresent();
   }
 
   public void merge(DesignParadigm paradigm) throws Exception {
@@ -120,7 +120,7 @@ public class ParadigmDaoImpl extends AbstractDao {
       try {
         merge.setString(1, paradigm.getName());
         merge.setString(2, paradigm.getDescription());
-        merge.setInt(3, paradigm.getId());
+        merge.setInt(3, paradigm.getDesignParadigmId());
         logger.debug(() -> Util.format(merge));
         merge.executeUpdate();
         connection.commit();
